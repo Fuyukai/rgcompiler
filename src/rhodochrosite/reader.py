@@ -59,6 +59,9 @@ class MarshalReader:
 
     custom_factories: dict[RubySymbol, CustomMakerFunc] = attrs.field(factory=dict)
 
+    object_refs: list[int] = attrs.field(factory=list)
+    inside_objlink_count: int = attrs.field(default=0)
+
     @classmethod
     def from_bytes(cls, data: bytes | bytearray, *, unwrap_strings: bool = True) -> MarshalReader:
         """
@@ -88,6 +91,12 @@ class MarshalReader:
             return data
 
         raise StreamUnexpectedlyEndedError(message + f" whilst reading {count} bytes")
+    
+    def _push_objref(self) -> None:
+        if self.inside_objlink_count >= 1:
+            return
+        
+        self.object_refs.append(self.stream.cursor - 1)
 
     def _next_type_code(self) -> RubyTypeCode:
         """
@@ -270,6 +279,7 @@ class MarshalReader:
                 return self._read_fixnum()
 
             case RubyTypeCode.Float:
+                self._push_objref()
                 return self._read_float()
 
             case RubyTypeCode.Symbol:
@@ -280,12 +290,15 @@ class MarshalReader:
 
             case RubyTypeCode.String:
                 # These are possible in the raw stream with e.g. ``Marshal.dump("abc".b)``.
+                self._push_objref()
                 return self._read_string()
 
             case RubyTypeCode.Array:
+                self._push_objref()
                 return self._read_array()
 
             case RubyTypeCode.Hash:
+                self._push_objref()
                 return self._read_hash()
 
             case RubyTypeCode.Klass:  # class
@@ -293,10 +306,23 @@ class MarshalReader:
                 return RubyClass(value=next)
 
             case RubyTypeCode.Object:  # regular object
+                self._push_objref()
                 klass_name = self._next_symbol_or_symlink()
                 return self._read_ruby_object(klass_name)
+            
+            case RubyTypeCode.ObjectLink:
+                link = self._read_fixnum()
+
+                with self.stream.with_seeked_to(self.object_refs[link]):
+                    self.inside_objlink_count += 1
+                    try:
+                        return self.next_object()
+                    finally:
+                        self.inside_objlink_count -= 1
+
 
             case RubyTypeCode.UserDefined:
+                self._push_objref()
                 klass_name = self._next_symbol_or_symlink()
                 size = self._read_fixnum()
 

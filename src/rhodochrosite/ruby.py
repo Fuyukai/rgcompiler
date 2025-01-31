@@ -56,6 +56,7 @@ class RubyTypeCode(bytes, enum.Enum):
     Instance = b"I"
     Array = b"["
     Hash = b"{"
+    ObjectLink = b"@"
     UserDefined = b"u"
 
 
