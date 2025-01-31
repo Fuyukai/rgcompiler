@@ -47,7 +47,7 @@ class MarshalWriter:
             return
 
         if -124 < number < 0:
-            self.buffer.write((number + 5).to_bytes(length=1, byteorder="little", signed=False))
+            self.buffer.write((number - 5).to_bytes(length=1, byteorder="little", signed=True))
             return
 
         size = int(math.ceil(number.bit_length() / 8.0))
