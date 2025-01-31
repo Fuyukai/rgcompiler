@@ -2,7 +2,7 @@ import pytest
 
 from rhodochrosite.exc import NotAMarshalFile
 from rhodochrosite.reader import MarshalReader, read_object
-from rhodochrosite.ruby import RubySpecialInstance, RubySymbol
+from rhodochrosite.ruby import RubyClass, RubySpecialInstance, RubySymbol
 
 
 def test_valid_magic_number() -> None:
@@ -80,3 +80,17 @@ def test_reading_string_without_unwrapping() -> None:
     assert isinstance(instance, RubySpecialInstance)
     assert instance.base_object == b"test"
     assert instance.instance_variables == [(RubySymbol(value="E"), True)]
+
+
+def test_reading_array() -> None:
+    result = read_object(b'\x04\b[\bi\x06I"\babc\x06:\x06ET[\ai\aI"\bdef\x06;\x00T')
+    assert result == [1, "abc", [2, "def"]]
+
+
+def test_reading_hashes() -> None:
+    assert read_object(b"\x04\b{\x06i\x06i\a") == {1: 2}
+    assert read_object(b"\x04\b{\x06:\babci\x06") == {RubySymbol(value="abc"): 1}
+
+
+def test_reading_class_reference() -> None:
+    assert read_object(b"\x04\bc\tTest") == RubyClass(value=RubySymbol(value="Test"))
