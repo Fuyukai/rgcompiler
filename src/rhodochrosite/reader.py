@@ -142,6 +142,14 @@ class MarshalReader:
             result = result - factor
 
         return result
+    
+    def _read_float(self) -> float:
+        """
+        Reads a single floating point number from the stream.
+        """
+
+        data = self._read_string().decode("ascii")
+        return float(data)
 
     def _read_symbol(self) -> RubySymbol:
         size = self._read_fixnum()
@@ -275,6 +283,9 @@ class MarshalReader:
 
             case RubyTypeCode.Fixnum:  # *not* the arbitrary big-integer type
                 return self._read_fixnum()
+            
+            case RubyTypeCode.Float:
+                return self._read_float()
 
             case RubyTypeCode.Symbol:
                 return self._read_symbol()

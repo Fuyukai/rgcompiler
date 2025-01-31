@@ -11,6 +11,7 @@ type RubyMarshalValue = (
     | int
     | str
     | bytes
+    | float
     | RubySymbol
     | RubyClass
     | RubySpecialInstance
@@ -46,6 +47,7 @@ class RubyTypeCode(bytes, enum.Enum):
     StaticFalse = b"F"
     StaticNone = b"0"
     Fixnum = b"i"
+    Float = b"f"
     Symbol = b":"
     SymbolLink = b";"
     Klass = b"c"

@@ -1,3 +1,5 @@
+import math
+
 import pytest
 
 from rhodochrosite.exc import NotAMarshalFile
@@ -94,3 +96,13 @@ def test_reading_hashes() -> None:
 
 def test_reading_class_reference() -> None:
     assert read_object(b"\x04\bc\tTest") == RubyClass(value=RubySymbol(value="Test"))
+
+
+def test_reading_floats() -> None:
+    assert read_object(b"\x04\bf\x062") == 2.0
+    assert read_object(b"\x04\bf\binf") == float("inf")
+
+    nan = read_object(b"\x04\bf\bnan")
+    assert isinstance(nan, float)
+    assert math.isnan(nan)
+    
