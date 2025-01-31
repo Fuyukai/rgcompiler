@@ -1,0 +1,92 @@
+[build-system]
+requires = ["pdm-backend"]
+build-backend = "pdm.backend"
+
+[project]
+name = "rgcompiler"
+version = "25.0.0"
+description = "RGXP compiler for Reborn-style games"
+authors = [
+    {name = "Lura Skye", email = "fuyukaii@proton.me"},
+]
+dependencies = ["cattrs>=24.1.2", "attrs>=25.1.0", "lxml>=5.3.0", "rich>=13.9.4"]
+requires-python = ">=3.13"
+readme = "README.rst"
+license = {text = "AGPL-3.0-or-later"}
+
+[project.scripts]
+ruby-unmarshal = "rhodochrosite.cli.dump_json:main"
+
+[dependency-groups]
+dev = [
+    "types-lxml>=2024.12.13",
+    "ruff>=0.9.4",
+    "pyright>=1.1.393",
+    "pytest>=8.3.4",
+    "pytest-cov>=6.0.0",
+]
+
+[tool.pdm]
+distribution = true
+
+[tool.coverage.run]
+omit = [
+    "src/rhodochrosite/cli/*"
+]
+
+[tool.pyright]
+pythonVersion = "3.12"
+include = ["src", "tests"]
+typeCheckingMode = "strict"
+
+reportImplicitOverride = "warning"
+reportUnusedVariable = false
+reportIncompatibleVariableOverride = false
+reportPrivateUsage = false
+
+[tool.ruff]
+target-version = "py313"
+respect-gitignore = true
+src = ["src/", "tests/"]
+line-length = 100
+indent-width = 4
+output-format = "full"
+
+[tool.ruff.lint]
+select = [
+    "RUF",
+    "F",
+    "E",
+    "W",
+    "I",
+    "UP",
+    "B",
+    "Q",
+    "YTT",
+    "PYI",
+    "SIM",
+    "RET",
+    "PERF",
+    "PIE",
+    "SIM",
+    "C4",
+    "ANN",
+    "FA",
+    "ICN",
+    "PYI",
+    "PT",
+    "RET",
+
+    # specific docstring rules
+    "D201", "D204", "D211", "D419",   # less ugly docstrings
+]
+ignore = [
+    "W291",
+    "W293",
+]
+
+[tool.ruff.lint.per-file-ignores]
+"tests/test_*" = ["D"]
+
+[tool.ruff.lint.isort]
+combine-as-imports = true
