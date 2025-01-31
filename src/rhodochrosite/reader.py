@@ -12,7 +12,7 @@ from rhodochrosite.exc import (
     StreamFormatError,
     StreamUnexpectedlyEndedError,
 )
-from rhodochrosite.ruby import RubyObject, RubySpecialInstance, RubySymbol, RubyTypeCode
+from rhodochrosite.ruby import RubyMarshalValue, RubySpecialInstance, RubySymbol, RubyTypeCode
 
 # Unlike Python's ``marshal``, Ruby's ``marshal`` is surprisingly well documented.
 # The format is available at https://devdocs.io/ruby~3.3/marshal_rdoc.
@@ -138,7 +138,7 @@ class MarshalReader:
         next_code = self._next_type_code()
         completed_object = self._next_object_after_type_code(next_code)
         count = self._read_fixnum()
-        pairs: list[tuple[RubySymbol, RubyObject]] = []
+        pairs: list[tuple[RubySymbol, RubyMarshalValue]] = []
 
         for _ in range(count):
             name = self.next_object()
@@ -160,7 +160,7 @@ class MarshalReader:
 
         return RubySpecialInstance(base_object=completed_object, instance_variables=pairs)
 
-    def _next_object_after_type_code(self, code: RubyTypeCode) -> RubyObject:
+    def _next_object_after_type_code(self, code: RubyTypeCode) -> RubyMarshalValue:
         """
         Reads the next object from the stream using the provided type code.
         """
@@ -206,7 +206,7 @@ class MarshalReader:
                 print(klass_name)
                 raise InvalidTypeCode(b"o")
 
-    def next_object(self) -> RubyObject:
+    def next_object(self) -> RubyMarshalValue:
         """
         Reads the next object from this stream.
         """
@@ -214,9 +214,9 @@ class MarshalReader:
         return self._next_object_after_type_code(self._next_type_code())
 
 
-def read_object(data: bytes | bytearray, *, unwrap_strings: bool = True) -> RubyObject:
+def read_object(data: bytes | bytearray, *, unwrap_strings: bool = True) -> RubyMarshalValue:
     """
-    Reads a single ``RubyObject`` from the provided byte data source.
+    Reads a single ``RubyMarshalValue`` from the provided byte data source.
     """
 
     return MarshalReader.from_bytes(data, unwrap_strings=unwrap_strings).next_object()

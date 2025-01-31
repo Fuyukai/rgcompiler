@@ -3,7 +3,7 @@ from typing import override
 
 import attrs
 
-type RubyObject = bool | None | int | str | bytes | RubySymbol | RubySpecialInstance
+type RubyMarshalValue = bool | None | int | str | bytes | RubySymbol | RubySpecialInstance
 
 
 class RubyTypeCode(bytes, enum.Enum):
@@ -52,7 +52,7 @@ class RubySpecialInstance:
     """
 
     #: The base object for this instance.
-    base_object: RubyObject = attrs.field()
+    base_object: RubyMarshalValue = attrs.field()
 
     #: The additional instance variables for this instance.
-    instance_variables: list[tuple[RubySymbol, RubyObject]] = attrs.field()
+    instance_variables: list[tuple[RubySymbol, RubyMarshalValue]] = attrs.field()
