@@ -214,6 +214,12 @@ class GenericRubyObject(RubyNonSpecialObject):
     def ruby_class_name(self) -> RubySymbol:
         return self.name
 
+    def get_ivar(self, ivar: RubySymbol | str) -> RubyMarshalValue | None:
+        if isinstance(ivar, str):
+            ivar = RubySymbol(ivar)
+
+        return self.instance_variables.get(ivar)
+
 
 def make_generic_object(
     name: RubySymbol, instance_vars: dict[RubySymbol, RubyMarshalValue]

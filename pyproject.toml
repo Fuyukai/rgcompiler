@@ -33,7 +33,9 @@ dev = [
 distribution = true
 
 [tool.coverage.run]
-omit = ["src/rhodochrosite/cli/*"]
+branch = true
+source = ["src/rhodochrosite", "src/rgcompiler"]
+omit = ["src/rgcompiler/cli/*"]
 
 [tool.pyright]
 pythonVersion = "3.12"

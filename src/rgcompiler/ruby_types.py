@@ -19,6 +19,8 @@ class RgssTable(CustomMarshal):
     A weird, 3D array table used by certain RGSS files.
     """
 
+    # TODO: validate dimensions
+
     raw_data: list[int] = attrs.field(factory=list)
 
     # dimensions of the table; 1 for only rows, 2 for rows + columns, 3 for rows + cols + layers
@@ -58,7 +60,16 @@ class RgssTable(CustomMarshal):
 
     @override
     def get_raw_bytes(self) -> bytes:
-        raise NotImplementedError
+        size = len(self.raw_data)
+        header = struct.pack(
+            "<5L", self.dimensions, self.row_count, self.column_count, self.layer_count, size
+        )
+
+        body = bytearray(header)
+        for i in self.raw_data:
+            body += struct.pack("<H", i)
+
+        return bytes(body)
 
 
 def add_all_ruby_types(reader: MarshalReader) -> None:
