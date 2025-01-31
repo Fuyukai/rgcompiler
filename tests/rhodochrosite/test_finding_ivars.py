@@ -30,6 +30,7 @@ def test_finding_skipped_ivars() -> None:
     fields = NormalType(field="abc").find_instance_variables()
     assert fields == []
 
+
 def test_finding_renamed_ivars() -> None:
     @attr.define
     class NormalType(RubyNonSpecialObject):

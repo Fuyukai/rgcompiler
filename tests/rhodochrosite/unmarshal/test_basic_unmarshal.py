@@ -105,4 +105,3 @@ def test_reading_floats() -> None:
     nan = read_object(b"\x04\bf\bnan")
     assert isinstance(nan, float)
     assert math.isnan(nan)
-    

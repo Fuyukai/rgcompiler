@@ -1,11 +1,11 @@
 from __future__ import annotations
 
 import struct
-from io import BytesIO
 from typing import final, override
 
 import attrs
 
+from rhodochrosite.cursor import Cursor
 from rhodochrosite.reader import MarshalReader
 from rhodochrosite.ruby import CustomMarshal, RubySymbol
 
@@ -81,6 +81,6 @@ def add_all_ruby_types(reader: MarshalReader) -> None:
 
 
 def make_reader(data: bytes) -> MarshalReader:
-    reader = MarshalReader(stream=BytesIO(data))
+    reader = MarshalReader(stream=Cursor(wrapped=data))
     add_all_ruby_types(reader)
     return reader

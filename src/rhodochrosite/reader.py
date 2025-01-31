@@ -1,12 +1,10 @@
 from __future__ import annotations
 
 from collections.abc import Callable
-from io import BytesIO
-from types import TracebackType
-from typing import IO
 
 import attrs
 
+from rhodochrosite.cursor import Cursor
 from rhodochrosite.exc import (
     InvalidTypeCode,
     NotAMarshalFile,
@@ -47,10 +45,8 @@ class MarshalReader:
     A low-level reader for data in the Ruby marshal format.
     """
 
-    #: The stream of data to read. This is a file-like object that returns raw binary data.
-    #:
-    #: For in-memory streams, use a :class:`io.BytesIO`.
-    stream: IO[bytes] = attrs.field()
+    #: The stream of data to read.
+    stream: Cursor = attrs.field()
 
     #: A list of previously encountered symbols in this stream.
     symbol_links: list[RubySymbol] = attrs.field(init=False, factory=list)
@@ -69,7 +65,7 @@ class MarshalReader:
         Creates a new :class:`.MarshalReader` from a series of bytes.
         """
 
-        return MarshalReader(stream=BytesIO(data), unwrap_strings=unwrap_strings)
+        return MarshalReader(stream=Cursor(wrapped=bytes(data)), unwrap_strings=unwrap_strings)
 
     def __attrs_post_init__(self) -> None:
         # e first two bytes of the stream contain the major and minor version, each as a single byte
@@ -92,17 +88,6 @@ class MarshalReader:
             return data
 
         raise StreamUnexpectedlyEndedError(message + f" whilst reading {count} bytes")
-
-    def __enter__(self) -> IO[bytes]:  # pragma: no cover
-        return self.stream.__enter__()
-
-    def __exit__(
-        self,
-        type: type[BaseException] | None,
-        value: BaseException | None,
-        traceback: TracebackType | None,
-    ) -> None:  # pragma: no cover
-        return self.stream.__exit__(type, value, traceback)
 
     def _next_type_code(self) -> RubyTypeCode:
         """
@@ -142,7 +127,7 @@ class MarshalReader:
             result = result - factor
 
         return result
-    
+
     def _read_float(self) -> float:
         """
         Reads a single floating point number from the stream.
@@ -283,7 +268,7 @@ class MarshalReader:
 
             case RubyTypeCode.Fixnum:  # *not* the arbitrary big-integer type
                 return self._read_fixnum()
-            
+
             case RubyTypeCode.Float:
                 return self._read_float()
 

@@ -5,9 +5,9 @@
 #   end
 # end
 
-from io import BytesIO
 from typing import cast, final, override
 
+from rhodochrosite.cursor import Cursor
 from rhodochrosite.reader import MarshalReader, read_object
 from rhodochrosite.ruby import GenericRubyObject, RubyMarshalValue, RubyNonSpecialObject, RubySymbol
 
@@ -37,7 +37,7 @@ def test_reading_generic_user_object() -> None:
 
 
 def test_reading_custom_user_object() -> None:
-    reader = MarshalReader(stream=BytesIO(b"\x04\bo:\tTest\x06:\t@abci\x06"))
+    reader = MarshalReader(stream=Cursor(wrapped=b"\x04\bo:\tTest\x06:\t@abci\x06"))
     reader.object_factories[TEST_NAME] = _make_test
     next_object = reader.next_object()
 
