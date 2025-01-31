@@ -1,6 +1,7 @@
 import abc
 import enum
-from typing import final, override
+from collections.abc import Iterable
+from typing import NotRequired, TypedDict, cast, final, override
 
 import attrs
 
@@ -17,6 +18,23 @@ type RubyMarshalValue = (
     | list[RubyMarshalValue]
     | dict[RubyMarshalValue, RubyMarshalValue]
 )
+
+
+class RubyExtra(TypedDict):
+    """
+    Extra data for attrs fields defining how they are marshalled to Ruby fields.
+    """
+
+    skip: bool
+    ivar_name: NotRequired[str]
+
+
+def ruby_skip() -> dict[str, RubyExtra]:
+    return {"ruby": {"skip": True}}
+
+
+def ruby_name(name: str) -> dict[str, RubyExtra]:
+    return {"ruby": {"skip": False, "ivar_name": name}}
 
 
 class RubyTypeCode(bytes, enum.Enum):
@@ -59,12 +77,21 @@ class RubySymbol:
         return self.value
 
 
+def atom(s: str, /) -> RubySymbol:
+    """
+    Shorthand notation for making a :class:`.RubySymbol`.
+    """
+
+    return RubySymbol(s)
+
+
 @attrs.define(kw_only=True, slots=True, frozen=True)
 class RubySpecialInstance:
     """
     An special instance with instance variables.
 
-    This is separate from a :class:`.RubyObject`!
+    This is separate from a :class:`.AnyRubyObject`, and is only used for certain special objects
+    under unknown circumstances.
     """
 
     #: The base object for this instance.
@@ -133,7 +160,9 @@ class RubyNonSpecialObject(AnyRubyObject, abc.ABC):
     """
     Base class for any Ruby object that doesn't have a built-in type code.
 
-    This should be an ``attrs`` class to function properly.
+    All objects inheriting this are serialisable into a Ruby object (with type code ``o``). This
+    should be an ``attrs`` class to function properly; all attrs fields on the class will be
+    automatically detected.
     """
 
     def find_instance_variables(self) -> list[tuple[RubySymbol, RubyMarshalValue]]:
@@ -141,8 +170,27 @@ class RubyNonSpecialObject(AnyRubyObject, abc.ABC):
         Finds all of the instance variables on this object for re-serialisation.
         """
 
-        # TODO: gather ``attrs`` ivars
-        raise NotImplementedError()
+        fields: Iterable[attrs.Attribute[RubyMarshalValue]] = attrs.fields(type(self))
+        ivars: list[tuple[RubySymbol, RubyMarshalValue]] = []
+
+        for field in fields:
+            extra = field.metadata
+            name = field.name
+            if "ruby" in extra:
+                ruby = cast(RubyExtra, extra["ruby"])
+
+                if ruby["skip"]:
+                    continue
+
+                name = ruby.get("ivar_name", name)
+
+            if not name.startswith("@"):
+                name = "@" + name
+
+            sym = RubySymbol(name)
+            ivars.append((sym, getattr(self, field.name)))
+
+        return ivars
 
 
 @final
