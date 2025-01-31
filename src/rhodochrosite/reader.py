@@ -12,6 +12,7 @@ from rhodochrosite.exc import (
     StreamUnexpectedlyEndedError,
 )
 from rhodochrosite.ruby import (
+    ENCODING_SYMBOL,
     CustomMarshal,
     RubyClass,
     RubyMarshalValue,
@@ -25,8 +26,6 @@ from rhodochrosite.ruby import (
 
 # Unlike Python's ``marshal``, Ruby's ``marshal`` is surprisingly well documented.
 # The format is available at https://devdocs.io/ruby~3.3/marshal_rdoc.
-
-ENCODING_SYMBOL = RubySymbol(value="E")
 
 type ObjectMakerFunc = Callable[
     [RubySymbol, dict[RubySymbol, RubyMarshalValue]], RubyNonSpecialObject
@@ -200,7 +199,7 @@ class MarshalReader:
         for _ in range(count):
             name = self.next_object()
 
-            if not isinstance(name, RubySymbol):
+            if not isinstance(name, RubySymbol):  # pragma: no cover
                 raise InvalidTypeCode(f"Expected a symbol when reading symbol, but got a '{name}'")
 
             value = self.next_object()

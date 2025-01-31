@@ -61,6 +61,7 @@ class RubyTypeCode(bytes, enum.Enum):
 
 
 @attrs.define(slots=True, frozen=True, repr=True, str=False, eq=True, hash=True)
+@final
 class RubySymbol:
     """
     A special type of immutable string.
@@ -79,6 +80,10 @@ class RubySymbol:
     def __str__(self) -> str:
         return self.value
 
+    @override    
+    def __repr__(self) -> str:
+        return f"RubySymbol({self.value})"
+
 
 def atom(s: str, /) -> RubySymbol:
     """
@@ -87,6 +92,8 @@ def atom(s: str, /) -> RubySymbol:
 
     return RubySymbol(s)
 
+
+ENCODING_SYMBOL = atom("E")
 
 @attrs.define(kw_only=True, slots=True, frozen=True)
 class RubySpecialInstance:
