@@ -41,7 +41,9 @@ omit = ["src/rgcompiler/cli/*"]
 exclude_lines = [
     "raise InvalidTypeCode",
     "raise NotAMarshalFile",
-    "pragma: no cover"
+    "pragma: no cover",
+    "def __str__",
+    "def __repr__",
 ]
 
 [tool.pyright]

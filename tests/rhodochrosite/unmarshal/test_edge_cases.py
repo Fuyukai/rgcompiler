@@ -21,3 +21,7 @@ def test_object_with_symlink_name() -> None:
     assert isinstance(obb, GenericRubyObject)
     assert obb.name == result[0]
 
+
+def test_truncated_marshal_stream() -> None:
+    with pytest.raises(EOFError):
+        read_object(b'\x04\x08"\x07a')
