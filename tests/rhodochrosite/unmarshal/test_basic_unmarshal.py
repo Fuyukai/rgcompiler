@@ -105,3 +105,9 @@ def test_reading_floats() -> None:
     nan = read_object(b"\x04\bf\bnan")
     assert isinstance(nan, float)
     assert math.isnan(nan)
+
+
+def test_reading_object_links() -> None:
+    hash = {RubySymbol("a"): 1}
+
+    assert read_object(b"\x04\b[\a[\a{\x06:\x06ai\x06@\a@\x06") == [[hash, hash], [hash, hash]]

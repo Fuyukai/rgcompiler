@@ -37,6 +37,13 @@ branch = true
 source = ["src/rhodochrosite", "src/rgcompiler"]
 omit = ["src/rgcompiler/cli/*"]
 
+[tool.coverage.report]
+exclude_lines = [
+    "raise InvalidTypeCode",
+    "raise NotAMarshalFile",
+    "pragma: no cover"
+]
+
 [tool.pyright]
 pythonVersion = "3.12"
 include = ["src", "tests"]
