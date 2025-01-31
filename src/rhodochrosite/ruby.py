@@ -39,7 +39,7 @@ class RubyTypeCode(bytes, enum.Enum):
     UserDefined = b"u"
 
 
-@attrs.define(kw_only=True, slots=True, frozen=True, repr=True, str=False, eq=True, hash=True)
+@attrs.define(slots=True, frozen=True, repr=True, str=False, eq=True, hash=True)
 class RubySymbol:
     """
     A special type of immutable string.
