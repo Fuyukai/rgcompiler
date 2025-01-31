@@ -6,16 +6,19 @@ build-backend = "pdm.backend"
 name = "rgcompiler"
 version = "25.0.0"
 description = "RGXP compiler for Reborn-style games"
-authors = [
-    {name = "Lura Skye", email = "fuyukaii@proton.me"},
+authors = [{ name = "Lura Skye", email = "fuyukaii@proton.me" }]
+dependencies = [
+    "cattrs>=24.1.2",
+    "attrs>=25.1.0",
+    "lxml>=5.3.0",
+    "rich>=13.9.4",
 ]
-dependencies = ["cattrs>=24.1.2", "attrs>=25.1.0", "lxml>=5.3.0", "rich>=13.9.4"]
 requires-python = ">=3.13"
 readme = "README.rst"
-license = {text = "AGPL-3.0-or-later"}
+license = { text = "AGPL-3.0-or-later" }
 
 [project.scripts]
-ruby-unmarshal = "rhodochrosite.cli.dump_json:main"
+rg-ruby-unmarshal = "rgcompiler.cli.dump_json:main"
 
 [dependency-groups]
 dev = [
@@ -30,9 +33,7 @@ dev = [
 distribution = true
 
 [tool.coverage.run]
-omit = [
-    "src/rhodochrosite/cli/*"
-]
+omit = ["src/rhodochrosite/cli/*"]
 
 [tool.pyright]
 pythonVersion = "3.12"
@@ -78,12 +79,12 @@ select = [
     "RET",
 
     # specific docstring rules
-    "D201", "D204", "D211", "D419",   # less ugly docstrings
+    "D201",
+    "D204",
+    "D211",
+    "D419", # less ugly docstrings
 ]
-ignore = [
-    "W291",
-    "W293",
-]
+ignore = ["W291", "W293"]
 
 [tool.ruff.lint.per-file-ignores]
 "tests/test_*" = ["D"]

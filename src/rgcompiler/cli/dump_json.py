@@ -3,7 +3,7 @@ from pathlib import Path
 
 from rich import print
 
-from rhodochrosite.reader import read_object
+from rgcompiler.ruby_types import make_reader
 
 
 def main() -> int:
@@ -14,7 +14,8 @@ def main() -> int:
         return 1
 
     raw_data = input_file.read_bytes()
-    data = read_object(raw_data)
+    reader = make_reader(raw_data)
+    data = reader.next_object()
     print(data)
 
     return 0
