@@ -1,4 +1,5 @@
 import math
+from collections.abc import Collection
 from io import BytesIO
 from typing import IO
 
@@ -6,8 +7,9 @@ import attrs
 
 from rhodochrosite.ruby import ENCODING_SYMBOL, RubyMarshalValue, RubySymbol, RubyTypeCode
 
-# Notes: Explicitly doesn't support object links because tracking it would be too annoying.
-# Object links suck format wise, too!
+# Notes: Object links are only supported for strings and floats because hashing lists and dicts
+# is a fool's game.
+# TODO: Actually support object links.
 
 
 @attrs.define(slots=True, kw_only=True)
@@ -22,6 +24,7 @@ class MarshalWriter:
     #: A mapping of {seen symbols: position} used to emit symbol links.
     seen_symbols: dict[RubySymbol, int] = attrs.field(init=False, factory=dict)
 
+    #: If true, the version header has been written.
     written_header: bool = attrs.field(init=False, default=False)
 
     def _write_header(self) -> None:
@@ -101,7 +104,7 @@ class MarshalWriter:
         self._write_raw_string(symbol.value)
         self.seen_symbols[symbol] = len(self.seen_symbols)
 
-    def _write_pairs(self, pairs: list[tuple[RubyMarshalValue, RubyMarshalValue]]) -> None:
+    def _write_pairs(self, pairs: Collection[tuple[RubyMarshalValue, RubyMarshalValue]]) -> None:
         """
         Writes out a list of (key, value) pairs.
         """
@@ -111,7 +114,7 @@ class MarshalWriter:
             self.write_object(k)
             self.write_object(v)
 
-    def _write_array_with_typecode(self, arr: list[RubyMarshalValue]) -> None:
+    def _write_array_with_typecode(self, arr: Collection[RubyMarshalValue]) -> None:
         """
         Writes out an array of objects.
         """
@@ -120,6 +123,14 @@ class MarshalWriter:
         self._write_raw_number(len(arr))
         for item in arr:
             self.write_object(item)
+
+    def _write_dict_with_typecode(self, dict: dict[RubyMarshalValue, RubyMarshalValue]) -> None:
+        """
+        Writes out a dict/Ruby hash of objects.
+        """
+
+        self.buffer.write(RubyTypeCode.Hash)
+        self._write_pairs(dict.items())
 
     def write_object(self, object: RubyMarshalValue) -> None:
         """
@@ -169,6 +180,10 @@ class MarshalWriter:
 
         if isinstance(object, list):
             self._write_array_with_typecode(object)
+            return
+        
+        if isinstance(object, dict):
+            self._write_dict_with_typecode(object)
             return
 
         raise NotImplementedError(object)

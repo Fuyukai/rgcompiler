@@ -69,3 +69,20 @@ def test_roundtripping_arrays(complete_marshal: bytes) -> None:
     loaded = read_object(complete_marshal)
     unloaded = write_object(loaded)
     assert unloaded == complete_marshal
+
+
+@pytest.mark.parametrize(
+    "complete_marshal",
+    [
+        b'\x04\b{\x06:\tnameI"\babc\x06:\x06ET',
+        b"\x04\b{\ti\x06i\ai\bi\ti\ni\vi\fi\r",
+        b"\x04\b{\x06i\x06{\x06i\x06i\a"
+    ],
+    ids=["hash-sym-name", "hash-long-int", "hash-nested"],
+)
+def test_roundtripping_hashes(complete_marshal: bytes) -> None:
+    loaded = read_object(complete_marshal)
+    unloaded = write_object(loaded)
+    assert unloaded == complete_marshal
+
+    
