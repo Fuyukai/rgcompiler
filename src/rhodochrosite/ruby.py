@@ -2,7 +2,7 @@ from __future__ import annotations
 
 import abc
 import enum
-from collections.abc import Iterable, Mapping, Sequence
+from collections.abc import Callable, Iterable, Mapping, Sequence
 from typing import NotRequired, TypedDict, cast, final, override
 
 import attrs
@@ -22,6 +22,9 @@ type RubyMarshalValue = (
     | Sequence[RubyMarshalValue]
     | Mapping[RubyMarshalValue, RubyMarshalValue]
 )
+
+
+type ObjectMakerFunc = Callable[[RubySymbol, dict[RubySymbol, RubyMarshalValue]], RubyUserObject]
 
 
 class RubyExtra(TypedDict):
@@ -219,6 +222,43 @@ class RubyUserObject(AnyRubyObject, abc.ABC):
             ivars.append((sym, getattr(self, field.name)))
 
         return ivars
+
+
+def make_ruby_attrs_object_fn(klass: type[RubyUserObject]) -> ObjectMakerFunc:
+    """
+    Makes a new :class:`.RubyUserObject` that uses ``attrs`` for its fields.
+    """
+
+    # TODO: do a cattrs and exec() this
+    fields: Iterable[attrs.Attribute[RubyMarshalValue]] = attrs.fields(klass)
+
+    def _make(_: RubySymbol, ivars: dict[RubySymbol, RubyMarshalValue]) -> RubyUserObject:
+        transformed_ivars = {s.value[1:]: v for (s, v) in ivars.items()}
+        kwargs: dict[str, RubyMarshalValue] = {}
+
+        for field in fields:
+            if not field.init:
+                continue
+
+            extra = field.metadata
+            name = field_name = field.name
+
+            if "ruby" in extra:
+                ruby = cast(RubyExtra, extra["ruby"])
+
+                if ruby["skip"]:
+                    continue
+
+                name = ruby.get("ivar_name", name)
+
+            kwargs[field_name] = transformed_ivars.pop(name)
+
+        if transformed_ivars:
+            raise ValueError(f"Can't map {transformed_ivars} to object {klass}")
+
+        return klass(**kwargs)
+
+    return _make
 
 
 @attrs.define(slots=True, kw_only=True)

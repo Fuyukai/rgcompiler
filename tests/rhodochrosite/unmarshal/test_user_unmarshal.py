@@ -8,6 +8,7 @@
 from collections.abc import Mapping
 from typing import cast, final, override
 
+import attrs
 import pytest
 
 from rhodochrosite.cursor import Cursor
@@ -18,6 +19,10 @@ from rhodochrosite.ruby import (
     RubySymbol,
     RubyUserObject,
     RubyUserSpecialSubtypeObject,
+    atom,
+    make_ruby_attrs_object_fn,
+    ruby_name,
+    ruby_skip,
 )
 
 TEST_NAME = RubySymbol(value="Test")
@@ -92,3 +97,26 @@ def test_special_subtype_force_decode_strings() -> None:
     obb = read_object(b'\x04\bC:\x0eTestEmpty"\x00', decode_all_strings=True)
     assert isinstance(obb, RubyUserSpecialSubtypeObject)
     assert obb.wrapped_object == ""
+
+
+def test_make_ruby_attrs_object_fn() -> None:
+    @attrs.define()
+    @final
+    class Test(RubyUserObject):
+        ivar: int = attrs.field()
+        ivar_2: list[int] = attrs.field(metadata=ruby_name("ivar2"))
+        non_ivar: int = attrs.field(default=1, init=False, metadata=ruby_skip())
+
+        @property
+        @override
+        def ruby_class_name(self):
+            return atom("Test")
+
+    reader = MarshalReader(stream=Cursor(b"\x04\bo:\tTest\a:\n@ivari\x06:\v@ivar2[\bi\x06i\ai\b"))
+    reader.object_factories[atom("Test")] = make_ruby_attrs_object_fn(Test)
+
+    next = reader.next_object()
+    assert isinstance(next, Test)
+    assert next.ivar == 1
+    assert next.ivar_2 == [1, 2, 3]
+    assert next.non_ivar == 1

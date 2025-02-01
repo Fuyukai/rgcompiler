@@ -16,6 +16,7 @@ from rhodochrosite.ruby import (
     ENCODING_SYMBOL,
     TYPE_CODE_CACHE,
     CustomMarshal,
+    ObjectMakerFunc,
     RubyClassReference,
     RubyMarshalValue,
     RubySpecialInstance,
@@ -29,8 +30,6 @@ from rhodochrosite.ruby import (
 
 # Unlike Python's ``marshal``, Ruby's ``marshal`` is surprisingly well documented.
 # The format is available at https://devdocs.io/ruby~3.3/marshal_rdoc.
-
-type ObjectMakerFunc = Callable[[RubySymbol, dict[RubySymbol, RubyMarshalValue]], RubyUserObject]
 
 type CustomMakerFunc = Callable[[RubySymbol, bytes], CustomMarshal]
 
