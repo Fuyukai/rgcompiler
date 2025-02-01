@@ -64,6 +64,19 @@ class RubyTypeCode(bytes, enum.Enum):
     UserDefined = b"u"
 
 
+# because Enum(b"?") is REALLY fucking slow???
+def _make_type_code_cache() -> dict[bytes, RubyTypeCode]:
+    cache: dict[bytes, RubyTypeCode] = {}
+    for code in RubyTypeCode.__members__:
+        i = RubyTypeCode[code]
+        cache[i.value] = i
+
+    return cache
+
+
+TYPE_CODE_CACHE: dict[bytes, RubyTypeCode] = _make_type_code_cache()
+
+
 @attrs.define(slots=True, frozen=True, repr=True, str=False, eq=True, hash=True)
 @final
 class RubySymbol:

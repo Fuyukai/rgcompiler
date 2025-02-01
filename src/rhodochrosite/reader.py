@@ -14,6 +14,7 @@ from rhodochrosite.exc import (
 )
 from rhodochrosite.ruby import (
     ENCODING_SYMBOL,
+    TYPE_CODE_CACHE,
     CustomMarshal,
     RubyClassReference,
     RubyMarshalValue,
@@ -123,7 +124,7 @@ class MarshalReader:
         A type code is a single character identifying the next object in the stream.
         """
 
-        return RubyTypeCode(self._read(1, "EOF reached when reading next object type code"))
+        return TYPE_CODE_CACHE[self._read(1, "EOF reached when reading next type code")]
 
     # stolen from rubymarshal directly
     def _read_fixnum(self) -> int:
