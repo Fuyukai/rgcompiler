@@ -1,15 +1,17 @@
 import math
 from collections.abc import Collection, Mapping, Sequence
 from io import BytesIO
-from typing import IO
+from typing import IO, assert_never
 
 import attrs
 
 from rhodochrosite.ruby import (
     ENCODING_SYMBOL,
     CustomMarshal,
+    RubyClass,
     RubyMarshalValue,
     RubyNonSpecialObject,
+    RubySpecialInstance,
     RubySymbol,
     RubyTypeCode,
 )
@@ -202,8 +204,21 @@ class MarshalWriter:
             self._write_raw_string(object)
             return
 
+        if isinstance(object, RubySpecialInstance):
+            # apparently the Reborn OrderedHash class uses this????
+            self.buffer.write(RubyTypeCode.Instance)
+            self.write_object(object.base_object)
+            self._write_pairs(object.instance_variables)
+            return
+
         if isinstance(object, RubySymbol):
             self._write_symbol_with_typecode(object)
+            return
+
+        if isinstance(object, RubyClass):
+            self.buffer.write(RubyTypeCode.Klass)
+            # doesn't use a symbol, but *does* use object links for some bizarre reason??
+            self._write_raw_string(object.value.value)
             return
 
         if isinstance(object, Sequence):
@@ -217,8 +232,8 @@ class MarshalWriter:
         if isinstance(object, RubyNonSpecialObject):
             self._write_ruby_object(object)
             return
-        
-        if isinstance(object, CustomMarshal):
+
+        if isinstance(object, CustomMarshal):  # pyright: ignore [reportUnnecessaryIsInstance]
             raw_bytes = object.get_raw_bytes()
 
             self.buffer.write(RubyTypeCode.UserDefined)
@@ -226,7 +241,7 @@ class MarshalWriter:
             self._write_raw_string(raw_bytes)
             return
 
-        raise NotImplementedError(object)
+        assert_never(object)
 
 
 def write_object(data: RubyMarshalValue) -> bytes:

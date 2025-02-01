@@ -2,7 +2,7 @@ from typing import Any
 
 import pytest
 
-from rhodochrosite.ruby import atom
+from rhodochrosite.ruby import RubySpecialInstance, atom
 from rhodochrosite.writer import write_object
 
 
@@ -49,3 +49,12 @@ def test_writing_floats() -> None:
 
 def test_writing_floats_with_truncation() -> None:
     assert write_object(1.0) == b"\x04\bf\x061"
+
+
+def test_writing_instances() -> None:
+    assert (
+        write_object(
+            RubySpecialInstance(base_object=b"test", instance_variables=[(atom("E"), True)])
+        )
+        == b'\x04\bI"\ttest\x06:\x06ET'
+    )
