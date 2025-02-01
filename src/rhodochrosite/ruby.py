@@ -1,7 +1,9 @@
+from __future__ import annotations
+
 import abc
 import enum
 from collections.abc import Iterable
-from typing import NotRequired, TypedDict, cast, final, override
+from typing import Mapping, NotRequired, Sequence, TypedDict, cast, final, override
 
 import attrs
 
@@ -15,9 +17,10 @@ type RubyMarshalValue = (
     | RubySymbol
     | RubyClass
     | RubySpecialInstance
-    | AnyRubyObject
-    | list[RubyMarshalValue]
-    | dict[RubyMarshalValue, RubyMarshalValue]
+    | RubyNonSpecialObject
+    | CustomMarshal
+    | Sequence[RubyMarshalValue]
+    | Mapping[RubyMarshalValue, RubyMarshalValue]
 )
 
 

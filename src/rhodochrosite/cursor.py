@@ -4,7 +4,7 @@ from contextlib import contextmanager
 import attrs
 
 
-@attrs.define(slots=True, kw_only=True)
+@attrs.define(slots=True, kw_only=False)
 class Cursor:
     wrapped: bytes = attrs.field()
     cursor: int = attrs.field(init=False, default=0)

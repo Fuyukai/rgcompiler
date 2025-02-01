@@ -1,5 +1,5 @@
 import math
-from collections.abc import Collection
+from collections.abc import Collection, Mapping, Sequence
 from io import BytesIO
 from typing import IO
 
@@ -7,6 +7,7 @@ import attrs
 
 from rhodochrosite.ruby import (
     ENCODING_SYMBOL,
+    CustomMarshal,
     RubyMarshalValue,
     RubyNonSpecialObject,
     RubySymbol,
@@ -132,7 +133,7 @@ class MarshalWriter:
         for item in arr:
             self.write_object(item)
 
-    def _write_dict_with_typecode(self, dict: dict[RubyMarshalValue, RubyMarshalValue]) -> None:
+    def _write_dict_with_typecode(self, dict: Mapping[RubyMarshalValue, RubyMarshalValue]) -> None:
         """
         Writes out a dict/Ruby hash of objects.
         """
@@ -205,16 +206,24 @@ class MarshalWriter:
             self._write_symbol_with_typecode(object)
             return
 
-        if isinstance(object, list):
+        if isinstance(object, Sequence):
             self._write_array_with_typecode(object)
             return
 
-        if isinstance(object, dict):
+        if isinstance(object, Mapping):
             self._write_dict_with_typecode(object)
             return
 
         if isinstance(object, RubyNonSpecialObject):
             self._write_ruby_object(object)
+            return
+        
+        if isinstance(object, CustomMarshal):
+            raw_bytes = object.get_raw_bytes()
+
+            self.buffer.write(RubyTypeCode.UserDefined)
+            self._write_symbol_with_typecode(object.ruby_class_name)
+            self._write_raw_string(raw_bytes)
             return
 
         raise NotImplementedError(object)
