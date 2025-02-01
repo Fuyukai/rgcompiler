@@ -95,3 +95,28 @@ def test_float_roundtrip() -> None:
     assert loaded_v2 == [1.5, 1.5]
     unloaded_v2 = write_object(loaded_v2)
     assert unloaded_v2 == unloaded_v1
+
+
+@pytest.mark.parametrize(
+    "complete_marshal",
+    [
+        b'\x04\bC:\x0eTestEmpty"\x00',
+        b"\x04\bIC:\rTestList[\bi\x06i\ai\b\x06:\n@testi\x06",
+        b'\x04\bIC:\x0eTestEmpty"\ttest\x06:\x06ET',
+        b'\x04\bIC:\x0fTestString"\ttest\a:\x06ET:\n@testi\x06',
+        b"\x04\bC:\rTestDict{\x06i\x06i\a",
+        b"\x04\bIC:\rTestDict{\x06i\x06i\a\x06:\n@testi\x06",
+    ],
+    ids=[
+        "unencoded-string",
+        "array",
+        "encoded-string",
+        "encoded-string-with-extra-ivars",
+        "hash",
+        "hash-with-extra-ivars",
+    ],
+)
+def test_roundtrip_special_subclasses(complete_marshal: bytes) -> None:
+    loaded = read_object(complete_marshal)
+    unloaded = write_object(loaded)
+    assert unloaded == complete_marshal

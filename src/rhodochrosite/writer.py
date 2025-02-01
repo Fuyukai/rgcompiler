@@ -14,6 +14,7 @@ from rhodochrosite.ruby import (
     RubySymbol,
     RubyTypeCode,
     RubyUserObject,
+    RubyUserSpecialSubtypeObject,
 )
 
 # Note on object links:
@@ -207,8 +208,19 @@ class MarshalWriter:
         if isinstance(object, RubySpecialInstance):
             # apparently the Reborn OrderedHash class uses this????
             self.buffer.write(RubyTypeCode.Instance)
-            self.write_object(object.base_object)
-            self._write_pairs(object.instance_variables)
+
+            # intercept strings so that they don't get wrapped in an instance
+            if isinstance(object.base_object, str):
+                pairs = dict(object.instance_variables)
+                self.buffer.write(RubyTypeCode.String)
+                self._write_raw_string(object.base_object)
+                pairs[ENCODING_SYMBOL] = True
+                pairs = list(pairs.items())
+            else:
+                pairs = object.instance_variables
+                self.write_object(object.base_object)
+
+            self._write_pairs(pairs)
             return
 
         if isinstance(object, RubySymbol):
@@ -227,6 +239,30 @@ class MarshalWriter:
 
         if isinstance(object, Mapping):
             self._write_dict_with_typecode(object)
+            return
+
+        # XXX: This has to be above it because it's a more specialised type!
+        if isinstance(object, RubyUserSpecialSubtypeObject):
+            if object.instance_variables:
+                self.buffer.write(RubyTypeCode.Instance)
+
+            self.buffer.write(RubyTypeCode.SpecialSubtypeObject)
+            self._write_symbol_with_typecode(object.name)
+
+            # luckily for us the inner value is typecode prefixed
+
+            if isinstance(object.wrapped_object, str):
+                # we need to intercept strings as writing a regular str with this function will
+                # force it to be wrapped in an Instance
+                self.buffer.write(RubyTypeCode.String)
+                self._write_raw_string(object.wrapped_object)
+                object.instance_variables[ENCODING_SYMBOL] = True
+            else:
+                self.write_object(object.wrapped_object)
+
+            if object.instance_variables:
+                self._write_pairs(object.instance_variables.items())
+
             return
 
         if isinstance(object, RubyUserObject):

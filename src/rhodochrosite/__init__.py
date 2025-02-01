@@ -10,4 +10,4 @@ from rhodochrosite.ruby import (
     RubySymbol as RubySymbol,
     UnknownCustomMarshal as UnknownCustomMarshal,
 )
-from rhodochrosite.writer import MarshalWriter as MarshalWriter
+from rhodochrosite.writer import MarshalWriter as MarshalWriter, write_object as write_object

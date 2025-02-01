@@ -58,3 +58,12 @@ def test_writing_instances() -> None:
         )
         == b'\x04\bI"\ttest\x06:\x06ET'
     )
+
+
+def test_writing_wrapped_string() -> None:
+    assert (
+        write_object(
+            RubySpecialInstance(base_object="test", instance_variables=[(atom("E"), True)])
+        )
+        == b'\x04\bI"\ttest\x06:\x06ET'
+    )
