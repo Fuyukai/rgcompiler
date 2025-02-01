@@ -111,6 +111,16 @@ class MarshalWriter:
             self.write_object(k)
             self.write_object(v)
 
+    def _write_array_with_typecode(self, arr: list[RubyMarshalValue]) -> None:
+        """
+        Writes out an array of objects.
+        """
+
+        self.buffer.write(RubyTypeCode.Array)
+        self._write_raw_number(len(arr))
+        for item in arr:
+            self.write_object(item)
+
     def write_object(self, object: RubyMarshalValue) -> None:
         """
         Writes a single object to the buffer.
@@ -154,6 +164,10 @@ class MarshalWriter:
         
         if isinstance(object, RubySymbol):
             self._write_symbol_with_typecode(object)
+            return
+        
+        if isinstance(object, list):
+            self._write_array_with_typecode(object)
             return
         
         raise NotImplementedError(object)

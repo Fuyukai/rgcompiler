@@ -52,3 +52,18 @@ def test_roundtripping_strings(complete_marshal: bytes) -> None:
     loaded = read_object(complete_marshal)
     unloaded = write_object(loaded)
     assert unloaded == complete_marshal
+
+
+@pytest.mark.parametrize(
+    "complete_marshal",
+    [
+        b"\x04\b[\bi\x06i\ai\b",
+        b'\x04\b[\bI"\babc\x06:\x06ETI"\bdef\x06;\x00TI"\bxyz\x06;\x00T',
+        b'\x04\b[\bi\x06I"\bdef\x06:\x06ETi\b'
+    ],
+    ids=["list-int", "list-str", "list-mixed"]
+)
+def test_roundtripping_arrays(complete_marshal: bytes) -> None:
+    loaded = read_object(complete_marshal)
+    unloaded = write_object(loaded)
+    assert unloaded == complete_marshal
