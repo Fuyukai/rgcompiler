@@ -90,11 +90,11 @@ class MarshalReader:
             return data
 
         raise StreamUnexpectedlyEndedError(message + f" whilst reading {count} bytes")
-    
+
     def _push_objref(self) -> None:
         if self.inside_objlink_count >= 1:
             return
-        
+
         self.object_refs.append(self.stream.cursor - 1)
 
     def _next_type_code(self) -> RubyTypeCode:
@@ -308,7 +308,7 @@ class MarshalReader:
                 self._push_objref()
                 klass_name = self._next_symbol_or_symlink()
                 return self._read_ruby_object(klass_name)
-            
+
             case RubyTypeCode.ObjectLink:
                 link = self._read_fixnum()
 
@@ -318,7 +318,6 @@ class MarshalReader:
                         return self.next_object()
                     finally:
                         self.inside_objlink_count -= 1
-
 
             case RubyTypeCode.UserDefined:
                 self._push_objref()

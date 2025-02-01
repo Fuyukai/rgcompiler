@@ -34,19 +34,21 @@ def test_roundtripping_ints(complete_marshal: bytes) -> None:
     unloaded = write_object(loaded)
     assert unloaded == complete_marshal
 
+
 @pytest.mark.parametrize("value", [0, 39, -39, 3939, -3939, 393939, -393939, 39393939, -39393939])
 def test_reverse_roundtrip_int(value: int) -> None:
     written = write_object(value)
     assert read_object(written) == value
+
 
 @pytest.mark.parametrize(
     "complete_marshal",
     [
         b'\x04\bI"\babc\x06:\x06ET',
         b'\x04\b"\babc',
-        b'\x04\bI"\x12\xE6\x9A\x81\xE5\xB1\xB1 \xE7\x91\x9E\xE5\xB8\x8C\x06:\x06ET'
+        b'\x04\bI"\x12\xe6\x9a\x81\xe5\xb1\xb1 \xe7\x91\x9e\xe5\xb8\x8c\x06:\x06ET',
     ],
-    ids=["abc", "abc-bytestring", "mizuki"]
+    ids=["abc", "abc-bytestring", "mizuki"],
 )
 def test_roundtripping_strings(complete_marshal: bytes) -> None:
     loaded = read_object(complete_marshal)
@@ -59,9 +61,9 @@ def test_roundtripping_strings(complete_marshal: bytes) -> None:
     [
         b"\x04\b[\bi\x06i\ai\b",
         b'\x04\b[\bI"\babc\x06:\x06ETI"\bdef\x06;\x00TI"\bxyz\x06;\x00T',
-        b'\x04\b[\bi\x06I"\bdef\x06:\x06ETi\b'
+        b'\x04\b[\bi\x06I"\bdef\x06:\x06ETi\b',
     ],
-    ids=["list-int", "list-str", "list-mixed"]
+    ids=["list-int", "list-str", "list-mixed"],
 )
 def test_roundtripping_arrays(complete_marshal: bytes) -> None:
     loaded = read_object(complete_marshal)

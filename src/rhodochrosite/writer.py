@@ -1,4 +1,3 @@
-
 import math
 from io import BytesIO
 from typing import IO
@@ -8,7 +7,8 @@ import attrs
 from rhodochrosite.ruby import ENCODING_SYMBOL, RubyMarshalValue, RubySymbol, RubyTypeCode
 
 # Notes: Explicitly doesn't support object links because tracking it would be too annoying.
-# Object links suck format wise, too! 
+# Object links suck format wise, too!
+
 
 @attrs.define(slots=True, kw_only=True)
 class MarshalWriter:
@@ -37,7 +37,7 @@ class MarshalWriter:
         """
 
         # https://github.com/d9pouces/RubyMarshal/blob/81135afa0235ca3b6e895192da3978f49b9a9706/rubymarshal/writer.py#L249
-        
+
         if number == 0:
             self.buffer.write(b"\x00")
             return
@@ -73,7 +73,7 @@ class MarshalWriter:
 
     def _write_raw_string(self, s: str | bytes, /) -> None:
         """
-        Writes a single raw bytestring to the stream. 
+        Writes a single raw bytestring to the stream.
         """
 
         if isinstance(s, str):
@@ -81,7 +81,7 @@ class MarshalWriter:
 
         self._write_raw_number(len(s))
         self.buffer.write(s)
-        
+
     def _write_symbol_with_typecode(self, symbol: RubySymbol) -> None:
         """
         Writes a symbol with the appropriate typecode.
@@ -96,7 +96,7 @@ class MarshalWriter:
             self.buffer.write(RubyTypeCode.SymbolLink)
             self._write_raw_number(previous_pos)
             return
-        
+
         self.buffer.write(RubyTypeCode.Symbol)
         self._write_raw_string(symbol.value)
         self.seen_symbols[symbol] = len(self.seen_symbols)
@@ -107,7 +107,7 @@ class MarshalWriter:
         """
 
         self._write_raw_number(len(pairs))
-        for (k, v) in pairs:
+        for k, v in pairs:
             self.write_object(k)
             self.write_object(v)
 
@@ -125,7 +125,7 @@ class MarshalWriter:
         """
         Writes a single object to the buffer.
 
-        Ideally, this should only be called once at the top-level because ``Marshal.load`` on the 
+        Ideally, this should only be called once at the top-level because ``Marshal.load`` on the
         Ruby side only supports loading a single value.
         """
 
@@ -134,11 +134,11 @@ class MarshalWriter:
         if object is True:
             self.buffer.write(RubyTypeCode.StaticTrue)
             return
-        
+
         if object is False:
             self.buffer.write(RubyTypeCode.StaticFalse)
             return
-        
+
         if object is None:
             self.buffer.write(RubyTypeCode.StaticFalse)
 
@@ -147,7 +147,7 @@ class MarshalWriter:
             self.buffer.write(RubyTypeCode.Fixnum)
             self._write_raw_number(object)
             return
-        
+
         if isinstance(object, str):
             # encoded string with instance variables...
             self.buffer.write(RubyTypeCode.Instance)
@@ -155,23 +155,23 @@ class MarshalWriter:
             self._write_raw_string(object)
             self._write_pairs([(ENCODING_SYMBOL, True)])
             return
-        
+
         if isinstance(object, bytes):
             # non-encoded string with no instance variables
             self.buffer.write(RubyTypeCode.String)
             self._write_raw_string(object)
             return
-        
+
         if isinstance(object, RubySymbol):
             self._write_symbol_with_typecode(object)
             return
-        
+
         if isinstance(object, list):
             self._write_array_with_typecode(object)
             return
-        
+
         raise NotImplementedError(object)
-                
+
 
 def write_object(data: RubyMarshalValue) -> bytes:
     buf = BytesIO()

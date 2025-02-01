@@ -80,7 +80,7 @@ class RubySymbol:
     def __str__(self) -> str:
         return self.value
 
-    @override    
+    @override
     def __repr__(self) -> str:
         return f"RubySymbol({self.value})"
 
@@ -94,6 +94,7 @@ def atom(s: str, /) -> RubySymbol:
 
 
 ENCODING_SYMBOL = atom("E")
+
 
 @attrs.define(kw_only=True, slots=True, frozen=True)
 class RubySpecialInstance:
