@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 from collections.abc import Callable
+from typing import assert_never
 
 import attrs
 
@@ -53,24 +54,40 @@ class MarshalReader:
     #: If True, then strings will be unwrapped in the stream.
     unwrap_strings: bool = attrs.field(default=True)
 
+    #: If True, then all strings will be decoded as UTF-8.
+    #:
+    #: This is mostly useful for older Ruby code that emitted raw bytestrings in the feed instead
+    #: of encoding them as instance strings.
+    decode_all_strings: bool = attrs.field(default=False)
+
     #: A mapping of {ruby type name: (name, instance vars) -> RubyObject} to make user objects.
     object_factories: dict[RubySymbol, ObjectMakerFunc] = attrs.field(factory=dict)
 
     #: A mapping of {ruby type name: (name, bytestring) _> RubyObject} for objects with ``_load``.
     #:
-    #: Examples include RGSS' Table class. 
+    #: Examples include RGSS' Table class.
     custom_factories: dict[RubySymbol, CustomMakerFunc] = attrs.field(factory=dict)
 
     _object_refs: list[int] = attrs.field(factory=list, init=False)
     _inside_objlink_count: int = attrs.field(default=0, init=False)
 
     @classmethod
-    def from_bytes(cls, data: bytes | bytearray, *, unwrap_strings: bool = True) -> MarshalReader:
+    def from_bytes(
+        cls,
+        data: bytes | bytearray,
+        *,
+        unwrap_strings: bool = True,
+        decode_all_strings: bool = False,
+    ) -> MarshalReader:
         """
         Creates a new :class:`.MarshalReader` from a series of bytes.
         """
 
-        return MarshalReader(stream=Cursor(wrapped=bytes(data)), unwrap_strings=unwrap_strings)
+        return MarshalReader(
+            stream=Cursor(wrapped=bytes(data)),
+            unwrap_strings=unwrap_strings,
+            decode_all_strings=decode_all_strings,
+        )
 
     def __attrs_post_init__(self) -> None:
         # e first two bytes of the stream contain the major and minor version, each as a single byte
@@ -223,15 +240,23 @@ class MarshalReader:
         pairs = self._read_symbol_pairs()
 
         if self.unwrap_strings and next_code == RubyTypeCode.String and len(pairs) == 1:
-            assert isinstance(completed_object, bytes), "string typecode was followed by non-str???"
+            if self.decode_all_strings:
+                # already decoded by the other function, just return it
+                assert isinstance(completed_object, str), f"{completed_object} not a decoded str"
+                return completed_object
+
+            assert isinstance(completed_object, bytes), (
+                "string typecode was followed by non-str???"
+            )
 
             name, value = pairs[0]
             assert name == ENCODING_SYMBOL, "expected String to have a single symbol of 'E'"
             if value:
                 return completed_object.decode()
 
-            # In practice, I don't think there's any way to produce strings with this set to False.
-            return completed_object  # pragma: no cover
+            # In practice, I don't think it's ever possible for strings with @E: false to be 
+            # emitted by Marshal.dump.
+            return completed_object
 
         return RubySpecialInstance(base_object=completed_object, instance_variables=pairs)
 
@@ -293,7 +318,11 @@ class MarshalReader:
             case RubyTypeCode.String:
                 # These are possible in the raw stream with e.g. ``Marshal.dump("abc".b)``.
                 self._push_objref()
-                return self._read_string()
+                s = self._read_string()
+                if self.decode_all_strings:
+                    return s.decode()
+
+                return s
 
             case RubyTypeCode.Array:
                 self._push_objref()
@@ -330,6 +359,8 @@ class MarshalReader:
                 factory = self.custom_factories.get(klass_name, UnknownUserDefined)
                 return factory(klass_name, self._read(size))
 
+        assert_never(code)
+
     def next_object(self) -> RubyMarshalValue:
         """
         Reads the next object from this stream.
@@ -338,9 +369,13 @@ class MarshalReader:
         return self._read_object_after_type_code(self._next_type_code())
 
 
-def read_object(data: bytes | bytearray, *, unwrap_strings: bool = True) -> RubyMarshalValue:
+def read_object(
+    data: bytes | bytearray, *, unwrap_strings: bool = True, decode_all_strings: bool = False
+) -> RubyMarshalValue:
     """
     Reads a single ``RubyMarshalValue`` from the provided byte data source.
     """
 
-    return MarshalReader.from_bytes(data, unwrap_strings=unwrap_strings).next_object()
+    return MarshalReader.from_bytes(
+        data, unwrap_strings=unwrap_strings, decode_all_strings=decode_all_strings
+    ).next_object()

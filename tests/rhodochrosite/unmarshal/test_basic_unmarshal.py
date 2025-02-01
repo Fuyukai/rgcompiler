@@ -111,3 +111,7 @@ def test_reading_object_links() -> None:
     hash = {RubySymbol("a"): 1}
 
     assert read_object(b"\x04\b[\a[\a{\x06:\x06ai\x06@\a@\x06") == [[hash, hash], [hash, hash]]
+
+
+def test_forcibly_decoding_string() -> None:
+    assert read_object(b'\x04\b"\tmiku', decode_all_strings=True) == "miku"
