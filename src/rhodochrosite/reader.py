@@ -56,10 +56,13 @@ class MarshalReader:
     #: A mapping of {ruby type name: (name, instance vars) -> RubyObject} to make user objects.
     object_factories: dict[RubySymbol, ObjectMakerFunc] = attrs.field(factory=dict)
 
+    #: A mapping of {ruby type name: (name, bytestring) _> RubyObject} for objects with ``_load``.
+    #:
+    #: Examples include RGSS' Table class. 
     custom_factories: dict[RubySymbol, CustomMakerFunc] = attrs.field(factory=dict)
 
-    object_refs: list[int] = attrs.field(factory=list)
-    inside_objlink_count: int = attrs.field(default=0)
+    _object_refs: list[int] = attrs.field(factory=list, init=False)
+    _inside_objlink_count: int = attrs.field(default=0, init=False)
 
     @classmethod
     def from_bytes(cls, data: bytes | bytearray, *, unwrap_strings: bool = True) -> MarshalReader:
@@ -92,10 +95,10 @@ class MarshalReader:
         raise StreamUnexpectedlyEndedError(message + f" whilst reading {count} bytes")
 
     def _push_objref(self) -> None:
-        if self.inside_objlink_count >= 1:
+        if self._inside_objlink_count >= 1:
             return
 
-        self.object_refs.append(self.stream.cursor - 1)
+        self._object_refs.append(self.stream.cursor - 1)
 
     def _next_type_code(self) -> RubyTypeCode:
         """
@@ -312,12 +315,12 @@ class MarshalReader:
             case RubyTypeCode.ObjectLink:
                 link = self._read_fixnum()
 
-                with self.stream.with_seeked_to(self.object_refs[link]):
-                    self.inside_objlink_count += 1
+                with self.stream.with_seeked_to(self._object_refs[link]):
+                    self._inside_objlink_count += 1
                     try:
                         return self.next_object()
                     finally:
-                        self.inside_objlink_count -= 1
+                        self._inside_objlink_count -= 1
 
             case RubyTypeCode.UserDefined:
                 self._push_objref()
