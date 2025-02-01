@@ -12,6 +12,7 @@ from rhodochrosite.ruby import CustomMarshal, RubyMarshalValue, RubySymbol
 from rhodochrosite.writer import MarshalWriter
 
 TABLE_TYPE = RubySymbol("Table")
+TONE_TYPE = RubySymbol("Tone")
 COLOUR_TYPE = RubySymbol("Color")
 
 
@@ -77,7 +78,6 @@ class RgssTable(CustomMarshal):
 
 # as far as I can tell the only purpose of this being a custom marshal type is to be annoying.
 @attrs.define(slots=True, kw_only=True)
-@final
 class RgssColour(CustomMarshal):
     """
     A RRGGBBAA colour object.
@@ -91,7 +91,7 @@ class RgssColour(CustomMarshal):
     @classmethod
     def from_bytes(cls, _: RubySymbol, data: bytes) -> RgssColour:
         r, b, g, a = struct.unpack("<4d", data)
-        return RgssColour(red=r, blue=b, green=g, alpha=a)
+        return cls(red=r, blue=b, green=g, alpha=a)
 
     @property
     @override
@@ -101,6 +101,14 @@ class RgssColour(CustomMarshal):
     @override
     def get_raw_bytes(self) -> bytes:
         return struct.pack("<4d", self.red, self.blue, self.green, self.alpha)
+    
+
+# wtf is the difference?
+class RgssTone(RgssColour):
+    @property
+    @override
+    def ruby_class_name(self) -> RubySymbol:
+        return TONE_TYPE
 
 
 def add_all_ruby_types(reader: MarshalReader) -> None:  # pragma: no cover
@@ -110,6 +118,7 @@ def add_all_ruby_types(reader: MarshalReader) -> None:  # pragma: no cover
 
     reader.custom_factories[TABLE_TYPE] = RgssTable.make_rgss_table
     reader.custom_factories[COLOUR_TYPE] = RgssColour.from_bytes
+    reader.custom_factories[TONE_TYPE] = RgssTone.from_bytes
 
 
 def make_reader(data: bytes) -> MarshalReader:  # pragma: no cover
