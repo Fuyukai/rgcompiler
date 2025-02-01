@@ -21,6 +21,7 @@ from rhodochrosite.ruby import (
     RubySymbol,
     RubyTypeCode,
     RubyUserObject,
+    RubyUserSpecialSubtypeObject,
     UnknownCustomMarshal,
     make_generic_object,
 )
@@ -226,7 +227,28 @@ class MarshalReader:
 
         return pairs
 
-    def _read_instance(self) -> RubySpecialInstance | str | bytes:
+    def _unwrap_str(
+        self, wrapped_str: bytes, ivars: list[tuple[RubySymbol, RubyMarshalValue]]
+    ) -> bytes | str:
+        """
+        Unwraps a string from a ``bytes`` object if it is an encoded string.
+        """
+
+        if self.decode_all_strings:
+            return wrapped_str.decode()
+
+        for name, value in ivars:
+            if name == ENCODING_SYMBOL:
+                if value:
+                    return wrapped_str.decode()
+
+                # In practice, I don't think it's ever possible for strings with @E: false to be
+                # emitted by Marshal.dump.
+                return wrapped_str
+
+        return wrapped_str
+
+    def _read_instance(self) -> RubySpecialInstance | RubyUserSpecialSubtypeObject | str | bytes:
         """
         Reads a new "instance" from the stream.
 
@@ -236,6 +258,22 @@ class MarshalReader:
         next_code = self._next_type_code()
         completed_object = self._read_object_after_type_code(next_code)
         pairs = self._read_symbol_pairs()
+
+        # extremely gross here... oh well
+
+        if next_code == RubyTypeCode.SpecialSubtypeObject:
+            assert isinstance(completed_object, RubyUserSpecialSubtypeObject)
+
+            # copy over all pairs into the special subtype's storage instead
+            for k, v in pairs:
+                completed_object.instance_variables[k] = v
+
+            if isinstance(completed_object.wrapped_object, bytes):
+                completed_object.wrapped_object = self._unwrap_str(
+                    completed_object.wrapped_object, pairs
+                )
+
+            return completed_object
 
         if self.unwrap_strings and next_code == RubyTypeCode.String and len(pairs) == 1:
             if self.decode_all_strings:
@@ -250,8 +288,6 @@ class MarshalReader:
             if value:
                 return completed_object.decode()
 
-            # In practice, I don't think it's ever possible for strings with @E: false to be
-            # emitted by Marshal.dump.
             return completed_object
 
         return RubySpecialInstance(base_object=completed_object, instance_variables=pairs)
@@ -336,6 +372,21 @@ class MarshalReader:
                 self._push_objref()
                 klass_name = self._next_symbol_or_symlink()
                 return self._read_ruby_object(klass_name)
+
+            case RubyTypeCode.SpecialSubtypeObject:
+                self._push_objref()
+                klass_name = self._next_symbol_or_symlink()
+                real_value = self.next_object()
+                assert isinstance(real_value, (str, bytes, list, dict)), (
+                    "special object that wasn't a subtype of bytes, list, hash, but is actually "
+                    f"{type(real_value)}"
+                )
+
+                # note: instance variables are handed by the ``I`` subtype, rather than this
+                # block.
+                return RubyUserSpecialSubtypeObject(
+                    wrapped_object=real_value, name=klass_name, instance_variables={}
+                )
 
             case RubyTypeCode.ObjectLink:
                 link = self._read_fixnum()

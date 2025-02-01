@@ -60,6 +60,7 @@ class RubyTypeCode(bytes, enum.Enum):
     Array = b"["
     Hash = b"{"
     ObjectLink = b"@"
+    SpecialSubtypeObject = b"C"
     UserDefined = b"u"
 
 
@@ -207,7 +208,6 @@ class RubyUserObject(AnyRubyObject, abc.ABC):
         return ivars
 
 
-@final
 @attrs.define(slots=True, kw_only=True)
 class GenericRubyUserObject(RubyUserObject):
     """
@@ -280,3 +280,23 @@ class UnknownCustomMarshal(CustomMarshal, AnyRubyObject):
     @override
     def get_raw_bytes(self) -> bytes:
         return self.raw_data
+
+
+@attrs.define(slots=True, kw_only=False)
+@final
+class RubyUserSpecialSubtypeObject(GenericRubyUserObject):
+    """
+    A Ruby type that is a subclass of one of four Ruby built-in types.
+
+    These types are either ``String``, ``Regexp``, ``Array``, or ``Hash``. The wrapped value will
+    be one of those four objects.
+    """
+
+    wrapped_object: (
+        bytes | str | Sequence[RubyMarshalValue] | Mapping[RubyMarshalValue, RubyMarshalValue]
+    ) = attrs.field()
+
+    @property
+    @override
+    def ruby_class_name(self) -> RubySymbol:
+        return self.name

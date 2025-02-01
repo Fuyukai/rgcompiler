@@ -5,11 +5,20 @@
 #   end
 # end
 
+from collections.abc import Mapping
 from typing import cast, final, override
+
+import pytest
 
 from rhodochrosite.cursor import Cursor
 from rhodochrosite.reader import MarshalReader, read_object
-from rhodochrosite.ruby import GenericRubyUserObject, RubyMarshalValue, RubySymbol, RubyUserObject
+from rhodochrosite.ruby import (
+    GenericRubyUserObject,
+    RubyMarshalValue,
+    RubySymbol,
+    RubyUserObject,
+    RubyUserSpecialSubtypeObject,
+)
 
 TEST_NAME = RubySymbol(value="Test")
 
@@ -43,3 +52,43 @@ def test_reading_custom_user_object() -> None:
 
     assert isinstance(next_object, _Test)
     assert next_object.value == 1
+
+
+@pytest.mark.parametrize(
+    ("marshalled", "real_value", "has_ivar"),
+    [
+        (b'\x04\bC:\x0eTestEmpty"\x00', b"", False),
+        (b"\x04\bIC:\rTestList[\bi\x06i\ai\b\x06:\n@testi\x06", [1, 2, 3], True),
+        (b'\x04\bIC:\x0eTestEmpty"\ttest\x06:\x06ET', "test", False),
+        (b'\x04\bIC:\x0fTestString"\ttest\a:\x06ET:\n@testi\x06', "test", True),
+        (b"\x04\bC:\rTestDict{\x06i\x06i\a", {1: 2}, False),
+        (b"\x04\bIC:\rTestDict{\x06i\x06i\a\x06:\n@testi\x06", {1: 2}, True),
+    ],
+    ids=[
+        "unencoded-string",
+        "array",
+        "encoded-string",
+        "encoded-string-with-extra-ivars",
+        "hash",
+        "hash-with-extra-ivars",
+    ],
+)
+def test_unmarshal_special_subtype(
+    marshalled: bytes,
+    real_value: bytes | str | list[RubyMarshalValue] | Mapping[RubyMarshalValue, RubyMarshalValue],
+    has_ivar: bool,
+) -> None:
+    obb = read_object(marshalled)
+    assert isinstance(obb, RubyUserSpecialSubtypeObject)
+    assert obb.wrapped_object == real_value
+
+    if has_ivar:
+        assert obb.get_ivar("@test") == 1
+    else:
+        assert not obb.get_ivar("@test")
+
+
+def test_special_subtype_force_decode_strings() -> None:
+    obb = read_object(b'\x04\bC:\x0eTestEmpty"\x00', decode_all_strings=True)
+    assert isinstance(obb, RubyUserSpecialSubtypeObject)
+    assert obb.wrapped_object == ""
