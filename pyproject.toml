@@ -45,6 +45,7 @@ exclude_lines = [
     "pragma: no cover",
     "def __str__",
     "def __repr__",
+    "assert_never"
 ]
 
 [tool.pyright]
