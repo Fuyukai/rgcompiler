@@ -5,7 +5,13 @@ from typing import IO
 
 import attrs
 
-from rhodochrosite.ruby import ENCODING_SYMBOL, RubyMarshalValue, RubySymbol, RubyTypeCode
+from rhodochrosite.ruby import (
+    ENCODING_SYMBOL,
+    RubyMarshalValue,
+    RubyNonSpecialObject,
+    RubySymbol,
+    RubyTypeCode,
+)
 
 # Notes: Object links are only supported for strings and floats because hashing lists and dicts
 # is a fool's game.
@@ -132,6 +138,16 @@ class MarshalWriter:
         self.buffer.write(RubyTypeCode.Hash)
         self._write_pairs(dict.items())
 
+    def _write_ruby_object(self, obb: RubyNonSpecialObject) -> None:
+        """
+        Writes a single Ruby object into the stream.
+        """
+
+        self.buffer.write(RubyTypeCode.Object)
+        self._write_symbol_with_typecode(obb.ruby_class_name)
+        pairs = obb.find_instance_variables()
+        self._write_pairs(pairs)
+
     def write_object(self, object: RubyMarshalValue) -> None:
         """
         Writes a single object to the buffer.
@@ -181,9 +197,13 @@ class MarshalWriter:
         if isinstance(object, list):
             self._write_array_with_typecode(object)
             return
-        
+
         if isinstance(object, dict):
             self._write_dict_with_typecode(object)
+            return
+
+        if isinstance(object, RubyNonSpecialObject):
+            self._write_ruby_object(object)
             return
 
         raise NotImplementedError(object)

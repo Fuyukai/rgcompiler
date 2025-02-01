@@ -38,5 +38,6 @@ def test_writing_symbol_links() -> None:
     # official marshaller won't dupe symbols, make sure we don't either
     assert write_object([atom("abc"), atom("abc")]) == b"\x04\b[\a:\babc;\x00"
 
+
 def test_writing_dicts() -> None:
     assert write_object({atom("name"): "abc"}) == b'\x04\b{\x06:\tnameI"\babc\x06:\x06ET'

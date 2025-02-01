@@ -81,6 +81,6 @@ def add_all_ruby_types(reader: MarshalReader) -> None:
 
 
 def make_reader(data: bytes) -> MarshalReader:
-    reader = MarshalReader(stream=Cursor(wrapped=data))
+    reader = MarshalReader(stream=Cursor(wrapped=data), decode_all_strings=True)
     add_all_ruby_types(reader)
     return reader

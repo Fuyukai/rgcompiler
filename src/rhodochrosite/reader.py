@@ -245,16 +245,14 @@ class MarshalReader:
                 assert isinstance(completed_object, str), f"{completed_object} not a decoded str"
                 return completed_object
 
-            assert isinstance(completed_object, bytes), (
-                "string typecode was followed by non-str???"
-            )
+            assert isinstance(completed_object, bytes), "string typecode was followed by non-str???"
 
             name, value = pairs[0]
             assert name == ENCODING_SYMBOL, "expected String to have a single symbol of 'E'"
             if value:
                 return completed_object.decode()
 
-            # In practice, I don't think it's ever possible for strings with @E: false to be 
+            # In practice, I don't think it's ever possible for strings with @E: false to be
             # emitted by Marshal.dump.
             return completed_object
 
