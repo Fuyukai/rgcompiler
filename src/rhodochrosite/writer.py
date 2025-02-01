@@ -164,25 +164,28 @@ class MarshalWriter:
 
         self._write_header()
 
+        # Note: This is noqa'd because it means that any missing ``return`` will fall through to
+        # the final assert_never() and cause a type-checker error.
+
         if object is True:
             self.buffer.write(RubyTypeCode.StaticTrue)
             return
 
-        if object is False:
+        elif object is False:   # noqa: RET505
             self.buffer.write(RubyTypeCode.StaticFalse)
             return
 
-        if object is None:
+        elif object is None:
             self.buffer.write(RubyTypeCode.StaticNone)
             return
 
-        if isinstance(object, int):
+        elif isinstance(object, int):
             # TODO: big numbers
             self.buffer.write(RubyTypeCode.Fixnum)
             self._write_raw_number(object)
             return
 
-        if isinstance(object, float):
+        elif isinstance(object, float):
             # XXX: Marshal.dump will strip trailing zeroes; I think this is identical to the ``g``
             #      format specifier...
             #      Needs further tests?
@@ -191,7 +194,7 @@ class MarshalWriter:
             self._write_raw_string(f"{object:g}")
             return
 
-        if isinstance(object, str):
+        elif isinstance(object, str):
             # encoded string with instance variables...
             self.buffer.write(RubyTypeCode.Instance)
             self.buffer.write(RubyTypeCode.String)
@@ -199,13 +202,13 @@ class MarshalWriter:
             self._write_pairs([(ENCODING_SYMBOL, True)])
             return
 
-        if isinstance(object, bytes):
+        elif isinstance(object, bytes):
             # non-encoded string with no instance variables
             self.buffer.write(RubyTypeCode.String)
             self._write_raw_string(object)
             return
 
-        if isinstance(object, RubySpecialInstance):
+        elif isinstance(object, RubySpecialInstance):
             # apparently the Reborn OrderedHash class uses this????
             self.buffer.write(RubyTypeCode.Instance)
 
@@ -223,26 +226,26 @@ class MarshalWriter:
             self._write_pairs(pairs)
             return
 
-        if isinstance(object, RubySymbol):
+        elif isinstance(object, RubySymbol):
             self._write_symbol_with_typecode(object)
             return
 
-        if isinstance(object, RubyClassReference):
+        elif isinstance(object, RubyClassReference):
             self.buffer.write(RubyTypeCode.Klass)
             # doesn't use a symbol, but *does* use object links for some bizarre reason??
             self._write_raw_string(object.value.value)
             return
 
-        if isinstance(object, Sequence):
+        elif isinstance(object, Sequence):
             self._write_array_with_typecode(object)
             return
 
-        if isinstance(object, Mapping):
+        elif isinstance(object, Mapping):
             self._write_dict_with_typecode(object)
             return
 
         # XXX: This has to be above it because it's a more specialised type!
-        if isinstance(object, RubyUserSpecialSubtypeObject):
+        elif isinstance(object, RubyUserSpecialSubtypeObject):
             if object.instance_variables:
                 self.buffer.write(RubyTypeCode.Instance)
 
@@ -265,11 +268,11 @@ class MarshalWriter:
 
             return
 
-        if isinstance(object, RubyUserObject):
+        elif isinstance(object, RubyUserObject):
             self._write_ruby_object(object)
             return
 
-        if isinstance(object, CustomMarshal):  # pyright: ignore [reportUnnecessaryIsInstance]
+        elif isinstance(object, CustomMarshal):  # pyright: ignore [reportUnnecessaryIsInstance]
             raw_bytes = object.get_raw_bytes()
 
             self.buffer.write(RubyTypeCode.UserDefined)
