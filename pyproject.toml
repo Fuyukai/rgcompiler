@@ -45,7 +45,8 @@ exclude_lines = [
     "pragma: no cover",
     "def __str__",
     "def __repr__",
-    "assert_never"
+    "assert_never",
+    "def ruby_class_name"
 ]
 
 [tool.pyright]
@@ -84,7 +85,6 @@ select = [
     "PIE",
     "SIM",
     "C4",
-    "ANN",
     "FA",
     "ICN",
     "PYI",
