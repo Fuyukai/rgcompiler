@@ -8,12 +8,12 @@ import attrs
 from rhodochrosite.ruby import (
     ENCODING_SYMBOL,
     CustomMarshal,
-    RubyClass,
+    RubyClassReference,
     RubyMarshalValue,
-    RubyNonSpecialObject,
     RubySpecialInstance,
     RubySymbol,
     RubyTypeCode,
+    RubyUserObject,
 )
 
 # Note on object links:
@@ -143,7 +143,7 @@ class MarshalWriter:
         self.buffer.write(RubyTypeCode.Hash)
         self._write_pairs(dict.items())
 
-    def _write_ruby_object(self, obb: RubyNonSpecialObject) -> None:
+    def _write_ruby_object(self, obb: RubyUserObject) -> None:
         """
         Writes a single Ruby object into the stream.
         """
@@ -215,7 +215,7 @@ class MarshalWriter:
             self._write_symbol_with_typecode(object)
             return
 
-        if isinstance(object, RubyClass):
+        if isinstance(object, RubyClassReference):
             self.buffer.write(RubyTypeCode.Klass)
             # doesn't use a symbol, but *does* use object links for some bizarre reason??
             self._write_raw_string(object.value.value)
@@ -229,7 +229,7 @@ class MarshalWriter:
             self._write_dict_with_typecode(object)
             return
 
-        if isinstance(object, RubyNonSpecialObject):
+        if isinstance(object, RubyUserObject):
             self._write_ruby_object(object)
             return
 

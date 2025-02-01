@@ -4,7 +4,7 @@ import pytest
 
 from rhodochrosite.exc import NotAMarshalFile
 from rhodochrosite.reader import MarshalReader, read_object
-from rhodochrosite.ruby import RubyClass, RubySpecialInstance, RubySymbol
+from rhodochrosite.ruby import RubyClassReference, RubySpecialInstance, RubySymbol
 
 
 def test_valid_magic_number() -> None:
@@ -95,7 +95,7 @@ def test_reading_hashes() -> None:
 
 
 def test_reading_class_reference() -> None:
-    assert read_object(b"\x04\bc\tTest") == RubyClass(value=RubySymbol(value="Test"))
+    assert read_object(b"\x04\bc\tTest") == RubyClassReference(value=RubySymbol(value="Test"))
 
 
 def test_reading_floats() -> None:

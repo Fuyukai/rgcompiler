@@ -2,8 +2,8 @@ from __future__ import annotations
 
 import abc
 import enum
-from collections.abc import Iterable
-from typing import Mapping, NotRequired, Sequence, TypedDict, cast, final, override
+from collections.abc import Iterable, Mapping, Sequence
+from typing import NotRequired, TypedDict, cast, final, override
 
 import attrs
 
@@ -15,9 +15,9 @@ type RubyMarshalValue = (
     | bytes
     | float
     | RubySymbol
-    | RubyClass
+    | RubyClassReference
     | RubySpecialInstance
-    | RubyNonSpecialObject
+    | RubyUserObject
     | CustomMarshal
     | Sequence[RubyMarshalValue]
     | Mapping[RubyMarshalValue, RubyMarshalValue]
@@ -132,7 +132,7 @@ class AnyRubyObject(abc.ABC):
 
 @attrs.define(kw_only=True, slots=True, frozen=True, eq=True, hash=True)
 @final
-class RubyClass(AnyRubyObject):
+class RubyClassReference(AnyRubyObject):
     """
     Wraps a symbol specifically for a Ruby-side class reference.
     """
@@ -152,7 +152,7 @@ class RubyClass(AnyRubyObject):
 
 @attrs.define(kw_only=True, slots=True, frozen=True, eq=True, hash=True)
 @final
-class RubyModule(AnyRubyObject):
+class RubyModuleReference(AnyRubyObject):
     """
     Wraps a symbol specifically for a Ruby-side module reference.
     """
@@ -170,7 +170,7 @@ class RubyModule(AnyRubyObject):
         return self.value
 
 
-class RubyNonSpecialObject(AnyRubyObject, abc.ABC):
+class RubyUserObject(AnyRubyObject, abc.ABC):
     """
     Base class for any Ruby object that doesn't have a built-in type code.
 
@@ -209,7 +209,7 @@ class RubyNonSpecialObject(AnyRubyObject, abc.ABC):
 
 @final
 @attrs.define(slots=True, kw_only=True)
-class GenericRubyObject(RubyNonSpecialObject):
+class GenericRubyUserObject(RubyUserObject):
     """
     A generic implementation of :class:`.RubyNonSpecialObject`.
 
@@ -237,12 +237,12 @@ class GenericRubyObject(RubyNonSpecialObject):
 
 def make_generic_object(
     name: RubySymbol, instance_vars: dict[RubySymbol, RubyMarshalValue]
-) -> GenericRubyObject:
+) -> GenericRubyUserObject:
     """
     Creates a new :class:`.GenericRubyObject`.
     """
 
-    return GenericRubyObject(name=name, instance_variables=instance_vars)
+    return GenericRubyUserObject(name=name, instance_variables=instance_vars)
 
 
 class CustomMarshal(AnyRubyObject, abc.ABC):
@@ -261,7 +261,7 @@ class CustomMarshal(AnyRubyObject, abc.ABC):
 
 @attrs.define(kw_only=False, slots=True, frozen=True, eq=True, hash=True)
 @final
-class UnknownUserDefined(CustomMarshal, AnyRubyObject):
+class UnknownCustomMarshal(CustomMarshal, AnyRubyObject):
     """
     A ruby type that has an unknown deserialisation method.
     """

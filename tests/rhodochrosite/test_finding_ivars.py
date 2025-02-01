@@ -2,12 +2,12 @@
 
 import attr
 
-from rhodochrosite.ruby import RubyNonSpecialObject, RubySymbol, ruby_name, ruby_skip
+from rhodochrosite.ruby import RubySymbol, RubyUserObject, ruby_name, ruby_skip
 
 
 def test_finding_normal_ivars() -> None:
     @attr.define
-    class NormalType(RubyNonSpecialObject):
+    class NormalType(RubyUserObject):
         field: str = attr.field()
 
         @property
@@ -20,7 +20,7 @@ def test_finding_normal_ivars() -> None:
 
 def test_finding_skipped_ivars() -> None:
     @attr.define
-    class NormalType(RubyNonSpecialObject):
+    class NormalType(RubyUserObject):
         field: str = attr.field(metadata=ruby_skip())
 
         @property
@@ -33,7 +33,7 @@ def test_finding_skipped_ivars() -> None:
 
 def test_finding_renamed_ivars() -> None:
     @attr.define
-    class NormalType(RubyNonSpecialObject):
+    class NormalType(RubyUserObject):
         field: str = attr.field(metadata=ruby_name("other_field"))
 
         @property

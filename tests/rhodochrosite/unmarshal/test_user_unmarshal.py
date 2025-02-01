@@ -9,13 +9,13 @@ from typing import cast, final, override
 
 from rhodochrosite.cursor import Cursor
 from rhodochrosite.reader import MarshalReader, read_object
-from rhodochrosite.ruby import GenericRubyObject, RubyMarshalValue, RubyNonSpecialObject, RubySymbol
+from rhodochrosite.ruby import GenericRubyUserObject, RubyMarshalValue, RubySymbol, RubyUserObject
 
 TEST_NAME = RubySymbol(value="Test")
 
 
 @final
-class _Test(RubyNonSpecialObject):
+class _Test(RubyUserObject):
     def __init__(self, value: int) -> None:
         self.value = value
 
@@ -31,7 +31,7 @@ def _make_test(name: RubySymbol, args: dict[RubySymbol, RubyMarshalValue]) -> _T
 
 def test_reading_generic_user_object() -> None:
     data = read_object(b"\x04\bo:\tTest\x06:\t@abci\x06")
-    assert isinstance(data, GenericRubyObject)
+    assert isinstance(data, GenericRubyUserObject)
     assert data.name == TEST_NAME
     assert data.find_instance_variables() == [(RubySymbol(value="@abc"), 1)]
 

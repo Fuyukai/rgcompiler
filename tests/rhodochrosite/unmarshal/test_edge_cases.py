@@ -1,7 +1,7 @@
 import pytest
 
 from rhodochrosite.reader import read_object
-from rhodochrosite.ruby import GenericRubyObject, RubyMarshalValue, RubySymbol
+from rhodochrosite.ruby import GenericRubyUserObject, RubyMarshalValue, RubySymbol
 
 
 def test_reading_zero_size() -> None:
@@ -18,7 +18,7 @@ def test_object_with_symlink_name() -> None:
 
     assert result[0] == RubySymbol("Test")
     obb = result[1]
-    assert isinstance(obb, GenericRubyObject)
+    assert isinstance(obb, GenericRubyUserObject)
     assert obb.name == result[0]
 
 

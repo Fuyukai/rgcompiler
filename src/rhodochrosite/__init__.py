@@ -5,9 +5,9 @@ from rhodochrosite.reader import (
 from rhodochrosite.ruby import (
     AnyRubyObject as AnyRubyObject,
     CustomMarshal as CustomMarshal,
-    GenericRubyObject as GenericRubyObject,
+    GenericRubyUserObject as GenericRubyUserObject,
     RubyMarshalValue as RubyMarshalValue,
     RubySymbol as RubySymbol,
-    UnknownUserDefined as UnknownUserDefined,
+    UnknownCustomMarshal as UnknownCustomMarshal,
 )
 from rhodochrosite.writer import MarshalWriter as MarshalWriter

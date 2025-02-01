@@ -15,22 +15,20 @@ from rhodochrosite.exc import (
 from rhodochrosite.ruby import (
     ENCODING_SYMBOL,
     CustomMarshal,
-    RubyClass,
+    RubyClassReference,
     RubyMarshalValue,
-    RubyNonSpecialObject,
     RubySpecialInstance,
     RubySymbol,
     RubyTypeCode,
-    UnknownUserDefined,
+    RubyUserObject,
+    UnknownCustomMarshal,
     make_generic_object,
 )
 
 # Unlike Python's ``marshal``, Ruby's ``marshal`` is surprisingly well documented.
 # The format is available at https://devdocs.io/ruby~3.3/marshal_rdoc.
 
-type ObjectMakerFunc = Callable[
-    [RubySymbol, dict[RubySymbol, RubyMarshalValue]], RubyNonSpecialObject
-]
+type ObjectMakerFunc = Callable[[RubySymbol, dict[RubySymbol, RubyMarshalValue]], RubyUserObject]
 
 type CustomMakerFunc = Callable[[RubySymbol, bytes], CustomMarshal]
 
@@ -258,7 +256,7 @@ class MarshalReader:
 
         return RubySpecialInstance(base_object=completed_object, instance_variables=pairs)
 
-    def _read_ruby_object(self, name: RubySymbol) -> RubyNonSpecialObject:
+    def _read_ruby_object(self, name: RubySymbol) -> RubyUserObject:
         """
         Reads a new Ruby object from the stream.
         """
@@ -332,7 +330,7 @@ class MarshalReader:
 
             case RubyTypeCode.Klass:  # class
                 next = self._read_symbol()
-                return RubyClass(value=next)
+                return RubyClassReference(value=next)
 
             case RubyTypeCode.Object:  # regular object
                 self._push_objref()
@@ -354,7 +352,7 @@ class MarshalReader:
                 klass_name = self._next_symbol_or_symlink()
                 size = self._read_fixnum()
 
-                factory = self.custom_factories.get(klass_name, UnknownUserDefined)
+                factory = self.custom_factories.get(klass_name, UnknownCustomMarshal)
                 return factory(klass_name, self._read(size))
 
         assert_never(code)
