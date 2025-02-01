@@ -101,7 +101,7 @@ class RgssColour(CustomMarshal):
     @override
     def get_raw_bytes(self) -> bytes:
         return struct.pack("<4d", self.red, self.blue, self.green, self.alpha)
-    
+
 
 # wtf is the difference?
 class RgssTone(RgssColour):

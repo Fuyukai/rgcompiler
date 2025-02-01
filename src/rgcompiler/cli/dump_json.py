@@ -1,8 +1,10 @@
+import json
 import sys
 from pathlib import Path
 
 from rich import print
 
+from rgcompiler.json import CONVERTER
 from rgcompiler.ruby_types import make_reader
 
 
@@ -16,6 +18,8 @@ def main() -> int:
     raw_data = input_file.read_bytes()
     reader = make_reader(raw_data)
     data = reader.next_object()
-    print(data)
+
+    result = json.dumps(CONVERTER.unstructure(data), indent=4)
+    print(result)
 
     return 0

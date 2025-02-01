@@ -14,7 +14,7 @@ from rhodochrosite.writer import write_object
         (None, b"\x04\b0"),
     ],
 )
-def test_writing_statics(what: Any, marshalled: bytes) -> None:  # noqa: ANN401
+def test_writing_statics(what: Any, marshalled: bytes) -> None:
     assert write_object(what) == marshalled
 
 
