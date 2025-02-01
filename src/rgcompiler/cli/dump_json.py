@@ -5,7 +5,7 @@ from pathlib import Path
 from rich import print
 
 from rgcompiler.json import CONVERTER
-from rgcompiler.ruby_types import make_reader
+from rgcompiler.ruby import make_reader
 
 
 def main() -> int:

@@ -36,7 +36,7 @@ distribution = true
 [tool.coverage.run]
 branch = true
 source = ["src/rhodochrosite", "src/rgcompiler"]
-omit = ["src/rgcompiler/cli/*"]
+omit = ["src/rgcompiler/cli/*", "src/rgcompiler/json.py"]
 
 [tool.coverage.report]
 exclude_lines = [

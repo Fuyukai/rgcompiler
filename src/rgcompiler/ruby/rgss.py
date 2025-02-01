@@ -1,15 +1,11 @@
 from __future__ import annotations
 
 import struct
-from io import BytesIO
-from typing import final, override
+from typing import Self, final, override
 
 import attrs
 
-from rhodochrosite.cursor import Cursor
-from rhodochrosite.reader import MarshalReader
-from rhodochrosite.ruby import CustomMarshal, RubyMarshalValue, RubySymbol
-from rhodochrosite.writer import MarshalWriter
+from rhodochrosite.ruby import CustomMarshal, RubySymbol
 
 TABLE_TYPE = RubySymbol("Table")
 TONE_TYPE = RubySymbol("Tone")
@@ -89,7 +85,7 @@ class RgssColour(CustomMarshal):
     alpha: float = attrs.field()
 
     @classmethod
-    def from_bytes(cls, _: RubySymbol, data: bytes) -> RgssColour:
+    def from_bytes(cls, _: RubySymbol, data: bytes) -> Self:
         r, b, g, a = struct.unpack("<4d", data)
         return cls(red=r, blue=b, green=g, alpha=a)
 
@@ -109,31 +105,3 @@ class RgssTone(RgssColour):
     @override
     def ruby_class_name(self) -> RubySymbol:
         return TONE_TYPE
-
-
-def add_all_ruby_types(reader: MarshalReader) -> None:  # pragma: no cover
-    """
-    Adds all ruby types to the marshal reader.
-    """
-
-    reader.custom_factories[TABLE_TYPE] = RgssTable.make_rgss_table
-    reader.custom_factories[COLOUR_TYPE] = RgssColour.from_bytes
-    reader.custom_factories[TONE_TYPE] = RgssTone.from_bytes
-
-
-def make_reader(data: bytes) -> MarshalReader:  # pragma: no cover
-    reader = MarshalReader(stream=Cursor(wrapped=data), decode_all_strings=True)
-    add_all_ruby_types(reader)
-    return reader
-
-
-def read_object_rgxp(data: bytes) -> RubyMarshalValue:  # pragma: no cover
-    reader = make_reader(data)
-    return reader.next_object()
-
-
-def write_object_rgxp(data: RubyMarshalValue) -> bytes:  # pragma: no cover
-    buf = BytesIO()
-    writer = MarshalWriter(buffer=buf)
-    writer.write_object(data)
-    return buf.getvalue()

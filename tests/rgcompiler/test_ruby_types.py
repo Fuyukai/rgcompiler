@@ -1,7 +1,8 @@
 import math
 from pathlib import Path
 
-from rgcompiler.ruby_types import RgssColour, RgssTable, read_object_rgxp, write_object_rgxp
+from rgcompiler.ruby import read_object_rgxp, write_object_rgxp
+from rgcompiler.ruby.rgss import RgssColour, RgssTable
 
 test_data = (Path(__file__).parent / "table.dat").read_bytes()
 

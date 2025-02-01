@@ -1,0 +1,35 @@
+from io import BytesIO
+
+from rgcompiler.ruby.rgss import COLOUR_TYPE, TABLE_TYPE, TONE_TYPE, RgssColour, RgssTable, RgssTone
+from rhodochrosite.cursor import Cursor
+from rhodochrosite.reader import MarshalReader
+from rhodochrosite.ruby import RubyMarshalValue
+from rhodochrosite.writer import MarshalWriter
+
+
+def add_all_ruby_types(reader: MarshalReader) -> None:  # pragma: no cover
+    """
+    Adds all ruby types to the marshal reader.
+    """
+
+    reader.custom_factories[TABLE_TYPE] = RgssTable.make_rgss_table
+    reader.custom_factories[COLOUR_TYPE] = RgssColour.from_bytes
+    reader.custom_factories[TONE_TYPE] = RgssTone.from_bytes
+
+
+def make_reader(data: bytes) -> MarshalReader:  # pragma: no cover
+    reader = MarshalReader(stream=Cursor(wrapped=data), decode_all_strings=True)
+    add_all_ruby_types(reader)
+    return reader
+
+
+def read_object_rgxp(data: bytes) -> RubyMarshalValue:  # pragma: no cover
+    reader = make_reader(data)
+    return reader.next_object()
+
+
+def write_object_rgxp(data: RubyMarshalValue) -> bytes:  # pragma: no cover
+    buf = BytesIO()
+    writer = MarshalWriter(buffer=buf)
+    writer.write_object(data)
+    return buf.getvalue()
