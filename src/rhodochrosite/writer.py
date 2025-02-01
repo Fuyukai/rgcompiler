@@ -230,12 +230,6 @@ class MarshalWriter:
             self._write_symbol_with_typecode(object)
             return
 
-        elif isinstance(object, RubyClassReference):
-            self.buffer.write(RubyTypeCode.Klass)
-            # doesn't use a symbol, but *does* use object links for some bizarre reason??
-            self._write_raw_string(object.value.value)
-            return
-
         elif isinstance(object, Sequence):
             self._write_array_with_typecode(object)
             return
@@ -272,12 +266,18 @@ class MarshalWriter:
             self._write_ruby_object(object)
             return
 
-        elif isinstance(object, CustomMarshal):  # pyright: ignore [reportUnnecessaryIsInstance]
+        elif isinstance(object, CustomMarshal):
             raw_bytes = object.get_raw_bytes()
 
             self.buffer.write(RubyTypeCode.UserDefined)
             self._write_symbol_with_typecode(object.ruby_class_name)
             self._write_raw_string(raw_bytes)
+            return
+        
+        elif isinstance(object, RubyClassReference):  # pyright: ignore [reportUnnecessaryIsInstance]
+            self.buffer.write(RubyTypeCode.Klass)
+            # doesn't use a symbol, but *does* use object links for some bizarre reason??
+            self._write_raw_string(object.value.value)
             return
 
         assert_never(object)
