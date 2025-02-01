@@ -1,13 +1,15 @@
 from __future__ import annotations
 
 import struct
+from io import BytesIO
 from typing import final, override
 
 import attrs
 
 from rhodochrosite.cursor import Cursor
 from rhodochrosite.reader import MarshalReader
-from rhodochrosite.ruby import CustomMarshal, RubySymbol
+from rhodochrosite.ruby import CustomMarshal, RubyMarshalValue, RubySymbol
+from rhodochrosite.writer import MarshalWriter
 
 TABLE_TYPE = RubySymbol("Table")
 
@@ -84,3 +86,15 @@ def make_reader(data: bytes) -> MarshalReader:
     reader = MarshalReader(stream=Cursor(wrapped=data), decode_all_strings=True)
     add_all_ruby_types(reader)
     return reader
+
+
+def read_object_rgxp(data: bytes) -> RubyMarshalValue:
+    reader = make_reader(data)
+    return reader.next_object()
+
+
+def write_object_rgxp(data: RubyMarshalValue) -> bytes:
+    buf = BytesIO()
+    writer = MarshalWriter(buffer=buf)
+    writer.write_object(data)
+    return buf.getvalue()

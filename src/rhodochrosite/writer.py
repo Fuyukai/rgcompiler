@@ -13,9 +13,11 @@ from rhodochrosite.ruby import (
     RubyTypeCode,
 )
 
-# Notes: Object links are only supported for strings and floats because hashing lists and dicts
-# is a fool's game.
-# TODO: Actually support object links.
+# Note on object links:
+# As lists/dicts/mutable objects, etc, are unhashable in Python, no object links are emitted. This
+# makes the outputted marshal file a bit longer. When an object is marshalled vs when it isn't also
+# depends on implementation details of the Ruby Marshal module, whereas it is completely fine to
+# just not emit object links.
 
 
 @attrs.define(slots=True, kw_only=True)
@@ -176,6 +178,15 @@ class MarshalWriter:
             self._write_raw_number(object)
             return
 
+        if isinstance(object, float):
+            # XXX: Marshal.dump will strip trailing zeroes; I think this is identical to the ``g``
+            #      format specifier...
+            #      Needs further tests?
+
+            self.buffer.write(RubyTypeCode.Float)
+            self._write_raw_string(f"{object:g}")
+            return
+
         if isinstance(object, str):
             # encoded string with instance variables...
             self.buffer.write(RubyTypeCode.Instance)
@@ -210,6 +221,10 @@ class MarshalWriter:
 
 
 def write_object(data: RubyMarshalValue) -> bytes:
+    """
+    Marshals a single, top-level object.
+    """
+
     buf = BytesIO()
     writer = MarshalWriter(buffer=buf)
     writer.write_object(data)

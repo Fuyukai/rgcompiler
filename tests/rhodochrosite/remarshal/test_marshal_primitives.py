@@ -41,3 +41,11 @@ def test_writing_symbol_links() -> None:
 
 def test_writing_dicts() -> None:
     assert write_object({atom("name"): "abc"}) == b'\x04\b{\x06:\tnameI"\babc\x06:\x06ET'
+
+
+def test_writing_floats() -> None:
+    assert write_object([1.5, 1.5]) == b"\x04\b[\af\b1.5f\b1.5"
+
+
+def test_writing_floats_with_truncation() -> None:
+    assert write_object(1.0) == b"\x04\bf\x061"

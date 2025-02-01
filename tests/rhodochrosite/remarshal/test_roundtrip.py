@@ -84,3 +84,14 @@ def test_roundtripping_hashes(complete_marshal: bytes) -> None:
     loaded = read_object(complete_marshal)
     unloaded = write_object(loaded)
     assert unloaded == complete_marshal
+
+
+def test_float_roundtrip() -> None:
+    # note: due to our lack of object links, this requires a second full trip!
+
+    loaded_v1 = read_object(b"\x04\b[\af\b1.5@\x06")
+    unloaded_v1 = write_object(loaded_v1)
+    loaded_v2 = read_object(unloaded_v1)
+    assert loaded_v2 == [1.5, 1.5]
+    unloaded_v2 = write_object(loaded_v2)
+    assert unloaded_v2 == unloaded_v1
