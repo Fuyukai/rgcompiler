@@ -140,7 +140,8 @@ class MarshalWriter:
             return
 
         if object is None:
-            self.buffer.write(RubyTypeCode.StaticFalse)
+            self.buffer.write(RubyTypeCode.StaticNone)
+            return
 
         if isinstance(object, int):
             # TODO: big numbers

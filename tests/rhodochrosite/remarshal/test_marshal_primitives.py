@@ -1,5 +1,21 @@
+from typing import Any
+
+import pytest
+
 from rhodochrosite.ruby import atom
 from rhodochrosite.writer import write_object
+
+
+@pytest.mark.parametrize(
+    ("what", "marshalled"),
+    [
+        (True, b"\x04\bT"),
+        (False, b"\x04\bF"),
+        (None, b"\x04\b0"),
+    ],
+)
+def test_writing_statics(what: Any, marshalled: bytes) -> None:  # noqa: ANN401
+    assert write_object(what) == marshalled
 
 
 def test_marshal_string() -> None:
@@ -8,6 +24,14 @@ def test_marshal_string() -> None:
 
 def test_marshal_bytestring() -> None:
     assert write_object(b"test") == b'\x04\b"\ttest'
+
+
+def test_writing_array() -> None:
+    assert write_object([1, 2, 3]) == b"\x04\b[\bi\x06i\ai\b"
+
+
+def test_writing_symbols() -> None:
+    assert write_object(atom("abc")) == b"\x04\b:\babc"
 
 
 def test_writing_symbol_links() -> None:
