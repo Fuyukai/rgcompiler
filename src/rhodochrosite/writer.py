@@ -171,7 +171,7 @@ class MarshalWriter:
             self.buffer.write(RubyTypeCode.StaticTrue)
             return
 
-        elif object is False:   # noqa: RET505
+        elif object is False:  # noqa: RET505
             self.buffer.write(RubyTypeCode.StaticFalse)
             return
 
@@ -273,7 +273,7 @@ class MarshalWriter:
             self._write_symbol_with_typecode(object.ruby_class_name)
             self._write_raw_string(raw_bytes)
             return
-        
+
         elif isinstance(object, RubyClassReference):  # pyright: ignore [reportUnnecessaryIsInstance]
             self.buffer.write(RubyTypeCode.Klass)
             # doesn't use a symbol, but *does* use object links for some bizarre reason??

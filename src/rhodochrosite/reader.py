@@ -169,7 +169,10 @@ class MarshalReader:
         name = self._read(size, f"Missing symbol body of length {size}")
 
         symbol = RubySymbol(value=name.decode(encoding="utf-8"))
-        self.symbol_links.append(symbol)
+
+        if self._inside_objlink_count <= 0:
+            self.symbol_links.append(symbol)
+
         return symbol
 
     def _read_symlink(self) -> RubySymbol:
@@ -297,6 +300,10 @@ class MarshalReader:
         """
         Reads a new Ruby object from the stream.
         """
+
+        assert not name.value.startswith("@"), (
+            "found object name beginning with @; this is obviously incorrect"
+        )
 
         pairs = self._read_symbol_pairs()
         maker = self.object_factories.get(name, make_generic_object)

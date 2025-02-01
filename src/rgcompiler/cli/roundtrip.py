@@ -18,6 +18,7 @@ def main() -> int:
 
     read_data = read_object_rgxp(input_file.read_bytes())
     written = write_object_rgxp(read_data)
+
     output_file.write_bytes(written)
 
     return 0
