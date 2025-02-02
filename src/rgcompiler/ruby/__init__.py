@@ -8,8 +8,14 @@ from rgcompiler.ruby.rgss import (
     RgssTable as RgssTable,
     RgssTone as RgssTone,
 )
-from rgcompiler.ruby.rpg import RPG_AUDIOFILE, RubyAudioFile as RubyAudioFile
-from rgcompiler.ruby.rpg.tileset import RPG_TILESET, RubyTileset as RubyTileset
+from rgcompiler.ruby.rpg import (
+    RPG_AUDIOFILE,
+    RPG_MAP,
+    RPG_TILESET,
+    RubyAudioFile as RubyAudioFile,
+    RubyRpgMap as RubyRpgMap,
+    RubyTileset as RubyTileset,
+)
 from rhodochrosite.cursor import Cursor
 from rhodochrosite.reader import MarshalReader
 from rhodochrosite.ruby import RubyMarshalValue, make_ruby_attrs_object_fn
@@ -27,6 +33,7 @@ def add_all_ruby_types(reader: MarshalReader) -> None:  # pragma: no cover
 
     reader.object_factories[RPG_AUDIOFILE] = make_ruby_attrs_object_fn(RubyAudioFile)
     reader.object_factories[RPG_TILESET] = make_ruby_attrs_object_fn(RubyTileset)
+    reader.object_factories[RPG_MAP] = make_ruby_attrs_object_fn(RubyRpgMap)
 
 
 def make_reader(data: bytes) -> MarshalReader:  # pragma: no cover
