@@ -15,6 +15,7 @@ from rgss.rpg.commands.dialogue import (
 from rgss.rpg.commands.misc import (
     ChangeScreenColourToneCommand as ChangeScreenColourToneCommand,
     EmptyEventCommand as EmptyEventCommand,
+    InlineRubyCommand as InlineRubyCommand,
     UnknownEventCommand as UnknownEventCommand,
     WaitCommand as WaitCommand,
 )
@@ -33,6 +34,7 @@ COMMAND_MAPPING: dict[int, type[RubyBaseEventCommand]] = {
     223: ChangeScreenColourToneCommand,
     106: WaitCommand,
     121: SetSwitchCommand,
+    355: InlineRubyCommand,
 }
 
 COMMAND_OVERRIDDES: dict[int, Callable[[RawEventCommand], RubyBaseEventCommand]] = {

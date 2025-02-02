@@ -106,3 +106,28 @@ class WaitCommand(RubyBaseEventCommand):
             "command": "WaitCommand",
             "frames": self.frames,
         }
+
+
+@attrs.define(kw_only=True)
+class InlineRubyCommand(RubyBaseEventCommand):
+    """
+    An event command that runs a Ruby script.
+    """
+
+    script: str = attrs.field()
+
+    @classmethod
+    @override
+    def from_raw_event_command(cls, cmd: RawEventCommand) -> InlineRubyCommand:
+        return InlineRubyCommand(script=cast(str, cmd.parameters[0]))
+
+    @override
+    def get_raw_event_command(self) -> RawEventCommand:
+        return RawEventCommand(code=355, parameters=[self.script])
+
+    @override
+    def unstructure(self, converter: Converter) -> dict[str, Any]:
+        return {
+            "command": "InlineRubyCommand",
+            "script": self.script,
+        }
