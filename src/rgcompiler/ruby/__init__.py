@@ -10,9 +10,17 @@ from rgcompiler.ruby.rgss import (
 )
 from rgcompiler.ruby.rpg import (
     RPG_AUDIOFILE,
+    RPG_EVENT,
+    RPG_EVENT_CONDITION,
+    RPG_EVENT_GRAPHIC,
+    RPG_EVENT_PAGE,
     RPG_MAP,
     RPG_TILESET,
     RubyAudioFile as RubyAudioFile,
+    RubyEventGraphic as RubyEventGraphic,
+    RubyEventPage as RubyEventPage,
+    RubyEventPageCondition as RubyEventPageCondition,
+    RubyRpgEvent as RubyRpgEvent,
     RubyRpgMap as RubyRpgMap,
     RubyTileset as RubyTileset,
 )
@@ -34,6 +42,10 @@ def add_all_ruby_types(reader: MarshalReader) -> None:  # pragma: no cover
     reader.object_factories[RPG_AUDIOFILE] = make_ruby_attrs_object_fn(RubyAudioFile)
     reader.object_factories[RPG_TILESET] = make_ruby_attrs_object_fn(RubyTileset)
     reader.object_factories[RPG_MAP] = make_ruby_attrs_object_fn(RubyRpgMap)
+    reader.object_factories[RPG_EVENT] = make_ruby_attrs_object_fn(RubyRpgEvent)
+    reader.object_factories[RPG_EVENT_PAGE] = make_ruby_attrs_object_fn(RubyEventPage)
+    reader.object_factories[RPG_EVENT_CONDITION] = make_ruby_attrs_object_fn(RubyEventPageCondition)
+    reader.object_factories[RPG_EVENT_GRAPHIC] = make_ruby_attrs_object_fn(RubyEventGraphic)
 
 
 def make_reader(data: bytes) -> MarshalReader:  # pragma: no cover

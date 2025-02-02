@@ -7,6 +7,8 @@ from typing import NotRequired, TypedDict, cast, final, override
 
 import attrs
 
+from rhodochrosite.exc import ObjectMissingKeyError
+
 type RubyMarshalValue = (
     bool
     | None
@@ -234,7 +236,7 @@ def make_ruby_attrs_object_fn(
     # TODO: do a cattrs and exec() this
     fields: Iterable[attrs.Attribute[RubyMarshalValue]] = attrs.fields(klass)
 
-    def _make(_: RubySymbol, ivars: dict[RubySymbol, RubyMarshalValue]) -> RubyUserObject:
+    def _make(klass_name: RubySymbol, ivars: dict[RubySymbol, RubyMarshalValue]) -> RubyUserObject:
         transformed_ivars = {s.value[1:]: v for (s, v) in ivars.items()}
         kwargs: dict[str, RubyMarshalValue] = {}
 
@@ -253,7 +255,12 @@ def make_ruby_attrs_object_fn(
 
                 name = ruby.get("ivar_name", name)
 
-            kwargs[field_name] = transformed_ivars.pop(name)
+            try:
+                kwargs[field_name] = transformed_ivars.pop(name)
+            except KeyError as e:
+                raise ObjectMissingKeyError(
+                    f"Missing ivar {name} when reading {klass_name.value}"
+                ) from e
 
         if transformed_ivars and not skip_extra:
             names = ", ".join(transformed_ivars.keys())

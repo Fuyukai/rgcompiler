@@ -26,3 +26,9 @@ class StreamUnexpectedlyEndedError(StreamFormatError, EOFError):
     """
     Raised when there is an unexpected EOF.
     """
+
+
+class ObjectMissingKeyError(MarshalError):
+    """
+    Raised when an object is missing a key when unmarshalling.
+    """

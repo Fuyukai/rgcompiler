@@ -3,9 +3,9 @@ from typing import final, override
 import attrs
 
 from rgcompiler.ruby.rgss import RgssTable
+from rgcompiler.ruby.rpg.event import RubyRpgEvent
 from rgcompiler.ruby.rpg.misc import RubyAudioFile
 from rhodochrosite.ruby import (
-    GenericRubyUserObject,
     RubyMarshalValue,
     RubySymbol,
     RubyUserObject,
@@ -55,7 +55,7 @@ class RubyRpgMap(RubyUserObject):
     data: RgssTable = attrs.field()
 
     #: A mapping of [event id: event] for this map.
-    events: dict[str, GenericRubyUserObject] = attrs.field()
+    events: dict[str, RubyRpgEvent] = attrs.field()
 
     # unused by reborn
     encounter_list: list[RubyMarshalValue] = attrs.field()
