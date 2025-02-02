@@ -5,24 +5,21 @@ from io import BytesIO
 from rgss.rpg import (
     RPG_AUDIOFILE,
     RPG_EVENT,
-    RPG_EVENT_COMMAND,
     RPG_EVENT_CONDITION,
     RPG_EVENT_GRAPHIC,
     RPG_EVENT_PAGE,
     RPG_MAP,
     RPG_TILESET,
-    EmptyEventCommand as EmptyEventCommand,
     RubyAudioFile as RubyAudioFile,
-    RubyBaseEventCommand as RubyBaseEventCommand,
     RubyEventGraphic as RubyEventGraphic,
     RubyEventPage as RubyEventPage,
     RubyEventPageCondition as RubyEventPageCondition,
     RubyRpgEvent as RubyRpgEvent,
     RubyRpgMap as RubyRpgMap,
     RubyTileset as RubyTileset,
-    UnknownEventCommand as UnknownEventCommand,
 )
-from rgss.rpg.event_commands import make_event_command_from_ivars
+from rgss.rpg.commands import make_event_command_from_ivars
+from rgss.rpg.commands.base import RPG_EVENT_COMMAND
 from rgss.types import (
     COLOUR_TYPE,
     TABLE_TYPE,

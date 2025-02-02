@@ -3,7 +3,7 @@ from typing import Any
 
 from cattr import Converter
 
-from rgss.rpg.event_commands import RubyBaseEventCommand
+from rgss.rpg.commands.base import RubyBaseEventCommand
 from rhodochrosite.ruby import GenericRubyUserObject, RubySymbol
 
 
