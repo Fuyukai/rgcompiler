@@ -2,7 +2,7 @@ import json
 import sys
 from pathlib import Path
 
-from rich import print
+from rich import print as r_print
 
 from rgcompiler.json import CONVERTER
 from rgcompiler.ruby import make_reader
@@ -20,6 +20,10 @@ def main() -> int:
     data = reader.next_object()
 
     result = json.dumps(CONVERTER.unstructure(data), indent=4)
-    print(result)
+
+    if sys.stdout.isatty():
+        r_print(result)
+    else:
+        print(result)
 
     return 0
