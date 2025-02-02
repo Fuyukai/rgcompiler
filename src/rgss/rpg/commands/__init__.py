@@ -9,6 +9,8 @@ from rgss.rpg.commands.base import (
     RubyBaseEventCommand as RubyBaseEventCommand,
 )
 from rgss.rpg.commands.dialogue import (
+    CommentCommand as CommentCommand,
+    ContinuedCommentCommand as ContinuedCommentCommand,
     ContinueDialogueCommand as ContinueDialogueCommand,
     ShowDialogueCommand as ShowDialogueCommand,
 )
@@ -35,6 +37,8 @@ COMMAND_MAPPING: dict[int, type[RubyBaseEventCommand]] = {
     106: WaitCommand,
     121: SetSwitchCommand,
     355: InlineRubyCommand,
+    108: CommentCommand,
+    408: ContinuedCommentCommand,
 }
 
 COMMAND_OVERRIDDES: dict[int, Callable[[RawEventCommand], RubyBaseEventCommand]] = {
