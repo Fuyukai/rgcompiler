@@ -7,6 +7,7 @@ import attr
 import attrs
 from cattr import Converter
 
+from rgcompiler.ruby.rgss import RgssTone
 from rhodochrosite.ruby import RubyMarshalValue, RubySymbol, RubyUserObject, atom
 
 RPG_EVENT_COMMAND = atom("RPG::EventCommand")
@@ -173,10 +174,66 @@ class ContinueDialogueCommand(ShowDialogueCommand):
         }
 
 
+@attr.define(kw_only=True)
+class ChangeScreenColourToneCommand(RubyBaseEventCommand):
+    """
+    An event command that changes the screen's colour tone.
+    """
+
+    tone: RgssTone = attr.field()
+    frames: int = attr.field()
+
+    @classmethod
+    @override
+    def from_raw_event_command(cls, cmd: RawEventCommand) -> ChangeScreenColourToneCommand:
+        return ChangeScreenColourToneCommand(
+            tone=cast(RgssTone, cmd.parameters[0]), frames=cast(int, cmd.parameters[1])
+        )
+
+    @override
+    def get_raw_event_command(self) -> RawEventCommand:
+        return RawEventCommand(code=223, parameters=[self.tone, self.frames])
+
+    @override
+    def unstructure(self, converter: Converter) -> dict[str, Any]:
+        return {
+            "command": "ChangeScreenColourToneCommand",
+            "tone": converter.unstructure(self.tone),
+            "frames": self.frames,
+        }
+
+
+@attr.define(kw_only=True)
+class WaitCommand(RubyBaseEventCommand):
+    """
+    An event command that waits for a certain number of frames.
+    """
+
+    frames: int = attr.field()
+
+    @classmethod
+    @override
+    def from_raw_event_command(cls, cmd: RawEventCommand) -> WaitCommand:
+        return WaitCommand(frames=cast(int, cmd.parameters[0]))
+
+    @override
+    def get_raw_event_command(self) -> RawEventCommand:
+        return RawEventCommand(code=106, parameters=[self.frames])
+
+    @override
+    def unstructure(self, converter: Converter) -> dict[str, Any]:
+        return {
+            "command": "WaitCommand",
+            "frames": self.frames,
+        }
+
+
 COMMAND_MAPPING: dict[int, type[RubyBaseEventCommand]] = {
     0: EmptyEventCommand,
     101: ShowDialogueCommand,
     401: ContinueDialogueCommand,
+    223: ChangeScreenColourToneCommand,
+    106: WaitCommand,
 }
 
 
