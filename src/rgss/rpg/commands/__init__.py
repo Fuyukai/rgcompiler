@@ -14,8 +14,12 @@ from rgss.rpg.commands.dialogue import (
     ContinueDialogueCommand as ContinueDialogueCommand,
     ShowDialogueCommand as ShowDialogueCommand,
 )
-from rgss.rpg.commands.misc import (
+from rgss.rpg.commands.effects import (
     ChangeScreenColourToneCommand as ChangeScreenColourToneCommand,
+    PlaySfxCommand as PlaySfxCommand,
+    ScreenFlashCommand as ScreenFlashCommand,
+)
+from rgss.rpg.commands.misc import (
     EmptyEventCommand as EmptyEventCommand,
     InlineRubyCommand as InlineRubyCommand,
     UnknownEventCommand as UnknownEventCommand,
@@ -39,6 +43,8 @@ COMMAND_MAPPING: dict[int, type[RubyBaseEventCommand]] = {
     355: InlineRubyCommand,
     108: CommentCommand,
     408: ContinuedCommentCommand,
+    224: ScreenFlashCommand,
+    250: PlaySfxCommand,
 }
 
 COMMAND_OVERRIDDES: dict[int, Callable[[RawEventCommand], RubyBaseEventCommand]] = {
