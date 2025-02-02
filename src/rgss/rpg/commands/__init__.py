@@ -23,6 +23,7 @@ from rgss.rpg.commands.transfer import (
     VariableTransferPlayerCommand as VariableTransferPlayerCommand,
     make_transfer_command,
 )
+from rgss.rpg.commands.vars import SetSwitchCommand as SetSwitchCommand
 from rhodochrosite.ruby import RubyMarshalValue, RubySymbol
 
 COMMAND_MAPPING: dict[int, type[RubyBaseEventCommand]] = {
@@ -31,6 +32,7 @@ COMMAND_MAPPING: dict[int, type[RubyBaseEventCommand]] = {
     401: ContinueDialogueCommand,
     223: ChangeScreenColourToneCommand,
     106: WaitCommand,
+    121: SetSwitchCommand,
 }
 
 COMMAND_OVERRIDDES: dict[int, Callable[[RawEventCommand], RubyBaseEventCommand]] = {
