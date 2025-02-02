@@ -1,7 +1,14 @@
 from io import BytesIO
 
-from rgcompiler.ruby.rgss import COLOUR_TYPE, TABLE_TYPE, TONE_TYPE, RgssColour, RgssTable, RgssTone
-from rgcompiler.ruby.rpg import RPG_AUDIOFILE, AudioFile
+from rgcompiler.ruby.rgss import (
+    COLOUR_TYPE,
+    TABLE_TYPE,
+    TONE_TYPE,
+    RgssColour as RgssColour,
+    RgssTable as RgssTable,
+    RgssTone as RgssTone,
+)
+from rgcompiler.ruby.rpg import RPG_AUDIOFILE, RubyAudioFile as RubyAudioFile
 from rhodochrosite.cursor import Cursor
 from rhodochrosite.reader import MarshalReader
 from rhodochrosite.ruby import RubyMarshalValue, make_ruby_attrs_object_fn
@@ -17,7 +24,7 @@ def add_all_ruby_types(reader: MarshalReader) -> None:  # pragma: no cover
     reader.custom_factories[COLOUR_TYPE] = RgssColour.from_bytes
     reader.custom_factories[TONE_TYPE] = RgssTone.from_bytes
 
-    reader.object_factories[RPG_AUDIOFILE] = make_ruby_attrs_object_fn(AudioFile)
+    reader.object_factories[RPG_AUDIOFILE] = make_ruby_attrs_object_fn(RubyAudioFile)
 
 
 def make_reader(data: bytes) -> MarshalReader:  # pragma: no cover

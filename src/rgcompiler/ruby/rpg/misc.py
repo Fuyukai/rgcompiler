@@ -9,7 +9,7 @@ RPG_AUDIOFILE = atom("RPG::AudioFile")
 
 @attr.define(slots=True, kw_only=True)
 @final
-class AudioFile(RubyUserObject):
+class RubyAudioFile(RubyUserObject):
     """
     References an audio file in the RPG Maker database.
     """
