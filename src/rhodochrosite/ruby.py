@@ -224,7 +224,9 @@ class RubyUserObject(AnyRubyObject, abc.ABC):
         return ivars
 
 
-def make_ruby_attrs_object_fn(klass: type[RubyUserObject]) -> ObjectMakerFunc:
+def make_ruby_attrs_object_fn(
+    klass: type[RubyUserObject], *, skip_extra: bool = False
+) -> ObjectMakerFunc:
     """
     Makes a new :class:`.RubyUserObject` that uses ``attrs`` for its fields.
     """
@@ -253,8 +255,9 @@ def make_ruby_attrs_object_fn(klass: type[RubyUserObject]) -> ObjectMakerFunc:
 
             kwargs[field_name] = transformed_ivars.pop(name)
 
-        if transformed_ivars:
-            raise ValueError(f"Can't map {transformed_ivars} to object {klass}")
+        if transformed_ivars and not skip_extra:
+            names = ", ".join(transformed_ivars.keys())
+            raise ValueError(f"{klass.__name__} is missing attributes for {names}")
 
         return klass(**kwargs)
 
