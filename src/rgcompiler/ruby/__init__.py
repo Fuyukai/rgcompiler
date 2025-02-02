@@ -11,19 +11,24 @@ from rgcompiler.ruby.rgss import (
 from rgcompiler.ruby.rpg import (
     RPG_AUDIOFILE,
     RPG_EVENT,
+    RPG_EVENT_COMMAND,
     RPG_EVENT_CONDITION,
     RPG_EVENT_GRAPHIC,
     RPG_EVENT_PAGE,
     RPG_MAP,
     RPG_TILESET,
+    EmptyEventCommand as EmptyEventCommand,
     RubyAudioFile as RubyAudioFile,
+    RubyBaseEventCommand as RubyBaseEventCommand,
     RubyEventGraphic as RubyEventGraphic,
     RubyEventPage as RubyEventPage,
     RubyEventPageCondition as RubyEventPageCondition,
     RubyRpgEvent as RubyRpgEvent,
     RubyRpgMap as RubyRpgMap,
     RubyTileset as RubyTileset,
+    UnknownEventCommand as UnknownEventCommand,
 )
+from rgcompiler.ruby.rpg.event_commands import make_event_command_from_ivars
 from rhodochrosite.cursor import Cursor
 from rhodochrosite.reader import MarshalReader
 from rhodochrosite.ruby import RubyMarshalValue, make_ruby_attrs_object_fn
@@ -46,6 +51,7 @@ def add_all_ruby_types(reader: MarshalReader) -> None:  # pragma: no cover
     reader.object_factories[RPG_EVENT_PAGE] = make_ruby_attrs_object_fn(RubyEventPage)
     reader.object_factories[RPG_EVENT_CONDITION] = make_ruby_attrs_object_fn(RubyEventPageCondition)
     reader.object_factories[RPG_EVENT_GRAPHIC] = make_ruby_attrs_object_fn(RubyEventGraphic)
+    reader.object_factories[RPG_EVENT_COMMAND] = make_event_command_from_ivars
 
 
 def make_reader(data: bytes) -> MarshalReader:  # pragma: no cover

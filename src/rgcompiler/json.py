@@ -3,6 +3,7 @@ from typing import Any
 
 from cattr import Converter
 
+from rgcompiler.ruby.rpg.event_commands import RubyBaseEventCommand
 from rhodochrosite.ruby import GenericRubyUserObject, RubySymbol
 
 
@@ -30,6 +31,7 @@ def make_converter() -> Converter:
 
     converter = Converter()
     converter.register_unstructure_hook(RubySymbol, partial(unstructure_symbol, converter))
+    converter.register_unstructure_hook(RubyBaseEventCommand, lambda it: it.unstructure(converter))
     converter.register_unstructure_hook(
         GenericRubyUserObject, partial(unstructure_generic_ruby_object, converter)
     )

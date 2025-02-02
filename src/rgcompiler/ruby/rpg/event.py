@@ -2,6 +2,7 @@ from typing import Literal, final, override
 
 import attrs
 
+from rgcompiler.ruby.rpg.event_commands import RubyBaseEventCommand
 from rhodochrosite.ruby import GenericRubyUserObject, RubySymbol, RubyUserObject, atom, ruby_name
 
 RPG_EVENT = atom("RPG::Event")
@@ -108,7 +109,7 @@ class RubyEventPage(RubyUserObject):
     always_on_top: bool = attrs.field()
     trigger: bool = attrs.field()  # wtf is this?
     through: bool = attrs.field()
-    commands: list[GenericRubyUserObject] = attrs.field(metadata=ruby_name("list"))
+    commands: list[RubyBaseEventCommand] = attrs.field(metadata=ruby_name("list"))
 
     @property
     @override
