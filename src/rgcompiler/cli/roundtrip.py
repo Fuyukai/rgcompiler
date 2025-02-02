@@ -1,7 +1,7 @@
 import sys
 from pathlib import Path
 
-from rgcompiler.ruby import read_object_rgxp, write_object_rgxp
+from rgss import read_object_rgxp, write_object_rgxp
 
 
 def main() -> int:

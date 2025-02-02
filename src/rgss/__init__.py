@@ -1,14 +1,8 @@
+from __future__ import annotations
+
 from io import BytesIO
 
-from rgcompiler.ruby.rgss import (
-    COLOUR_TYPE,
-    TABLE_TYPE,
-    TONE_TYPE,
-    RgssColour as RgssColour,
-    RgssTable as RgssTable,
-    RgssTone as RgssTone,
-)
-from rgcompiler.ruby.rpg import (
+from rgss.rpg import (
     RPG_AUDIOFILE,
     RPG_EVENT,
     RPG_EVENT_COMMAND,
@@ -28,7 +22,15 @@ from rgcompiler.ruby.rpg import (
     RubyTileset as RubyTileset,
     UnknownEventCommand as UnknownEventCommand,
 )
-from rgcompiler.ruby.rpg.event_commands import make_event_command_from_ivars
+from rgss.rpg.event_commands import make_event_command_from_ivars
+from rgss.types import (
+    COLOUR_TYPE,
+    TABLE_TYPE,
+    TONE_TYPE,
+    RgssColour as RgssColour,
+    RgssTable as RgssTable,
+    RgssTone as RgssTone,
+)
 from rhodochrosite.cursor import Cursor
 from rhodochrosite.reader import MarshalReader
 from rhodochrosite.ruby import RubyMarshalValue, make_ruby_attrs_object_fn

@@ -2,7 +2,7 @@ from typing import Literal, final, override
 
 import attrs
 
-from rgcompiler.ruby.rpg.event_commands import RubyBaseEventCommand
+from rgss.rpg.event_commands import RubyBaseEventCommand
 from rhodochrosite.ruby import GenericRubyUserObject, RubySymbol, RubyUserObject, atom, ruby_name
 
 RPG_EVENT = atom("RPG::Event")

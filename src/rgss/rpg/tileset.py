@@ -2,7 +2,7 @@ from typing import final, override
 
 import attrs
 
-from rgcompiler.ruby.rgss import RgssTable
+from rgss.types import RgssTable
 from rhodochrosite.ruby import RubySymbol, RubyUserObject, atom
 
 RPG_TILESET = atom("RPG::Tileset")

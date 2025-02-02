@@ -7,7 +7,7 @@ import attr
 import attrs
 from cattr import Converter
 
-from rgcompiler.ruby.rgss import RgssTone
+from rgss.types import RgssTone
 from rhodochrosite.ruby import RubyMarshalValue, RubySymbol, RubyUserObject, atom
 
 RPG_EVENT_COMMAND = atom("RPG::EventCommand")

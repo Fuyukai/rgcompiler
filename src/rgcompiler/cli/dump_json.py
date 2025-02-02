@@ -4,8 +4,8 @@ from pathlib import Path
 
 from rich import print as r_print
 
-from rgcompiler.json import CONVERTER
-from rgcompiler.ruby import make_reader
+from rgss import make_reader
+from rgss.json import CONVERTER
 
 
 def main() -> int:

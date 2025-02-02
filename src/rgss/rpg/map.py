@@ -2,9 +2,9 @@ from typing import final, override
 
 import attrs
 
-from rgcompiler.ruby.rgss import RgssTable
-from rgcompiler.ruby.rpg.event import RubyRpgEvent
-from rgcompiler.ruby.rpg.misc import RubyAudioFile
+from rgss.rpg.event import RubyRpgEvent
+from rgss.rpg.misc import RubyAudioFile
+from rgss.types import RgssTable
 from rhodochrosite.ruby import (
     RubyMarshalValue,
     RubySymbol,
