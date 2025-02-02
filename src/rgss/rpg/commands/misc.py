@@ -2,7 +2,7 @@ from __future__ import annotations
 
 from typing import Any, cast, final, override
 
-import attr
+import attrs
 from cattr import Converter
 
 from rgss.rpg.commands.base import RawEventCommand, RubyBaseEventCommand
@@ -31,14 +31,14 @@ class EmptyEventCommand(RubyBaseEventCommand):
         return {"command": "EmptyEventCommand"}
 
 
-@attr.define(kw_only=True)
+@attrs.define(kw_only=True)
 @final
 class UnknownEventCommand(RubyBaseEventCommand):
     """
     An event command that is currently unknown.
     """
 
-    raw: RawEventCommand = attr.field()
+    raw: RawEventCommand = attrs.field()
 
     @classmethod
     @override
@@ -54,14 +54,14 @@ class UnknownEventCommand(RubyBaseEventCommand):
         return super().unstructure(converter)
 
 
-@attr.define(kw_only=True)
+@attrs.define(kw_only=True)
 class ChangeScreenColourToneCommand(RubyBaseEventCommand):
     """
     An event command that changes the screen's colour tone.
     """
 
-    tone: RgssTone = attr.field()
-    frames: int = attr.field()
+    tone: RgssTone = attrs.field()
+    frames: int = attrs.field()
 
     @classmethod
     @override
@@ -83,13 +83,13 @@ class ChangeScreenColourToneCommand(RubyBaseEventCommand):
         }
 
 
-@attr.define(kw_only=True)
+@attrs.define(kw_only=True)
 class WaitCommand(RubyBaseEventCommand):
     """
     An event command that waits for a certain number of frames.
     """
 
-    frames: int = attr.field()
+    frames: int = attrs.field()
 
     @classmethod
     @override

@@ -1,3 +1,4 @@
+from collections.abc import Callable
 from typing import cast
 
 from rgss.rpg.commands.base import (
@@ -17,6 +18,11 @@ from rgss.rpg.commands.misc import (
     UnknownEventCommand as UnknownEventCommand,
     WaitCommand as WaitCommand,
 )
+from rgss.rpg.commands.transfer import (
+    DirectTransferPlayerCommand as DirectTransferPlayerCommand,
+    VariableTransferPlayerCommand as VariableTransferPlayerCommand,
+    make_transfer_command,
+)
 from rhodochrosite.ruby import RubyMarshalValue, RubySymbol
 
 COMMAND_MAPPING: dict[int, type[RubyBaseEventCommand]] = {
@@ -27,15 +33,29 @@ COMMAND_MAPPING: dict[int, type[RubyBaseEventCommand]] = {
     106: WaitCommand,
 }
 
+COMMAND_OVERRIDDES: dict[int, Callable[[RawEventCommand], RubyBaseEventCommand]] = {
+    201: make_transfer_command,
+}
+
+
+def make_raw_event_command(ivars: dict[RubySymbol, RubyMarshalValue]) -> RawEventCommand:
+    return RawEventCommand(
+        code=cast(int, ivars[CODE_SYMBOL]),
+        parameters=cast(list[RubyMarshalValue], ivars[PARAMS_SYMBOL]),
+        indent=cast(int, ivars[INDENT_SYMBOL]),
+    )
+
 
 def make_event_command_from_ivars(
     _: RubySymbol, ivars: dict[RubySymbol, RubyMarshalValue]
 ) -> RubyBaseEventCommand:
     code = cast(int, ivars[CODE_SYMBOL])
+
+    fn = COMMAND_OVERRIDDES.get(
+        code, COMMAND_MAPPING.get(code, UnknownEventCommand).from_raw_event_command
+    )
+    return fn(make_raw_event_command(ivars))
+
     return COMMAND_MAPPING.get(code, UnknownEventCommand).from_raw_event_command(
-        RawEventCommand(
-            code=code,
-            parameters=cast(list[RubyMarshalValue], ivars[PARAMS_SYMBOL]),
-            indent=cast(int, ivars[INDENT_SYMBOL]),
-        )
+        make_raw_event_command(ivars)
     )
