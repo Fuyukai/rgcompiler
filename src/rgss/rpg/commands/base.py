@@ -98,6 +98,5 @@ class RubyBaseMoveCommand(RubyBaseCommand, abc.ABC):
         cmd = self.to_raw_command()
         return [
             (PARAMS_SYMBOL, cmd.parameters),
-            (INDENT_SYMBOL, cmd.indent),
             (CODE_SYMBOL, cmd.code),
         ]

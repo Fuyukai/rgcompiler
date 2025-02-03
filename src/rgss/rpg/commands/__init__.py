@@ -5,6 +5,8 @@ from rgss.rpg.commands.base import (
     CODE_SYMBOL,
     INDENT_SYMBOL,
     PARAMS_SYMBOL,
+    RPG_EVENT_COMMAND,
+    RPG_MOVE_COMMAND,
     RawCommand as RawCommand,
     RubyBaseCommand,
     RubyBaseEventCommand as RubyBaseEventCommand,
@@ -27,7 +29,7 @@ from rgss.rpg.commands.misc import (
     InlineRubyCommand as InlineRubyCommand,
     InlineRubyContinuedCommand as InlineRubyContinuedCommand,
     SetMoveRouteCommand as SetMoveRouteCommand,
-    UnknownEventCommand as UnknownEventCommand,
+    UnknownCommand as UnknownCommand,
     VisualMoveRouteCommand as VisualMoveRouteCommand,
     WaitCommand as WaitCommand,
 )
@@ -72,7 +74,7 @@ def make_raw_event_command(ivars: dict[RubySymbol, RubyMarshalValue]) -> RawComm
     return RawCommand(
         code=cast(int, ivars[CODE_SYMBOL]),
         parameters=cast(list[RubyMarshalValue], ivars[PARAMS_SYMBOL]),
-        indent=cast(int, ivars[INDENT_SYMBOL]),
+        indent=cast(int, ivars.get(INDENT_SYMBOL, 0)),
     )
 
 
@@ -84,7 +86,27 @@ def make_command_from_ivars(
     if code == 0:
         return EmptyCommand(symbol=name)
 
-    fn = COMMAND_OVERRIDDES.get(
-        code, COMMAND_MAPPING.get(code, UnknownEventCommand).from_raw_command
-    )
-    return fn(make_raw_event_command(ivars))
+    fn = COMMAND_OVERRIDDES.get(code)
+    if fn is None:
+        klass = COMMAND_MAPPING.get(code)
+        if klass is not None:
+            fn = klass.from_raw_command
+
+    raw_cmd = make_raw_event_command(ivars)
+
+    if fn is None:  # noqa: SIM108
+        result = UnknownCommand(name=name, raw=raw_cmd)
+    else:
+        result = fn(raw_cmd)
+
+    if __debug__:
+        if code < 100:
+            assert result.ruby_class_name == RPG_MOVE_COMMAND, (
+                f"expected a move command with code {code}, got {result}"
+            )
+        else:
+            assert result.ruby_class_name == RPG_EVENT_COMMAND, (
+                f"expected an event command with code {code}"
+            )
+
+    return result

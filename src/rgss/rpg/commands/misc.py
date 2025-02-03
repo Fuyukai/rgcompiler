@@ -5,14 +5,14 @@ from typing import Any, cast, final, override
 import attrs
 from cattr import Converter
 
-from rgss.rpg.commands.base import RawCommand, RubyBaseEventCommand
+from rgss.rpg.commands.base import RawCommand, RubyBaseCommand, RubyBaseEventCommand
 from rgss.rpg.moves import RubyMoveRoute
 from rhodochrosite.ruby import RubySymbol
 
 
 @attrs.define(kw_only=True)
 @final
-class EmptyCommand(RubyBaseEventCommand):
+class EmptyCommand(RubyBaseCommand):
     """
     An event command that is empty.
 
@@ -42,17 +42,23 @@ class EmptyCommand(RubyBaseEventCommand):
 
 @attrs.define(kw_only=True)
 @final
-class UnknownEventCommand(RubyBaseEventCommand):
+class UnknownCommand(RubyBaseCommand):
     """
     An event command that is currently unknown.
     """
 
+    name: RubySymbol = attrs.field()
     raw: RawCommand = attrs.field()
+
+    @property
+    @override
+    def ruby_class_name(self) -> RubySymbol:
+        return self.name
 
     @classmethod
     @override
-    def from_raw_command(cls, cmd: RawCommand) -> UnknownEventCommand:
-        return UnknownEventCommand(raw=cmd)
+    def from_raw_command(cls, cmd: RawCommand) -> UnknownCommand:
+        raise NotImplementedError("Special form can't be made using from_raw_command")
 
     @override
     def to_raw_command(self) -> RawCommand:
