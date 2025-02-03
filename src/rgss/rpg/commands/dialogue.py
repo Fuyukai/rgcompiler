@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+import enum
 from typing import Any, cast, override
 
 import attrs
@@ -122,6 +123,15 @@ class ContinuedCommentCommand(CommentCommand):
         }
 
 
+class ChoiceCancelledAction(enum.IntEnum):
+    Disallow = 0
+    Choice1 = 1
+    Choice2 = 2
+    Choice3 = 3
+    Choice4 = 4
+    Branch = 5
+
+
 @attrs.define(kw_only=True)
 class SelectChoiceCommand(RubyBaseEventCommand):
     """
@@ -132,21 +142,21 @@ class SelectChoiceCommand(RubyBaseEventCommand):
     # It's either been zero, len(choices), len(choices) + 1.
 
     choices: list[str] = attrs.field()
-    default_index: int = attrs.field()
+    when_cancelled: ChoiceCancelledAction = attrs.field()
 
     @classmethod
     @override
     def from_raw_command(cls, cmd: RawCommand) -> SelectChoiceCommand:
         return SelectChoiceCommand(
             choices=cast(list[str], cmd.parameters[0]),
-            default_index=cast(int, cmd.parameters[1]),
+            when_cancelled=ChoiceCancelledAction(cmd.parameters[1]),
         )
 
     @override
     def to_raw_command(self) -> RawCommand:
         return RawCommand(
             code=102,
-            parameters=[self.choices, self.default_index],
+            parameters=[self.choices, self.when_cancelled.value],
         )
 
     @override
@@ -154,4 +164,5 @@ class SelectChoiceCommand(RubyBaseEventCommand):
         return {
             "command": "SelectChoiceCommand",
             "choices": self.choices,
+            "when_cancelled": self.when_cancelled.name,
         }
