@@ -43,7 +43,10 @@ from rgss.rpg.commands.misc import (
     VisualMoveRouteCommand as VisualMoveRouteCommand,
     WaitCommand as WaitCommand,
 )
-from rgss.rpg.commands.move import BasicDirectionMoveCommand as BasicDirectionMoveCommand
+from rgss.rpg.commands.move import (
+    BasicDirectionMoveCommand as BasicDirectionMoveCommand,
+    StepOneCommand as StepOneCommand,
+)
 from rgss.rpg.commands.transfer import (
     DirectTransferPlayerCommand as DirectTransferPlayerCommand,
     VariableTransferPlayerCommand as VariableTransferPlayerCommand,
@@ -62,6 +65,8 @@ COMMAND_MAPPING: dict[int, type[RubyBaseCommand]] = {
     2: BasicDirectionMoveCommand,
     3: BasicDirectionMoveCommand,
     4: BasicDirectionMoveCommand,
+    12: StepOneCommand,
+    13: StepOneCommand,
 
     101: ShowDialogueCommand,
     401: ContinueDialogueCommand,

@@ -23,6 +23,7 @@ DIRECTION_REVERSE_CODES = [
 ]
 
 
+# <MoveOnce direction="Left">
 @attrs.define(kw_only=True)
 class BasicDirectionMoveCommand(RubyBaseMoveCommand):
     """
@@ -46,3 +47,29 @@ class BasicDirectionMoveCommand(RubyBaseMoveCommand):
     @override
     def unstructure(self, converter: Converter) -> dict[str, Any]:
         return {"command": "BasicDirectionMoveCommand", "direction": self.direction.name}
+
+
+# <MoveStep backwards="true">
+@attrs.define(kw_only=True)
+class StepOneCommand(RubyBaseMoveCommand):
+    """
+    A move command for stepping forwards or backwards.
+    """
+
+    backwards: bool = attrs.field()
+
+    @classmethod
+    @override
+    def from_raw_command(cls, cmd: RawCommand) -> StepOneCommand:
+        return cls(backwards=cmd.code == 13)
+
+    @override
+    def to_raw_command(self) -> RawCommand:
+        return RawCommand(code=13 if self.backwards else 12, parameters=[], indent=0)
+
+    @override
+    def unstructure(self, converter: Converter) -> dict[str, Any]:
+        return {
+            "command": "StepOneCommand",
+            "direction": "Backwards" if self.backwards else "Forwards",
+        }
