@@ -102,7 +102,31 @@ class InlineRubyCommand(RubyBaseEventCommand):
             "command": "InlineRubyCommand",
             "script": self.script,
         }
+    
 
+@attrs.define(kw_only=True)
+class InlineRubyContinuedCommand(RubyBaseEventCommand):
+    """
+    Like :class:`.InlineRubyCommand`, but continued onto the next editor line.
+    """
+
+    script: str = attrs.field()
+
+    @classmethod
+    @override
+    def from_raw_event_command(cls, cmd: RawEventCommand) -> InlineRubyContinuedCommand:
+        return InlineRubyContinuedCommand(script=cast(str, cmd.parameters[0]))
+
+    @override
+    def get_raw_event_command(self) -> RawEventCommand:
+        return RawEventCommand(code=655, parameters=[self.script])
+
+    @override
+    def unstructure(self, converter: Converter) -> dict[str, Any]:
+        return {
+            "command": "InlineRubyContinuedCommand",
+            "script": self.script,
+        }
 
 @attrs.define(kw_only=True)
 class SetMoveRouteCommand(RubyBaseEventCommand):

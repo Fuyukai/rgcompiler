@@ -23,6 +23,7 @@ from rgss.rpg.commands.effects import (
 from rgss.rpg.commands.misc import (
     EmptyEventCommand as EmptyEventCommand,
     InlineRubyCommand as InlineRubyCommand,
+    InlineRubyContinuedCommand as InlineRubyContinuedCommand,
     SetMoveRouteCommand as SetMoveRouteCommand,
     UnknownEventCommand as UnknownEventCommand,
     VisualMoveRouteCommand as VisualMoveRouteCommand,
@@ -48,6 +49,7 @@ COMMAND_MAPPING: dict[int, type[RubyBaseEventCommand]] = {
     106: WaitCommand,
     121: SetSwitchCommand,
     355: InlineRubyCommand,
+    655: InlineRubyContinuedCommand,
     108: CommentCommand,
     408: ContinuedCommentCommand,
     224: ScreenFlashCommand,
