@@ -25,3 +25,4 @@ class RubyMoveRoute(RubyUserObject):
     @override
     def ruby_class_name(self) -> RubySymbol:
         return RPG_MOVE_ROUTE
+

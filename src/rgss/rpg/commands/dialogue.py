@@ -5,7 +5,7 @@ from typing import Any, cast, override
 import attrs
 from cattr import Converter
 
-from rgss.rpg.commands.base import RawEventCommand, RubyBaseEventCommand
+from rgss.rpg.commands.base import RawCommand, RubyBaseEventCommand
 
 # Interesting note: 401/408 are weird, they're only separate to show the text in the editor.
 # 101 -> 401 will force scrolling, 101 -> 101 will force a new message.
@@ -21,12 +21,12 @@ class ShowDialogueCommand(RubyBaseEventCommand):
 
     @classmethod
     @override
-    def from_raw_event_command(cls, cmd: RawEventCommand) -> ShowDialogueCommand:
+    def from_raw_command(cls, cmd: RawCommand) -> ShowDialogueCommand:
         return ShowDialogueCommand(text=cast(str, cmd.parameters[0]))
 
     @override
-    def get_raw_event_command(self) -> RawEventCommand:
-        return RawEventCommand(
+    def to_raw_command(self) -> RawCommand:
+        return RawCommand(
             code=101,
             parameters=[self.text],
         )
@@ -47,12 +47,12 @@ class ContinueDialogueCommand(ShowDialogueCommand):
 
     @classmethod
     @override
-    def from_raw_event_command(cls, cmd: RawEventCommand) -> ContinueDialogueCommand:
+    def from_raw_command(cls, cmd: RawCommand) -> ContinueDialogueCommand:
         return ContinueDialogueCommand(text=cast(str, cmd.parameters[0]))
 
     @override
-    def get_raw_event_command(self) -> RawEventCommand:
-        return RawEventCommand(
+    def to_raw_command(self) -> RawCommand:
+        return RawCommand(
             code=401,
             parameters=[self.text],
         )
@@ -78,12 +78,12 @@ class CommentCommand(RubyBaseEventCommand):
 
     @classmethod
     @override
-    def from_raw_event_command(cls, cmd: RawEventCommand) -> CommentCommand:
+    def from_raw_command(cls, cmd: RawCommand) -> CommentCommand:
         return CommentCommand(comment=cast(str, cmd.parameters[0]))
 
     @override
-    def get_raw_event_command(self) -> RawEventCommand:
-        return RawEventCommand(
+    def to_raw_command(self) -> RawCommand:
+        return RawCommand(
             code=108,
             parameters=[self.comment],
         )
@@ -104,12 +104,12 @@ class ContinuedCommentCommand(CommentCommand):
 
     @classmethod
     @override
-    def from_raw_event_command(cls, cmd: RawEventCommand) -> ContinuedCommentCommand:
+    def from_raw_command(cls, cmd: RawCommand) -> ContinuedCommentCommand:
         return ContinuedCommentCommand(comment=cast(str, cmd.parameters[0]))
 
     @override
-    def get_raw_event_command(self) -> RawEventCommand:
-        return RawEventCommand(
+    def to_raw_command(self) -> RawCommand:
+        return RawCommand(
             code=408,
             parameters=[self.comment],
         )
@@ -136,15 +136,15 @@ class SelectChoiceCommand(RubyBaseEventCommand):
 
     @classmethod
     @override
-    def from_raw_event_command(cls, cmd: RawEventCommand) -> SelectChoiceCommand:
+    def from_raw_command(cls, cmd: RawCommand) -> SelectChoiceCommand:
         return SelectChoiceCommand(
             choices=cast(list[str], cmd.parameters[0]),
             default_index=cast(int, cmd.parameters[1]),
         )
 
     @override
-    def get_raw_event_command(self) -> RawEventCommand:
-        return RawEventCommand(
+    def to_raw_command(self) -> RawCommand:
+        return RawCommand(
             code=102,
             parameters=[self.choices, self.default_index],
         )

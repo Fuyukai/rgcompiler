@@ -5,30 +5,39 @@ from typing import Any, cast, final, override
 import attrs
 from cattr import Converter
 
-from rgss.rpg.commands.base import RawEventCommand, RubyBaseEventCommand
+from rgss.rpg.commands.base import RawCommand, RubyBaseEventCommand
 from rgss.rpg.moves import RubyMoveRoute
+from rhodochrosite.ruby import RubySymbol
 
 
+@attrs.define(kw_only=True)
 @final
-class EmptyEventCommand(RubyBaseEventCommand):
+class EmptyCommand(RubyBaseEventCommand):
     """
     An event command that is empty.
 
     This is used for events with no events.
     """
 
+    symbol: RubySymbol = attrs.field()
+
+    @property
+    @override
+    def ruby_class_name(self) -> RubySymbol:
+        return self.symbol
+
     @classmethod
     @override
-    def from_raw_event_command(cls, cmd: RawEventCommand) -> EmptyEventCommand:
-        return EmptyEventCommand()
+    def from_raw_command(cls, cmd: RawCommand) -> EmptyCommand:
+        raise NotImplementedError("Can't do this with the empty command")
 
     @override
-    def get_raw_event_command(self) -> RawEventCommand:
-        return RawEventCommand(code=0)
+    def to_raw_command(self) -> RawCommand:
+        return RawCommand(code=0)
 
     @override
     def unstructure(self, converter: Converter) -> dict[str, Any]:
-        return {"command": "EmptyEventCommand"}
+        return {"command": "EmptyCommand"}
 
 
 @attrs.define(kw_only=True)
@@ -38,15 +47,15 @@ class UnknownEventCommand(RubyBaseEventCommand):
     An event command that is currently unknown.
     """
 
-    raw: RawEventCommand = attrs.field()
+    raw: RawCommand = attrs.field()
 
     @classmethod
     @override
-    def from_raw_event_command(cls, cmd: RawEventCommand) -> UnknownEventCommand:
+    def from_raw_command(cls, cmd: RawCommand) -> UnknownEventCommand:
         return UnknownEventCommand(raw=cmd)
 
     @override
-    def get_raw_event_command(self) -> RawEventCommand:
+    def to_raw_command(self) -> RawCommand:
         return self.raw
 
     @override
@@ -64,12 +73,12 @@ class WaitCommand(RubyBaseEventCommand):
 
     @classmethod
     @override
-    def from_raw_event_command(cls, cmd: RawEventCommand) -> WaitCommand:
+    def from_raw_command(cls, cmd: RawCommand) -> WaitCommand:
         return WaitCommand(frames=cast(int, cmd.parameters[0]))
 
     @override
-    def get_raw_event_command(self) -> RawEventCommand:
-        return RawEventCommand(code=106, parameters=[self.frames])
+    def to_raw_command(self) -> RawCommand:
+        return RawCommand(code=106, parameters=[self.frames])
 
     @override
     def unstructure(self, converter: Converter) -> dict[str, Any]:
@@ -89,12 +98,12 @@ class InlineRubyCommand(RubyBaseEventCommand):
 
     @classmethod
     @override
-    def from_raw_event_command(cls, cmd: RawEventCommand) -> InlineRubyCommand:
+    def from_raw_command(cls, cmd: RawCommand) -> InlineRubyCommand:
         return InlineRubyCommand(script=cast(str, cmd.parameters[0]))
 
     @override
-    def get_raw_event_command(self) -> RawEventCommand:
-        return RawEventCommand(code=355, parameters=[self.script])
+    def to_raw_command(self) -> RawCommand:
+        return RawCommand(code=355, parameters=[self.script])
 
     @override
     def unstructure(self, converter: Converter) -> dict[str, Any]:
@@ -114,12 +123,12 @@ class InlineRubyContinuedCommand(RubyBaseEventCommand):
 
     @classmethod
     @override
-    def from_raw_event_command(cls, cmd: RawEventCommand) -> InlineRubyContinuedCommand:
+    def from_raw_command(cls, cmd: RawCommand) -> InlineRubyContinuedCommand:
         return InlineRubyContinuedCommand(script=cast(str, cmd.parameters[0]))
 
     @override
-    def get_raw_event_command(self) -> RawEventCommand:
-        return RawEventCommand(code=655, parameters=[self.script])
+    def to_raw_command(self) -> RawCommand:
+        return RawCommand(code=655, parameters=[self.script])
 
     @override
     def unstructure(self, converter: Converter) -> dict[str, Any]:
@@ -140,15 +149,15 @@ class SetMoveRouteCommand(RubyBaseEventCommand):
 
     @classmethod
     @override
-    def from_raw_event_command(cls, cmd: RawEventCommand) -> SetMoveRouteCommand:
+    def from_raw_command(cls, cmd: RawCommand) -> SetMoveRouteCommand:
         return SetMoveRouteCommand(
             event_id=cast(int, cmd.parameters[0]),
             move_route=cast(RubyMoveRoute, cmd.parameters[1]),
         )
 
     @override
-    def get_raw_event_command(self) -> RawEventCommand:
-        return RawEventCommand(code=209, parameters=[self.event_id, self.move_route])
+    def to_raw_command(self) -> RawCommand:
+        return RawCommand(code=209, parameters=[self.event_id, self.move_route])
 
     @override
     def unstructure(self, converter: Converter) -> dict[str, Any]:
@@ -172,12 +181,12 @@ class VisualMoveRouteCommand(RubyBaseEventCommand):
 
     @classmethod
     @override
-    def from_raw_event_command(cls, cmd: RawEventCommand) -> VisualMoveRouteCommand:
+    def from_raw_command(cls, cmd: RawCommand) -> VisualMoveRouteCommand:
         return VisualMoveRouteCommand(move_route=cast(RubyMoveRoute, cmd.parameters[0]))
 
     @override
-    def get_raw_event_command(self) -> RawEventCommand:
-        return RawEventCommand(code=509, parameters=[self.move_route])
+    def to_raw_command(self) -> RawCommand:
+        return RawCommand(code=509, parameters=[self.move_route])
 
     @override
     def unstructure(self, converter: Converter) -> dict[str, Any]:

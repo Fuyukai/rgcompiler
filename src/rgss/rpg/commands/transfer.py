@@ -5,7 +5,7 @@ from typing import Any, cast, override
 import attrs
 from cattr import Converter
 
-from rgss.rpg.commands.base import RawEventCommand, RubyBaseEventCommand
+from rgss.rpg.commands.base import RawCommand, RubyBaseEventCommand
 from rgss.types import RgssDirection
 
 
@@ -25,7 +25,7 @@ class DirectTransferPlayerCommand(RubyBaseEventCommand):
 
     @classmethod
     @override
-    def from_raw_event_command(cls, cmd: RawEventCommand) -> DirectTransferPlayerCommand:
+    def from_raw_command(cls, cmd: RawCommand) -> DirectTransferPlayerCommand:
         return DirectTransferPlayerCommand(
             map_id=cast(int, cmd.parameters[1]),
             x=cast(int, cmd.parameters[2]),
@@ -35,8 +35,8 @@ class DirectTransferPlayerCommand(RubyBaseEventCommand):
         )
 
     @override
-    def get_raw_event_command(self) -> RawEventCommand:
-        return RawEventCommand(
+    def to_raw_command(self) -> RawCommand:
+        return RawCommand(
             code=201,
             parameters=[0, self.map_id, self.x, self.y, self.direction.value, int(self.no_fade)],
         )
@@ -69,7 +69,7 @@ class VariableTransferPlayerCommand(RubyBaseEventCommand):
 
     @classmethod
     @override
-    def from_raw_event_command(cls, cmd: RawEventCommand) -> VariableTransferPlayerCommand:
+    def from_raw_command(cls, cmd: RawCommand) -> VariableTransferPlayerCommand:
         return VariableTransferPlayerCommand(
             map_id_variable=cast(int, cmd.parameters[1]),
             x_variable=cast(int, cmd.parameters[2]),
@@ -79,8 +79,8 @@ class VariableTransferPlayerCommand(RubyBaseEventCommand):
         )
 
     @override
-    def get_raw_event_command(self) -> RawEventCommand:
-        return RawEventCommand(
+    def to_raw_command(self) -> RawCommand:
+        return RawCommand(
             code=201,
             parameters=[
                 1,
@@ -104,13 +104,13 @@ class VariableTransferPlayerCommand(RubyBaseEventCommand):
         }
 
 
-def make_transfer_command(raw: RawEventCommand) -> RubyBaseEventCommand:
+def make_transfer_command(raw: RawCommand) -> RubyBaseEventCommand:
     assert raw.parameters[0] in (0, 1), (
         f"expected first param of code 201 to be (0, 1), not {raw.parameters[0]}"
     )
     uses_variables = raw.parameters[0] == 1
 
     if uses_variables:
-        return VariableTransferPlayerCommand.from_raw_event_command(raw)
+        return VariableTransferPlayerCommand.from_raw_command(raw)
 
-    return DirectTransferPlayerCommand.from_raw_event_command(raw)
+    return DirectTransferPlayerCommand.from_raw_command(raw)

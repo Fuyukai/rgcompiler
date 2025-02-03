@@ -5,7 +5,7 @@ from typing import Any, cast, override
 import attrs
 from cattr import Converter
 
-from rgss.rpg.commands.base import RawEventCommand, RubyBaseEventCommand
+from rgss.rpg.commands.base import RawCommand, RubyBaseEventCommand
 from rgss.rpg.misc import RubyAudioFile
 from rgss.types import RgssColour, RgssDirection, RgssTone
 
@@ -21,14 +21,14 @@ class ChangeScreenColourToneCommand(RubyBaseEventCommand):
 
     @classmethod
     @override
-    def from_raw_event_command(cls, cmd: RawEventCommand) -> ChangeScreenColourToneCommand:
+    def from_raw_command(cls, cmd: RawCommand) -> ChangeScreenColourToneCommand:
         return ChangeScreenColourToneCommand(
             tone=cast(RgssTone, cmd.parameters[0]), frames=cast(int, cmd.parameters[1])
         )
 
     @override
-    def get_raw_event_command(self) -> RawEventCommand:
-        return RawEventCommand(code=223, parameters=[self.tone, self.frames])
+    def to_raw_command(self) -> RawCommand:
+        return RawCommand(code=223, parameters=[self.tone, self.frames])
 
     @override
     def unstructure(self, converter: Converter) -> dict[str, Any]:
@@ -50,14 +50,14 @@ class ScreenFlashCommand(RubyBaseEventCommand):
 
     @classmethod
     @override
-    def from_raw_event_command(cls, cmd: RawEventCommand) -> ScreenFlashCommand:
+    def from_raw_command(cls, cmd: RawCommand) -> ScreenFlashCommand:
         return ScreenFlashCommand(
             colour=cast(RgssTone, cmd.parameters[0]), frames=cast(int, cmd.parameters[1])
         )
 
     @override
-    def get_raw_event_command(self) -> RawEventCommand:
-        return RawEventCommand(code=224, parameters=[self.colour, self.frames])
+    def to_raw_command(self) -> RawCommand:
+        return RawCommand(code=224, parameters=[self.colour, self.frames])
 
     @override
     def unstructure(self, converter: Converter) -> dict[str, Any]:
@@ -78,12 +78,12 @@ class PlaySfxCommand(RubyBaseEventCommand):
 
     @classmethod
     @override
-    def from_raw_event_command(cls, cmd: RawEventCommand) -> PlaySfxCommand:
+    def from_raw_command(cls, cmd: RawCommand) -> PlaySfxCommand:
         return PlaySfxCommand(audio=cast(RubyAudioFile, cmd.parameters[0]))
 
     @override
-    def get_raw_event_command(self) -> RawEventCommand:
-        return RawEventCommand(code=250, parameters=[self.audio])
+    def to_raw_command(self) -> RawCommand:
+        return RawCommand(code=250, parameters=[self.audio])
 
     @override
     def unstructure(self, converter: Converter) -> dict[str, Any]:
@@ -105,7 +105,7 @@ class ScrollMapCommand(RubyBaseEventCommand):
 
     @classmethod
     @override
-    def from_raw_event_command(cls, cmd: RawEventCommand) -> ScrollMapCommand:
+    def from_raw_command(cls, cmd: RawCommand) -> ScrollMapCommand:
         return ScrollMapCommand(
             direction=cast(int, cmd.parameters[0]),
             distance=cast(int, cmd.parameters[1]),
@@ -113,8 +113,8 @@ class ScrollMapCommand(RubyBaseEventCommand):
         )
 
     @override
-    def get_raw_event_command(self) -> RawEventCommand:
-        return RawEventCommand(
+    def to_raw_command(self) -> RawCommand:
+        return RawCommand(
             code=204, parameters=[self.direction.value, self.distance, self.speed]
         )
 

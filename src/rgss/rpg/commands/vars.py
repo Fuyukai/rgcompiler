@@ -6,7 +6,7 @@ from typing import Any, Literal, NewType, cast, final, override
 import attrs
 from cattrs import Converter
 
-from rgss.rpg.commands.base import RawEventCommand, RubyBaseEventCommand
+from rgss.rpg.commands.base import RawCommand, RubyBaseEventCommand
 from rhodochrosite.ruby import RubyMarshalValue
 
 
@@ -22,7 +22,7 @@ class SetSwitchCommand(RubyBaseEventCommand):
 
     @classmethod
     @override
-    def from_raw_event_command(cls, cmd: RawEventCommand) -> SetSwitchCommand:
+    def from_raw_command(cls, cmd: RawCommand) -> SetSwitchCommand:
         return SetSwitchCommand(
             switch_start=cast(int, cmd.parameters[0]),
             switch_end=cast(int, cmd.parameters[1]),
@@ -31,8 +31,8 @@ class SetSwitchCommand(RubyBaseEventCommand):
         )
 
     @override
-    def get_raw_event_command(self) -> RawEventCommand:
-        return RawEventCommand(
+    def to_raw_command(self) -> RawCommand:
+        return RawCommand(
             code=121,
             parameters=[self.switch_start, self.switch_end, int(not self.switch_value)],
         )
@@ -58,15 +58,15 @@ class SetSelfSwitchCommand(RubyBaseEventCommand):
 
     @classmethod
     @override
-    def from_raw_event_command(cls, cmd: RawEventCommand) -> SetSelfSwitchCommand:
+    def from_raw_command(cls, cmd: RawCommand) -> SetSelfSwitchCommand:
         return SetSelfSwitchCommand(
             switch=cast(Literal["A", "B", "C", "D"], cmd.parameters[0]),
             switch_value=cmd.parameters[1] == 0,
         )
 
     @override
-    def get_raw_event_command(self) -> RawEventCommand:
-        return RawEventCommand(
+    def to_raw_command(self) -> RawCommand:
+        return RawCommand(
             code=123,
             parameters=[self.switch, int(not self.switch_value)],
         )
@@ -123,7 +123,7 @@ class SetVariableCommand(RubyBaseEventCommand):
 
     @classmethod
     @override
-    def from_raw_event_command(cls, cmd: RawEventCommand) -> SetVariableCommand:
+    def from_raw_command(cls, cmd: RawCommand) -> SetVariableCommand:
         # fucking variable length format, ugh.
         opcode = SetVariableOpcode(cast(int, cmd.parameters[2]))
         opval_type = SetVariableOpvalType(cast(int, cmd.parameters[3]))
@@ -150,7 +150,7 @@ class SetVariableCommand(RubyBaseEventCommand):
         )
 
     @override
-    def get_raw_event_command(self) -> RawEventCommand:
+    def to_raw_command(self) -> RawCommand:
         parameters: list[RubyMarshalValue] = [
             self.variable_start,
             self.variable_end,
@@ -165,7 +165,7 @@ class SetVariableCommand(RubyBaseEventCommand):
                 lower, upper = cast(SvOpvalRandom, self.opval)
                 parameters.extend([lower, upper])
 
-        return RawEventCommand(
+        return RawCommand(
             code=122,
             parameters=parameters,
         )

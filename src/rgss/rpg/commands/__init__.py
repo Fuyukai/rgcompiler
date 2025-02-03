@@ -5,7 +5,8 @@ from rgss.rpg.commands.base import (
     CODE_SYMBOL,
     INDENT_SYMBOL,
     PARAMS_SYMBOL,
-    RawEventCommand as RawEventCommand,
+    RawCommand as RawCommand,
+    RubyBaseCommand,
     RubyBaseEventCommand as RubyBaseEventCommand,
 )
 from rgss.rpg.commands.dialogue import (
@@ -22,7 +23,7 @@ from rgss.rpg.commands.effects import (
     ScrollMapCommand as ScrollMapCommand,
 )
 from rgss.rpg.commands.misc import (
-    EmptyEventCommand as EmptyEventCommand,
+    EmptyCommand as EmptyCommand,
     InlineRubyCommand as InlineRubyCommand,
     InlineRubyContinuedCommand as InlineRubyContinuedCommand,
     SetMoveRouteCommand as SetMoveRouteCommand,
@@ -42,8 +43,7 @@ from rgss.rpg.commands.vars import (
 )
 from rhodochrosite.ruby import RubyMarshalValue, RubySymbol
 
-COMMAND_MAPPING: dict[int, type[RubyBaseEventCommand]] = {
-    0: EmptyEventCommand,
+COMMAND_MAPPING: dict[int, type[RubyBaseCommand]] = {
     101: ShowDialogueCommand,
     401: ContinueDialogueCommand,
     223: ChangeScreenColourToneCommand,
@@ -63,25 +63,28 @@ COMMAND_MAPPING: dict[int, type[RubyBaseEventCommand]] = {
     203: ScrollMapCommand,
 }
 
-COMMAND_OVERRIDDES: dict[int, Callable[[RawEventCommand], RubyBaseEventCommand]] = {
+COMMAND_OVERRIDDES: dict[int, Callable[[RawCommand], RubyBaseCommand]] = {
     201: make_transfer_command,
 }
 
 
-def make_raw_event_command(ivars: dict[RubySymbol, RubyMarshalValue]) -> RawEventCommand:
-    return RawEventCommand(
+def make_raw_event_command(ivars: dict[RubySymbol, RubyMarshalValue]) -> RawCommand:
+    return RawCommand(
         code=cast(int, ivars[CODE_SYMBOL]),
         parameters=cast(list[RubyMarshalValue], ivars[PARAMS_SYMBOL]),
         indent=cast(int, ivars[INDENT_SYMBOL]),
     )
 
 
-def make_event_command_from_ivars(
-    _: RubySymbol, ivars: dict[RubySymbol, RubyMarshalValue]
-) -> RubyBaseEventCommand:
+def make_command_from_ivars(
+    name: RubySymbol, ivars: dict[RubySymbol, RubyMarshalValue]
+) -> RubyBaseCommand:
     code = cast(int, ivars[CODE_SYMBOL])
 
+    if code == 0:
+        return EmptyCommand(symbol=name)
+
     fn = COMMAND_OVERRIDDES.get(
-        code, COMMAND_MAPPING.get(code, UnknownEventCommand).from_raw_event_command
+        code, COMMAND_MAPPING.get(code, UnknownEventCommand).from_raw_command
     )
     return fn(make_raw_event_command(ivars))
