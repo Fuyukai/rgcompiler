@@ -259,7 +259,7 @@ class ConditionalBranchCommand(RubyBaseEventCommand):
             params = self.wrapped.raw_parameters
 
         elif isinstance(self.wrapped, CheckFacingOpval):
-            params = [self.wrapped.character_id, self.wrapped.direction.value]
+            params = [6, self.wrapped.character_id, self.wrapped.direction.value]
 
         else:
             # unify variable_id writing, the next code will overwrite params[2|3]
