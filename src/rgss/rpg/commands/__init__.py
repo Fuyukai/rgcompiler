@@ -46,6 +46,8 @@ from rgss.rpg.commands.misc import (
 from rgss.rpg.commands.move import (
     BasicDirectionMoveCommand as BasicDirectionMoveCommand,
     StepOneCommand as StepOneCommand,
+    ToggleDirectionFixCommand,
+    ToggleMoveAnimationCommand,
 )
 from rgss.rpg.commands.transfer import (
     DirectTransferPlayerCommand as DirectTransferPlayerCommand,
@@ -67,6 +69,10 @@ COMMAND_MAPPING: dict[int, type[RubyBaseCommand]] = {
     4: BasicDirectionMoveCommand,
     12: StepOneCommand,
     13: StepOneCommand,
+    31: ToggleMoveAnimationCommand,
+    32: ToggleMoveAnimationCommand,
+    35: ToggleDirectionFixCommand,
+    36: ToggleDirectionFixCommand,
 
     101: ShowDialogueCommand,
     401: ContinueDialogueCommand,

@@ -73,3 +73,53 @@ class StepOneCommand(RubyBaseMoveCommand):
             "command": "StepOneCommand",
             "direction": "Backwards" if self.backwards else "Forwards",
         }
+
+
+@attrs.define(kw_only=True)
+class ToggleMoveAnimationCommand(RubyBaseMoveCommand):
+    """
+    A move command for toggling enabling actor move animations.
+    """
+
+    enable: bool = attrs.field()
+
+    @classmethod
+    @override
+    def from_raw_command(cls, cmd: RawCommand) -> ToggleMoveAnimationCommand:
+        return cls(enable=cmd.code == 31)
+    
+    @override
+    def to_raw_command(self) -> RawCommand:
+        return RawCommand(code=31 if self.enable else 32, parameters=[], indent=0)
+    
+    @override
+    def unstructure(self, converter: Converter) -> dict[str, Any]:
+        return {
+            "command": "ToggleMoveAnimationCommand",
+            "enable": self.enable
+        }
+
+
+@attrs.define(kw_only=True)
+class ToggleDirectionFixCommand(RubyBaseMoveCommand):
+    """
+    A move command for toggling enabling actor direction fix (?).
+    """
+
+    enable: bool = attrs.field()
+
+    @classmethod
+    @override
+    def from_raw_command(cls, cmd: RawCommand) -> ToggleDirectionFixCommand:
+        return cls(enable=cmd.code == 35)
+    
+    @override
+    def to_raw_command(self) -> RawCommand:
+        return RawCommand(code=35 if self.enable else 36, parameters=[], indent=0)
+    
+    @override
+    def unstructure(self, converter: Converter) -> dict[str, Any]:
+        return {
+            "command": "ToggleDirectionFixCommand",
+            "enable": self.enable
+        }
