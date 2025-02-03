@@ -22,7 +22,9 @@ from rgss.rpg.commands.effects import (
 from rgss.rpg.commands.misc import (
     EmptyEventCommand as EmptyEventCommand,
     InlineRubyCommand as InlineRubyCommand,
+    SetMoveRouteCommand as SetMoveRouteCommand,
     UnknownEventCommand as UnknownEventCommand,
+    VisualMoveRouteCommand as VisualMoveRouteCommand,
     WaitCommand as WaitCommand,
 )
 from rgss.rpg.commands.transfer import (
@@ -46,6 +48,8 @@ COMMAND_MAPPING: dict[int, type[RubyBaseEventCommand]] = {
     224: ScreenFlashCommand,
     250: PlaySfxCommand,
     123: SetSelfSwitchCommand,
+    209: SetMoveRouteCommand,
+    509: VisualMoveRouteCommand,
 }
 
 COMMAND_OVERRIDDES: dict[int, Callable[[RawEventCommand], RubyBaseEventCommand]] = {
@@ -70,7 +74,3 @@ def make_event_command_from_ivars(
         code, COMMAND_MAPPING.get(code, UnknownEventCommand).from_raw_event_command
     )
     return fn(make_raw_event_command(ivars))
-
-    return COMMAND_MAPPING.get(code, UnknownEventCommand).from_raw_event_command(
-        make_raw_event_command(ivars)
-    )

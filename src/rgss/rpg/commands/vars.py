@@ -1,12 +1,11 @@
 from __future__ import annotations
 
-from typing import Any, cast, override
+from typing import Any, Literal, cast, override
 
 import attrs
 from cattr import Converter
 
 from rgss.rpg.commands.base import RawEventCommand, RubyBaseEventCommand
-from rgss.rpg.event import SelfSwitch
 
 
 @attrs.define(kw_only=True)
@@ -52,14 +51,14 @@ class SetSelfSwitchCommand(RubyBaseEventCommand):
     An event command that sets a self-switch.
     """
 
-    switch: SelfSwitch = attrs.field()
+    switch: Literal["A", "B", "C", "D"] = attrs.field()
     switch_value: bool = attrs.field()
 
     @classmethod
     @override
     def from_raw_event_command(cls, cmd: RawEventCommand) -> SetSelfSwitchCommand:
         return SetSelfSwitchCommand(
-            switch=cast(SelfSwitch, cmd.parameters[0]),
+            switch=cast(Literal["A", "B", "C", "D"], cmd.parameters[0]),
             switch_value=cmd.parameters[1] == 0,
         )
 

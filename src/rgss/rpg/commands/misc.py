@@ -6,6 +6,7 @@ import attrs
 from cattr import Converter
 
 from rgss.rpg.commands.base import RawEventCommand, RubyBaseEventCommand
+from rgss.rpg.moves import RubyMoveRoute
 
 
 @final
@@ -100,4 +101,62 @@ class InlineRubyCommand(RubyBaseEventCommand):
         return {
             "command": "InlineRubyCommand",
             "script": self.script,
+        }
+
+
+@attrs.define(kw_only=True)
+class SetMoveRouteCommand(RubyBaseEventCommand):
+    """
+    An event command that sets the move route of another event.
+    """
+
+    event_id: int = attrs.field()
+    move_route: RubyMoveRoute = attrs.field()
+
+    @classmethod
+    @override
+    def from_raw_event_command(cls, cmd: RawEventCommand) -> SetMoveRouteCommand:
+        return SetMoveRouteCommand(
+            event_id=cast(int, cmd.parameters[0]),
+            move_route=cast(RubyMoveRoute, cmd.parameters[1]),
+        )
+
+    @override
+    def get_raw_event_command(self) -> RawEventCommand:
+        return RawEventCommand(code=209, parameters=[self.event_id, self.move_route])
+
+    @override
+    def unstructure(self, converter: Converter) -> dict[str, Any]:
+        return {
+            "command": "SetMoveRouteCommand",
+            "event_id": self.event_id,
+            "move_route": converter.unstructure(self.move_route),
+        }
+
+
+@attrs.define(kw_only=True)
+class VisualMoveRouteCommand(RubyBaseEventCommand):
+    """
+    An event command that contains a single move route. This command is not bound to an event.
+
+    The differernce between this class and the other move route class is unknown, but the official
+    editor seems to emit both? This command is likely entirely visual for editor purposes.
+    """
+
+    move_route: RubyMoveRoute = attrs.field()
+
+    @classmethod
+    @override
+    def from_raw_event_command(cls, cmd: RawEventCommand) -> VisualMoveRouteCommand:
+        return VisualMoveRouteCommand(move_route=cast(RubyMoveRoute, cmd.parameters[0]))
+
+    @override
+    def get_raw_event_command(self) -> RawEventCommand:
+        return RawEventCommand(code=509, parameters=[self.move_route])
+
+    @override
+    def unstructure(self, converter: Converter) -> dict[str, Any]:
+        return {
+            "command": "VisualMoveRouteCommand",
+            "move_route": converter.unstructure(self.move_route),
         }
