@@ -12,6 +12,7 @@ from rgss.rpg.commands.dialogue import (
     CommentCommand as CommentCommand,
     ContinuedCommentCommand as ContinuedCommentCommand,
     ContinueDialogueCommand as ContinueDialogueCommand,
+    SelectChoiceCommand as SelectChoiceCommand,
     ShowDialogueCommand as ShowDialogueCommand,
 )
 from rgss.rpg.commands.effects import (
@@ -55,6 +56,7 @@ COMMAND_MAPPING: dict[int, type[RubyBaseEventCommand]] = {
     209: SetMoveRouteCommand,
     509: VisualMoveRouteCommand,
     122: SetVariableCommand,
+    102: SelectChoiceCommand,
 }
 
 COMMAND_OVERRIDDES: dict[int, Callable[[RawEventCommand], RubyBaseEventCommand]] = {

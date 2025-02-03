@@ -120,3 +120,38 @@ class ContinuedCommentCommand(CommentCommand):
             "command": "ContinuedCommentCommand",
             "comment": self.comment,
         }
+
+
+@attrs.define(kw_only=True)
+class SelectChoiceCommand(RubyBaseEventCommand):
+    """
+    An event command that shows a choice to the player.
+    """
+
+    # Who fucking knows what the default index is for.
+    # It's either been zero, len(choices), len(choices) + 1.
+
+    choices: list[str] = attrs.field()
+    default_index: int = attrs.field()
+
+    @classmethod
+    @override
+    def from_raw_event_command(cls, cmd: RawEventCommand) -> SelectChoiceCommand:
+        return SelectChoiceCommand(
+            choices=cast(list[str], cmd.parameters[0]),
+            default_index=cast(int, cmd.parameters[1]),
+        )
+
+    @override
+    def get_raw_event_command(self) -> RawEventCommand:
+        return RawEventCommand(
+            code=102,
+            parameters=[self.choices, self.default_index],
+        )
+
+    @override
+    def unstructure(self, converter: Converter) -> dict[str, Any]:
+        return {
+            "command": "SelectChoiceCommand",
+            "choices": self.choices,
+        }
