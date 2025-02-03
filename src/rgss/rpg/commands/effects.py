@@ -1,6 +1,6 @@
 from __future__ import annotations
 
-from typing import Any, TypedDict, cast, override
+from typing import Any, cast, override
 
 import attrs
 from cattr import Converter
@@ -66,12 +66,6 @@ class ScreenFlashCommand(RubyBaseEventCommand):
             "colour": converter.unstructure(self.colour),
             "frames": self.frames,
         }
-
-
-class SfxTypedDict(TypedDict):
-    name: str
-    volume: int
-    pitch: int
 
 
 @attrs.define(kw_only=True)
