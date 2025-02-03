@@ -14,12 +14,14 @@ from rgss.rpg import (
     RubyEventGraphic as RubyEventGraphic,
     RubyEventPage as RubyEventPage,
     RubyEventPageCondition as RubyEventPageCondition,
+    RubyMoveRoute as RubyMoveRoute,
     RubyRpgEvent as RubyRpgEvent,
     RubyRpgMap as RubyRpgMap,
     RubyTileset as RubyTileset,
 )
 from rgss.rpg.commands import make_event_command_from_ivars
 from rgss.rpg.commands.base import RPG_EVENT_COMMAND
+from rgss.rpg.moves import RPG_MOVE_ROUTE
 from rgss.types import (
     COLOUR_TYPE,
     TABLE_TYPE,
@@ -51,6 +53,7 @@ def add_all_ruby_types(reader: MarshalReader) -> None:  # pragma: no cover
     reader.object_factories[RPG_EVENT_CONDITION] = make_ruby_attrs_object_fn(RubyEventPageCondition)
     reader.object_factories[RPG_EVENT_GRAPHIC] = make_ruby_attrs_object_fn(RubyEventGraphic)
     reader.object_factories[RPG_EVENT_COMMAND] = make_event_command_from_ivars
+    reader.object_factories[RPG_MOVE_ROUTE] = make_ruby_attrs_object_fn(RubyMoveRoute)
 
 
 def make_reader(data: bytes) -> MarshalReader:  # pragma: no cover

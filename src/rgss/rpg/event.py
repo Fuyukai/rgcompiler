@@ -3,7 +3,8 @@ from typing import Literal, final, override
 import attrs
 
 from rgss.rpg.commands.base import RubyBaseEventCommand
-from rhodochrosite.ruby import GenericRubyUserObject, RubySymbol, RubyUserObject, atom, ruby_name
+from rgss.rpg.moves import RubyMoveRoute
+from rhodochrosite.ruby import RubySymbol, RubyUserObject, atom, ruby_name
 
 RPG_EVENT = atom("RPG::Event")
 RPG_EVENT_PAGE = atom("RPG::Event::Page")
@@ -100,7 +101,7 @@ class RubyEventPage(RubyUserObject):
     move_type: int = attrs.field()
     move_speed: int = attrs.field()
     move_frequency: int = attrs.field()
-    move_route: GenericRubyUserObject = attrs.field()
+    move_route: RubyMoveRoute = attrs.field()
 
     animate_walk: bool = attrs.field(metadata=ruby_name("walk_anime"))
     animate_step: bool = attrs.field(metadata=ruby_name("step_anime"))

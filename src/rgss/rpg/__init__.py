@@ -10,4 +10,5 @@ from rgss.rpg.event import (
 )
 from rgss.rpg.map import RPG_MAP as RPG_MAP, RubyRpgMap as RubyRpgMap
 from rgss.rpg.misc import RPG_AUDIOFILE as RPG_AUDIOFILE, RubyAudioFile as RubyAudioFile
+from rgss.rpg.moves import RPG_MOVE_ROUTE as RPG_MOVE_ROUTE, RubyMoveRoute as RubyMoveRoute
 from rgss.rpg.tileset import RPG_TILESET as RPG_TILESET, RubyTileset as RubyTileset
