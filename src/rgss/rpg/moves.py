@@ -17,7 +17,10 @@ class RubyMoveRoute(RubyUserObject):
     This is also re-used for the Move Route event command.
     """
 
+    # "Ignore if cannot move"
     skippable: bool = attrs.field(default=False)
+
+    # "Repeat action"
     repeat: bool = attrs.field(default=False)
 
     moves: list[RubyBaseMoveCommand] = attrs.field(factory=list, metadata=ruby_name("list"))

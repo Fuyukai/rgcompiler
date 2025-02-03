@@ -43,6 +43,7 @@ from rgss.rpg.commands.misc import (
     VisualMoveRouteCommand as VisualMoveRouteCommand,
     WaitCommand as WaitCommand,
 )
+from rgss.rpg.commands.move import BasicDirectionMoveCommand as BasicDirectionMoveCommand
 from rgss.rpg.commands.transfer import (
     DirectTransferPlayerCommand as DirectTransferPlayerCommand,
     VariableTransferPlayerCommand as VariableTransferPlayerCommand,
@@ -55,7 +56,13 @@ from rgss.rpg.commands.vars import (
 )
 from rhodochrosite.ruby import RubyMarshalValue, RubySymbol
 
+# fmt: off
 COMMAND_MAPPING: dict[int, type[RubyBaseCommand]] = {
+    1: BasicDirectionMoveCommand,
+    2: BasicDirectionMoveCommand,
+    3: BasicDirectionMoveCommand,
+    4: BasicDirectionMoveCommand,
+
     101: ShowDialogueCommand,
     401: ContinueDialogueCommand,
     223: ChangeScreenColourToneCommand,
@@ -77,6 +84,7 @@ COMMAND_MAPPING: dict[int, type[RubyBaseCommand]] = {
     411: ElseCommand,
     412: EndBranchCommand,
 }
+# fmt: on
 
 COMMAND_OVERRIDDES: dict[int, Callable[[RawCommand], RubyBaseCommand]] = {
     201: make_transfer_command,

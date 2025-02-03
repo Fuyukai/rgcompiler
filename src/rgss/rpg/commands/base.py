@@ -94,7 +94,7 @@ class RubyBaseMoveCommand(RubyBaseCommand, abc.ABC):
     @property
     @override
     def ruby_class_name(self) -> RubySymbol:
-        return RPG_EVENT_COMMAND
+        return RPG_MOVE_COMMAND
 
     @override
     def find_instance_variables(self) -> list[tuple[RubySymbol, RubyMarshalValue]]:
