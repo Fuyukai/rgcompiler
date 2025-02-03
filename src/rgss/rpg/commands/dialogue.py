@@ -23,14 +23,11 @@ class ShowDialogueCommand(RubyBaseEventCommand):
     @classmethod
     @override
     def from_raw_command(cls, cmd: RawCommand) -> ShowDialogueCommand:
-        return ShowDialogueCommand(text=cast(str, cmd.parameters[0]))
+        return ShowDialogueCommand(text=cast(str, cmd.parameters[0]), indent=cmd.indent)
 
     @override
     def to_raw_command(self) -> RawCommand:
-        return RawCommand(
-            code=101,
-            parameters=[self.text],
-        )
+        return RawCommand(code=101, parameters=[self.text], indent=self.indent)
 
     @override
     def unstructure(self, converter: Converter) -> dict[str, Any]:
@@ -49,13 +46,14 @@ class ContinueDialogueCommand(ShowDialogueCommand):
     @classmethod
     @override
     def from_raw_command(cls, cmd: RawCommand) -> ContinueDialogueCommand:
-        return ContinueDialogueCommand(text=cast(str, cmd.parameters[0]))
+        return ContinueDialogueCommand(text=cast(str, cmd.parameters[0]), indent=cmd.indent)
 
     @override
     def to_raw_command(self) -> RawCommand:
         return RawCommand(
             code=401,
             parameters=[self.text],
+            indent=self.indent,
         )
 
     @override
@@ -80,14 +78,11 @@ class CommentCommand(RubyBaseEventCommand):
     @classmethod
     @override
     def from_raw_command(cls, cmd: RawCommand) -> CommentCommand:
-        return CommentCommand(comment=cast(str, cmd.parameters[0]))
+        return CommentCommand(comment=cast(str, cmd.parameters[0]), indent=cmd.indent)
 
     @override
     def to_raw_command(self) -> RawCommand:
-        return RawCommand(
-            code=108,
-            parameters=[self.comment],
-        )
+        return RawCommand(code=108, parameters=[self.comment], indent=self.indent)
 
     @override
     def unstructure(self, converter: Converter) -> dict[str, Any]:
@@ -106,13 +101,14 @@ class ContinuedCommentCommand(CommentCommand):
     @classmethod
     @override
     def from_raw_command(cls, cmd: RawCommand) -> ContinuedCommentCommand:
-        return ContinuedCommentCommand(comment=cast(str, cmd.parameters[0]))
+        return ContinuedCommentCommand(comment=cast(str, cmd.parameters[0]), indent=cmd.indent)
 
     @override
     def to_raw_command(self) -> RawCommand:
         return RawCommand(
             code=408,
             parameters=[self.comment],
+            indent=self.indent,
         )
 
     @override
@@ -150,6 +146,7 @@ class SelectChoiceCommand(RubyBaseEventCommand):
         return SelectChoiceCommand(
             choices=cast(list[str], cmd.parameters[0]),
             when_cancelled=ChoiceCancelledAction(cmd.parameters[1]),
+            indent=cmd.indent,
         )
 
     @override
@@ -157,6 +154,7 @@ class SelectChoiceCommand(RubyBaseEventCommand):
         return RawCommand(
             code=102,
             parameters=[self.choices, self.when_cancelled.value],
+            indent=self.indent,
         )
 
     @override

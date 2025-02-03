@@ -28,6 +28,7 @@ class SetSwitchCommand(RubyBaseEventCommand):
             switch_end=cast(int, cmd.parameters[1]),
             # THIS IS CORRECT, FOR SOME STUPID FUCKING REASON IT'S INVERTED?
             switch_value=cmd.parameters[2] == 0,
+            indent=cmd.indent,
         )
 
     @override
@@ -35,6 +36,7 @@ class SetSwitchCommand(RubyBaseEventCommand):
         return RawCommand(
             code=121,
             parameters=[self.switch_start, self.switch_end, int(not self.switch_value)],
+            indent=self.indent,
         )
 
     @override
@@ -62,6 +64,7 @@ class SetSelfSwitchCommand(RubyBaseEventCommand):
         return SetSelfSwitchCommand(
             switch=cast(Literal["A", "B", "C", "D"], cmd.parameters[0]),
             switch_value=cmd.parameters[1] == 0,
+            indent=cmd.indent,
         )
 
     @override
@@ -69,6 +72,7 @@ class SetSelfSwitchCommand(RubyBaseEventCommand):
         return RawCommand(
             code=123,
             parameters=[self.switch, int(not self.switch_value)],
+            indent=self.indent,
         )
 
     @override
@@ -147,6 +151,7 @@ class SetVariableCommand(RubyBaseEventCommand):
             opcode=opcode,
             opval_type=opval_type,
             opval=opval,
+            indent=cmd.indent,
         )
 
     @override
@@ -169,6 +174,7 @@ class SetVariableCommand(RubyBaseEventCommand):
         return RawCommand(
             code=122,
             parameters=parameters,
+            indent=self.indent,
         )
 
     @override

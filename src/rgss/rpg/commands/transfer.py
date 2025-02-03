@@ -32,6 +32,7 @@ class DirectTransferPlayerCommand(RubyBaseEventCommand):
             y=cast(int, cmd.parameters[3]),
             direction=RgssDirection(cast(int, cmd.parameters[4])),
             no_fade=cmd.parameters[5] == 1,
+            indent=cmd.indent,
         )
 
     @override
@@ -39,6 +40,7 @@ class DirectTransferPlayerCommand(RubyBaseEventCommand):
         return RawCommand(
             code=201,
             parameters=[0, self.map_id, self.x, self.y, self.direction.value, int(self.no_fade)],
+            indent=self.indent,
         )
 
     @override
@@ -76,6 +78,7 @@ class VariableTransferPlayerCommand(RubyBaseEventCommand):
             y_variable=cast(int, cmd.parameters[3]),
             direction=cast(int, cmd.parameters[4]),
             no_fade=cmd.parameters[5] == 1,
+            indent=cmd.indent,
         )
 
     @override
@@ -90,6 +93,7 @@ class VariableTransferPlayerCommand(RubyBaseEventCommand):
                 self.direction.value,
                 int(self.no_fade),
             ],
+            indent=self.indent,
         )
 
     @override

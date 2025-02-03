@@ -23,12 +23,14 @@ class ChangeScreenColourToneCommand(RubyBaseEventCommand):
     @override
     def from_raw_command(cls, cmd: RawCommand) -> ChangeScreenColourToneCommand:
         return ChangeScreenColourToneCommand(
-            tone=cast(RgssTone, cmd.parameters[0]), frames=cast(int, cmd.parameters[1])
+            tone=cast(RgssTone, cmd.parameters[0]),
+            frames=cast(int, cmd.parameters[1]),
+            indent=cmd.indent,
         )
 
     @override
     def to_raw_command(self) -> RawCommand:
-        return RawCommand(code=223, parameters=[self.tone, self.frames])
+        return RawCommand(code=223, parameters=[self.tone, self.frames], indent=self.indent)
 
     @override
     def unstructure(self, converter: Converter) -> dict[str, Any]:
@@ -52,12 +54,14 @@ class ScreenFlashCommand(RubyBaseEventCommand):
     @override
     def from_raw_command(cls, cmd: RawCommand) -> ScreenFlashCommand:
         return ScreenFlashCommand(
-            colour=cast(RgssTone, cmd.parameters[0]), frames=cast(int, cmd.parameters[1])
+            colour=cast(RgssTone, cmd.parameters[0]),
+            frames=cast(int, cmd.parameters[1]),
+            indent=cmd.indent,
         )
 
     @override
     def to_raw_command(self) -> RawCommand:
-        return RawCommand(code=224, parameters=[self.colour, self.frames])
+        return RawCommand(code=224, parameters=[self.colour, self.frames], indent=self.indent)
 
     @override
     def unstructure(self, converter: Converter) -> dict[str, Any]:
@@ -79,11 +83,11 @@ class PlaySfxCommand(RubyBaseEventCommand):
     @classmethod
     @override
     def from_raw_command(cls, cmd: RawCommand) -> PlaySfxCommand:
-        return PlaySfxCommand(audio=cast(RubyAudioFile, cmd.parameters[0]))
+        return PlaySfxCommand(audio=cast(RubyAudioFile, cmd.parameters[0]), indent=cmd.indent)
 
     @override
     def to_raw_command(self) -> RawCommand:
-        return RawCommand(code=250, parameters=[self.audio])
+        return RawCommand(code=250, parameters=[self.audio], indent=self.indent)
 
     @override
     def unstructure(self, converter: Converter) -> dict[str, Any]:
@@ -110,11 +114,16 @@ class ScrollMapCommand(RubyBaseEventCommand):
             direction=cast(int, cmd.parameters[0]),
             distance=cast(int, cmd.parameters[1]),
             speed=cast(int, cmd.parameters[2]),
+            indent=cmd.indent,
         )
 
     @override
     def to_raw_command(self) -> RawCommand:
-        return RawCommand(code=204, parameters=[self.direction.value, self.distance, self.speed])
+        return RawCommand(
+            code=204,
+            parameters=[self.direction.value, self.distance, self.speed],
+            indent=self.indent,
+        )
 
     @override
     def unstructure(self, converter: Converter) -> dict[str, Any]:

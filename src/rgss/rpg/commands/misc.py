@@ -20,6 +20,7 @@ class EmptyCommand(RubyBaseCommand):
     """
 
     symbol: RubySymbol = attrs.field()
+    raw: RawCommand = attrs.field()
 
     @property
     @override
@@ -33,7 +34,7 @@ class EmptyCommand(RubyBaseCommand):
 
     @override
     def to_raw_command(self) -> RawCommand:
-        return RawCommand(code=0)
+        return RawCommand(code=0, indent=self.raw.indent)
 
     @override
     def unstructure(self, converter: Converter) -> dict[str, Any]:
@@ -80,11 +81,11 @@ class WaitCommand(RubyBaseEventCommand):
     @classmethod
     @override
     def from_raw_command(cls, cmd: RawCommand) -> WaitCommand:
-        return WaitCommand(frames=cast(int, cmd.parameters[0]))
+        return WaitCommand(frames=cast(int, cmd.parameters[0]), indent=cmd.indent)
 
     @override
     def to_raw_command(self) -> RawCommand:
-        return RawCommand(code=106, parameters=[self.frames])
+        return RawCommand(code=106, parameters=[self.frames], indent=self.indent)
 
     @override
     def unstructure(self, converter: Converter) -> dict[str, Any]:
@@ -105,11 +106,11 @@ class InlineRubyCommand(RubyBaseEventCommand):
     @classmethod
     @override
     def from_raw_command(cls, cmd: RawCommand) -> InlineRubyCommand:
-        return InlineRubyCommand(script=cast(str, cmd.parameters[0]))
+        return InlineRubyCommand(script=cast(str, cmd.parameters[0]), indent=cmd.indent)
 
     @override
     def to_raw_command(self) -> RawCommand:
-        return RawCommand(code=355, parameters=[self.script])
+        return RawCommand(code=355, parameters=[self.script], indent=self.indent)
 
     @override
     def unstructure(self, converter: Converter) -> dict[str, Any]:
@@ -130,11 +131,11 @@ class InlineRubyContinuedCommand(RubyBaseEventCommand):
     @classmethod
     @override
     def from_raw_command(cls, cmd: RawCommand) -> InlineRubyContinuedCommand:
-        return InlineRubyContinuedCommand(script=cast(str, cmd.parameters[0]))
+        return InlineRubyContinuedCommand(script=cast(str, cmd.parameters[0]), indent=cmd.indent)
 
     @override
     def to_raw_command(self) -> RawCommand:
-        return RawCommand(code=655, parameters=[self.script])
+        return RawCommand(code=655, parameters=[self.script], indent=self.indent)
 
     @override
     def unstructure(self, converter: Converter) -> dict[str, Any]:
@@ -159,11 +160,12 @@ class SetMoveRouteCommand(RubyBaseEventCommand):
         return SetMoveRouteCommand(
             event_id=cast(int, cmd.parameters[0]),
             move_route=cast(RubyMoveRoute, cmd.parameters[1]),
+            indent=cmd.indent,
         )
 
     @override
     def to_raw_command(self) -> RawCommand:
-        return RawCommand(code=209, parameters=[self.event_id, self.move_route])
+        return RawCommand(code=209, parameters=[self.event_id, self.move_route], indent=self.indent)
 
     @override
     def unstructure(self, converter: Converter) -> dict[str, Any]:
@@ -188,11 +190,13 @@ class VisualMoveRouteCommand(RubyBaseEventCommand):
     @classmethod
     @override
     def from_raw_command(cls, cmd: RawCommand) -> VisualMoveRouteCommand:
-        return VisualMoveRouteCommand(move_route=cast(RubyMoveRoute, cmd.parameters[0]))
+        return VisualMoveRouteCommand(
+            move_route=cast(RubyMoveRoute, cmd.parameters[0]), indent=cmd.indent
+        )
 
     @override
     def to_raw_command(self) -> RawCommand:
-        return RawCommand(code=509, parameters=[self.move_route])
+        return RawCommand(code=509, parameters=[self.move_route], indent=self.indent)
 
     @override
     def unstructure(self, converter: Converter) -> dict[str, Any]:

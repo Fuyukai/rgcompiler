@@ -14,7 +14,7 @@ INDENT_SYMBOL = atom("@indent")
 CODE_SYMBOL = atom("@code")
 
 
-@attrs.define(frozen=True, eq=True)
+@attrs.define(kw_only=True, frozen=True, eq=True)
 @final
 class RawCommand:
     """
@@ -30,7 +30,7 @@ class RawCommand:
     parameters: list[RubyMarshalValue] = attrs.field(factory=list)
 
     #: The "indent" for this command. Ignored, and is only used in the editor for event commands.
-    indent: int = attrs.field(default=0)
+    indent: int = attrs.field()
 
 
 class RubyBaseCommand(RubyUserObject, abc.ABC):
@@ -72,10 +72,13 @@ class RubyBaseCommand(RubyUserObject, abc.ABC):
         ]
 
 
+@attrs.define(kw_only=True)
 class RubyBaseEventCommand(RubyBaseCommand, abc.ABC):
     """
     A single event command in an event.
     """
+
+    indent: int = attrs.field()
 
     @property
     @override

@@ -84,18 +84,17 @@ def make_raw_event_command(ivars: dict[RubySymbol, RubyMarshalValue]) -> RawComm
 def make_command_from_ivars(
     name: RubySymbol, ivars: dict[RubySymbol, RubyMarshalValue]
 ) -> RubyBaseCommand:
-    code = cast(int, ivars[CODE_SYMBOL])
+    raw_cmd = make_raw_event_command(ivars)
+    code = raw_cmd.code
 
     if code == 0:
-        return EmptyCommand(symbol=name)
+        return EmptyCommand(symbol=name, raw=raw_cmd)
 
     fn = COMMAND_OVERRIDDES.get(code)
     if fn is None:
         klass = COMMAND_MAPPING.get(code)
         if klass is not None:
             fn = klass.from_raw_command
-
-    raw_cmd = make_raw_event_command(ivars)
 
     if fn is None:  # noqa: SIM108
         result = UnknownCommand(name=name, raw=raw_cmd)
