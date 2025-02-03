@@ -154,7 +154,8 @@ class SetVariableCommand(RubyBaseEventCommand):
         parameters: list[RubyMarshalValue] = [
             self.variable_start,
             self.variable_end,
-            int(self.opcode),
+            self.opcode.value,
+            self.opval_type.value
         ]
 
         match self.opval_type:
