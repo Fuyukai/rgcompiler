@@ -204,3 +204,22 @@ class VisualMoveRouteCommand(RubyBaseEventCommand):
             "command": "VisualMoveRouteCommand",
             "move_route": converter.unstructure(self.move_route),
         }
+
+
+class WaitForMoveCompletionCommand(RubyBaseEventCommand):
+    """
+    Waits for the move route to complete.
+    """
+
+    @classmethod
+    @override
+    def from_raw_command(cls, cmd: RawCommand) -> WaitForMoveCompletionCommand:
+        return WaitForMoveCompletionCommand(indent=cmd.indent)
+
+    @override
+    def to_raw_command(self) -> RawCommand:
+        return RawCommand(code=210, parameters=[], indent=self.indent)
+
+    @override
+    def unstructure(self, converter: Converter) -> dict[str, Any]:
+        return {"command": "WaitForMoveCompletionCommand"}

@@ -42,6 +42,7 @@ from rgss.rpg.commands.misc import (
     UnknownCommand as UnknownCommand,
     VisualMoveRouteCommand as VisualMoveRouteCommand,
     WaitCommand as WaitCommand,
+    WaitForMoveCompletionCommand as WaitForMoveCompletionCommand,
 )
 from rgss.rpg.commands.move import (
     BasicDirectionMoveCommand as BasicDirectionMoveCommand,
@@ -50,7 +51,7 @@ from rgss.rpg.commands.move import (
     StepOneCommand as StepOneCommand,
     ToggleDirectionFixCommand as ToggleDirectionFixCommand,
     ToggleMoveAnimationCommand as ToggleMoveAnimationCommand,
-    TurnAbsoluteCommand,
+    TurnAbsoluteCommand as TurnAbsoluteCommand,
     WaitMoveCommand as WaitMoveCommand,
 )
 from rgss.rpg.commands.transfer import (
@@ -108,6 +109,7 @@ COMMAND_MAPPING: dict[int, type[RubyBaseCommand]] = {
     111: ConditionalBranchCommand,
     411: ElseCommand,
     412: EndBranchCommand,
+    210: WaitForMoveCompletionCommand,
 }
 # fmt: on
 
