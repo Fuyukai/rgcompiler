@@ -30,7 +30,7 @@ from rgss.rpg.commands.transfer import (
     VariableTransferPlayerCommand as VariableTransferPlayerCommand,
     make_transfer_command,
 )
-from rgss.rpg.commands.vars import SetSwitchCommand as SetSwitchCommand
+from rgss.rpg.commands.vars import SetSelfSwitchCommand, SetSwitchCommand as SetSwitchCommand
 from rhodochrosite.ruby import RubyMarshalValue, RubySymbol
 
 COMMAND_MAPPING: dict[int, type[RubyBaseEventCommand]] = {
@@ -45,6 +45,7 @@ COMMAND_MAPPING: dict[int, type[RubyBaseEventCommand]] = {
     408: ContinuedCommentCommand,
     224: ScreenFlashCommand,
     250: PlaySfxCommand,
+    123: SetSelfSwitchCommand,
 }
 
 COMMAND_OVERRIDDES: dict[int, Callable[[RawEventCommand], RubyBaseEventCommand]] = {

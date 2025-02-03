@@ -6,6 +6,7 @@ import attrs
 from cattr import Converter
 
 from rgss.rpg.commands.base import RawEventCommand, RubyBaseEventCommand
+from rgss.rpg.event import SelfSwitch
 
 
 @attrs.define(kw_only=True)
@@ -41,5 +42,38 @@ class SetSwitchCommand(RubyBaseEventCommand):
             "command": "SetSwitchCommand",
             "switch_start": self.switch_start,
             "switch_end": self.switch_end,
+            "switch_value": self.switch_value,
+        }
+
+
+@attrs.define(kw_only=True)
+class SetSelfSwitchCommand(RubyBaseEventCommand):
+    """
+    An event command that sets a self-switch.
+    """
+
+    switch: SelfSwitch = attrs.field()
+    switch_value: bool = attrs.field()
+
+    @classmethod
+    @override
+    def from_raw_event_command(cls, cmd: RawEventCommand) -> SetSelfSwitchCommand:
+        return SetSelfSwitchCommand(
+            switch=cast(SelfSwitch, cmd.parameters[0]),
+            switch_value=cmd.parameters[1] == 0,
+        )
+
+    @override
+    def get_raw_event_command(self) -> RawEventCommand:
+        return RawEventCommand(
+            code=123,
+            parameters=[self.switch, int(not self.switch_value)],
+        )
+
+    @override
+    def unstructure(self, converter: Converter) -> dict[str, Any]:
+        return {
+            "command": "SetSelfSwitchCommand",
+            "switch": self.switch,
             "switch_value": self.switch_value,
         }

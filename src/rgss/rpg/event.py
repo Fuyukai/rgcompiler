@@ -11,6 +11,8 @@ RPG_EVENT_PAGE = atom("RPG::Event::Page")
 RPG_EVENT_CONDITION = atom("RPG::Event::Page::Condition")
 RPG_EVENT_GRAPHIC = atom("RPG::Event::Page::Graphic")
 
+type SelfSwitch = Literal["A", "B", "C", "D"]
+
 
 @attrs.define()
 @final
@@ -29,7 +31,7 @@ class RubyEventPageCondition(RubyUserObject):
     variable_id: int = attrs.field(default=1)
     variable_value: int = attrs.field(default=0)
 
-    self_switch_ch: Literal["A", "B", "C", "D"] = attrs.field(default="A")
+    self_switch_ch: SelfSwitch = attrs.field(default="A")
 
     @property
     @override
