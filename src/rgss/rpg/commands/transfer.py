@@ -38,7 +38,7 @@ class DirectTransferPlayerCommand(RubyBaseEventCommand):
     def get_raw_event_command(self) -> RawEventCommand:
         return RawEventCommand(
             code=201,
-            parameters=[0, self.map_id, self.x, self.y, self.direction, int(self.no_fade)],
+            parameters=[0, self.map_id, self.x, self.y, self.direction.value, int(self.no_fade)],
         )
 
     @override
@@ -87,7 +87,7 @@ class VariableTransferPlayerCommand(RubyBaseEventCommand):
                 self.map_id_variable,
                 self.x_variable,
                 self.y_variable,
-                self.direction,
+                self.direction.value,
                 int(self.no_fade),
             ],
         )

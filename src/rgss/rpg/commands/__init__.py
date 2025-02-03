@@ -19,6 +19,7 @@ from rgss.rpg.commands.effects import (
     ChangeScreenColourToneCommand as ChangeScreenColourToneCommand,
     PlaySfxCommand as PlaySfxCommand,
     ScreenFlashCommand as ScreenFlashCommand,
+    ScrollMapCommand as ScrollMapCommand,
 )
 from rgss.rpg.commands.misc import (
     EmptyEventCommand as EmptyEventCommand,
@@ -59,6 +60,7 @@ COMMAND_MAPPING: dict[int, type[RubyBaseEventCommand]] = {
     509: VisualMoveRouteCommand,
     122: SetVariableCommand,
     102: SelectChoiceCommand,
+    203: ScrollMapCommand,
 }
 
 COMMAND_OVERRIDDES: dict[int, Callable[[RawEventCommand], RubyBaseEventCommand]] = {

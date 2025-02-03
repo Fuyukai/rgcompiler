@@ -7,7 +7,7 @@ from cattr import Converter
 
 from rgss.rpg.commands.base import RawEventCommand, RubyBaseEventCommand
 from rgss.rpg.misc import RubyAudioFile
-from rgss.types import RgssColour, RgssTone
+from rgss.types import RgssColour, RgssDirection, RgssTone
 
 
 @attrs.define(kw_only=True)
@@ -90,4 +90,39 @@ class PlaySfxCommand(RubyBaseEventCommand):
         return {
             "command": "PlaySfxCommand",
             "audio": converter.unstructure(self.audio),
+        }
+
+
+@attrs.define(kw_only=True)
+class ScrollMapCommand(RubyBaseEventCommand):
+    """
+    An event command that scrolls the map.
+    """
+
+    direction: RgssDirection = attrs.field(converter=RgssDirection)
+    distance: int = attrs.field()
+    speed: int = attrs.field()
+
+    @classmethod
+    @override
+    def from_raw_event_command(cls, cmd: RawEventCommand) -> ScrollMapCommand:
+        return ScrollMapCommand(
+            direction=cast(int, cmd.parameters[0]),
+            distance=cast(int, cmd.parameters[1]),
+            speed=cast(int, cmd.parameters[2]),
+        )
+
+    @override
+    def get_raw_event_command(self) -> RawEventCommand:
+        return RawEventCommand(
+            code=204, parameters=[self.direction.value, self.distance, self.speed]
+        )
+
+    @override
+    def unstructure(self, converter: Converter) -> dict[str, Any]:
+        return {
+            "command": "ScrollMapCommand",
+            "direction": self.direction.name,
+            "distance": self.distance,
+            "speed": self.speed,
         }
