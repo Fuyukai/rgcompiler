@@ -49,6 +49,53 @@ class BasicDirectionMoveCommand(RubyBaseMoveCommand):
         return {"command": "BasicDirectionMoveCommand", "direction": self.direction.name}
 
 
+@attrs.define(kw_only=True)
+class CornerMoveCommand(RubyBaseMoveCommand):
+    """
+    A move command for moving an actor left/right and also upper/lower.
+    """
+
+    upper: bool = attrs.field()
+    left: bool = attrs.field()
+
+    @classmethod
+    @override
+    def from_raw_command(cls, cmd: RawCommand) -> CornerMoveCommand:
+        match cmd.code:
+            case 5:
+                return CornerMoveCommand(upper=False, left=True)
+            case 6:
+                return CornerMoveCommand(upper=False, left=False)
+            case 7:
+                return CornerMoveCommand(upper=True, left=True)
+            case 8:
+                return CornerMoveCommand(upper=True, left=False)
+            case _:
+                raise ValueError(f"Invalid corner move command code: {cmd.code}")
+
+    @override
+    def to_raw_command(self) -> RawCommand:
+        code: int
+        if self.upper and self.left:
+            code = 7
+        elif self.upper and not self.left:
+            code = 8
+        elif not self.upper and self.left:
+            code = 5
+        else:
+            code = 6
+
+        return RawCommand(code=code, parameters=[], indent=0)
+
+    @override
+    def unstructure(self, converter: Converter) -> dict[str, Any]:
+        return {
+            "command": "CornerMoveCommand",
+            "upper": self.upper,
+            "left": self.left,
+        }
+
+
 # <MoveStep backwards="true">
 @attrs.define(kw_only=True)
 class StepOneCommand(RubyBaseMoveCommand):

@@ -45,10 +45,11 @@ from rgss.rpg.commands.misc import (
 )
 from rgss.rpg.commands.move import (
     BasicDirectionMoveCommand as BasicDirectionMoveCommand,
-    ChangeSpeedCommand,
+    ChangeSpeedCommand as ChangeSpeedCommand,
+    CornerMoveCommand as CornerMoveCommand,
     StepOneCommand as StepOneCommand,
-    ToggleDirectionFixCommand,
-    ToggleMoveAnimationCommand,
+    ToggleDirectionFixCommand as ToggleDirectionFixCommand,
+    ToggleMoveAnimationCommand as ToggleMoveAnimationCommand,
 )
 from rgss.rpg.commands.transfer import (
     DirectTransferPlayerCommand as DirectTransferPlayerCommand,
@@ -68,6 +69,10 @@ COMMAND_MAPPING: dict[int, type[RubyBaseCommand]] = {
     2: BasicDirectionMoveCommand,
     3: BasicDirectionMoveCommand,
     4: BasicDirectionMoveCommand,
+    5: CornerMoveCommand,
+    6: CornerMoveCommand,
+    7: CornerMoveCommand,
+    8: CornerMoveCommand,
     12: StepOneCommand,
     13: StepOneCommand,
     31: ToggleMoveAnimationCommand,
