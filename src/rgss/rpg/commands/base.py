@@ -62,6 +62,15 @@ class RubyBaseCommand(RubyUserObject, abc.ABC):
             "raw": converter.unstructure(self.to_raw_command()),
         }
 
+    @override
+    def find_instance_variables(self) -> list[tuple[RubySymbol, RubyMarshalValue]]:
+        cmd = self.to_raw_command()
+        return [
+            (PARAMS_SYMBOL, cmd.parameters),
+            (INDENT_SYMBOL, cmd.indent),
+            (CODE_SYMBOL, cmd.code),
+        ]
+
 
 class RubyBaseEventCommand(RubyBaseCommand, abc.ABC):
     """
@@ -72,15 +81,6 @@ class RubyBaseEventCommand(RubyBaseCommand, abc.ABC):
     @override
     def ruby_class_name(self) -> RubySymbol:
         return RPG_EVENT_COMMAND
-
-    @override
-    def find_instance_variables(self) -> list[tuple[RubySymbol, RubyMarshalValue]]:
-        cmd = self.to_raw_command()
-        return [
-            (PARAMS_SYMBOL, cmd.parameters),
-            (INDENT_SYMBOL, cmd.indent),
-            (CODE_SYMBOL, cmd.code),
-        ]
 
 
 class RubyBaseMoveCommand(RubyBaseCommand, abc.ABC):

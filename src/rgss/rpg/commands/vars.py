@@ -155,7 +155,7 @@ class SetVariableCommand(RubyBaseEventCommand):
             self.variable_start,
             self.variable_end,
             self.opcode.value,
-            self.opval_type.value
+            self.opval_type.value,
         ]
 
         match self.opval_type:

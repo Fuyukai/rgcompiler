@@ -114,9 +114,7 @@ class ScrollMapCommand(RubyBaseEventCommand):
 
     @override
     def to_raw_command(self) -> RawCommand:
-        return RawCommand(
-            code=204, parameters=[self.direction.value, self.distance, self.speed]
-        )
+        return RawCommand(code=204, parameters=[self.direction.value, self.distance, self.speed])
 
     @override
     def unstructure(self, converter: Converter) -> dict[str, Any]:

@@ -11,6 +11,7 @@ from rgss.rpg.commands.base import (
     RubyBaseCommand,
     RubyBaseEventCommand as RubyBaseEventCommand,
 )
+from rgss.rpg.commands.branch import ElseCommand as ElseCommand, EndBranchCommand
 from rgss.rpg.commands.dialogue import (
     CommentCommand as CommentCommand,
     ContinuedCommentCommand as ContinuedCommentCommand,
@@ -63,6 +64,8 @@ COMMAND_MAPPING: dict[int, type[RubyBaseCommand]] = {
     122: SetVariableCommand,
     102: SelectChoiceCommand,
     203: ScrollMapCommand,
+    411: ElseCommand,
+    412: EndBranchCommand,
 }
 
 COMMAND_OVERRIDDES: dict[int, Callable[[RawCommand], RubyBaseCommand]] = {
