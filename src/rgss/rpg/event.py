@@ -4,6 +4,7 @@ import attrs
 
 from rgss.rpg.commands.base import RubyBaseEventCommand
 from rgss.rpg.moves import RubyMoveRoute
+from rgss.types import RgssDirection
 from rhodochrosite.ruby import RubySymbol, RubyUserObject, atom, ruby_name
 
 RPG_EVENT = atom("RPG::Event")
@@ -60,7 +61,7 @@ class RubyEventGraphic(RubyUserObject):
     #: This is a number between 1 and 8, representing one of the cardinal directions; this will
     #: index into the rows of the graphic file. If the graphic file only has four rows, this number
     #: is divided by two to get the appropriate sprite.
-    direction: int = attrs.field(default=2)
+    direction: RgssDirection = attrs.field(default=RgssDirection.Left, converter=RgssDirection)
 
     #: The "pattern" of the graphic.
     #:

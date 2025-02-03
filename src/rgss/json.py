@@ -4,6 +4,7 @@ from typing import Any
 from cattr import Converter
 
 from rgss.rpg.commands.base import RubyBaseEventCommand
+from rgss.types import RgssDirection
 from rhodochrosite.ruby import GenericRubyUserObject, RubySymbol
 
 
@@ -30,6 +31,8 @@ def make_converter() -> Converter:
     """
 
     converter = Converter()
+    converter.register_unstructure_hook(RgssDirection, lambda it: it.name)
+
     converter.register_unstructure_hook(RubySymbol, partial(unstructure_symbol, converter))
     converter.register_unstructure_hook(RubyBaseEventCommand, lambda it: it.unstructure(converter))
     converter.register_unstructure_hook(

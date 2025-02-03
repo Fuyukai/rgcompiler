@@ -6,6 +6,7 @@ import attrs
 from cattr import Converter
 
 from rgss.rpg.commands.base import RawEventCommand, RubyBaseEventCommand
+from rgss.types import RgssDirection
 
 
 @attrs.define(kw_only=True)
@@ -19,7 +20,7 @@ class DirectTransferPlayerCommand(RubyBaseEventCommand):
     map_id: int = attrs.field()
     x: int = attrs.field()
     y: int = attrs.field()
-    direction: int = attrs.field()
+    direction: RgssDirection = attrs.field(converter=RgssDirection)
     no_fade: bool = attrs.field()
 
     @classmethod
@@ -29,7 +30,7 @@ class DirectTransferPlayerCommand(RubyBaseEventCommand):
             map_id=cast(int, cmd.parameters[1]),
             x=cast(int, cmd.parameters[2]),
             y=cast(int, cmd.parameters[3]),
-            direction=cast(int, cmd.parameters[4]),
+            direction=RgssDirection(cast(int, cmd.parameters[4])),
             no_fade=cmd.parameters[5] == 1,
         )
 
@@ -47,7 +48,7 @@ class DirectTransferPlayerCommand(RubyBaseEventCommand):
             "map_id": self.map_id,
             "x": self.x,
             "y": self.y,
-            "direction": self.direction,
+            "direction": self.direction.name,
             "no_fade": self.no_fade,
         }
 
@@ -63,7 +64,7 @@ class VariableTransferPlayerCommand(RubyBaseEventCommand):
     map_id_variable: int = attrs.field()
     x_variable: int = attrs.field()
     y_variable: int = attrs.field()
-    direction: int = attrs.field()
+    direction: RgssDirection = attrs.field(converter=RgssDirection)
     no_fade: bool = attrs.field()
 
     @classmethod
@@ -98,7 +99,7 @@ class VariableTransferPlayerCommand(RubyBaseEventCommand):
             "map_id_variable": self.map_id_variable,
             "x_variable": self.x_variable,
             "y_variable": self.y_variable,
-            "direction": self.direction,
+            "direction": self.direction.name,
             "no_fade": self.no_fade,
         }
 

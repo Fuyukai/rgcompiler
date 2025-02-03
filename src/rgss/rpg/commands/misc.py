@@ -102,7 +102,7 @@ class InlineRubyCommand(RubyBaseEventCommand):
             "command": "InlineRubyCommand",
             "script": self.script,
         }
-    
+
 
 @attrs.define(kw_only=True)
 class InlineRubyContinuedCommand(RubyBaseEventCommand):
@@ -127,6 +127,7 @@ class InlineRubyContinuedCommand(RubyBaseEventCommand):
             "command": "InlineRubyContinuedCommand",
             "script": self.script,
         }
+
 
 @attrs.define(kw_only=True)
 class SetMoveRouteCommand(RubyBaseEventCommand):

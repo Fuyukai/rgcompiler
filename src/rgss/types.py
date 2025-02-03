@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+import enum
 import struct
 from typing import Self, final, override
 
@@ -105,3 +106,21 @@ class RgssTone(RgssColour):
     @override
     def ruby_class_name(self) -> RubySymbol:
         return TONE_TYPE
+
+
+class RgssDirection(enum.IntEnum):
+    """
+    The enumeration of directions used by various RGSS functions.
+    """
+
+    # TODO: what are the unk directions? probably diagonals?
+
+    Retain = 0  # Only used by move commands?
+    Unk1 = 1
+    Down = 2
+    Unk3 = 3
+    Left = 4
+    Unk5 = 5
+    Right = 6
+    Unk7 = 7
+    Up = 8
