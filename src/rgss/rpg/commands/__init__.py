@@ -11,7 +11,16 @@ from rgss.rpg.commands.base import (
     RubyBaseCommand,
     RubyBaseEventCommand as RubyBaseEventCommand,
 )
-from rgss.rpg.commands.branch import ElseCommand as ElseCommand, EndBranchCommand
+from rgss.rpg.commands.branch import (
+    CheckFacingOpval as CheckFacingOpval,
+    CheckSwitchOpval as CheckSwitchOpval,
+    CompareVariableOpcode as CompareVariableOpcode,
+    CompareVariableToConstantOpval as CompareVariableToConstantOpval,
+    CompareVariableToVariableOpval as CompareVariableToVariableOpval,
+    ConditionalBranchCommand as ConditionalBranchCommand,
+    ElseCommand as ElseCommand,
+    EndBranchCommand as EndBranchCommand,
+)
 from rgss.rpg.commands.dialogue import (
     CommentCommand as CommentCommand,
     ContinuedCommentCommand as ContinuedCommentCommand,
@@ -64,6 +73,7 @@ COMMAND_MAPPING: dict[int, type[RubyBaseCommand]] = {
     122: SetVariableCommand,
     102: SelectChoiceCommand,
     203: ScrollMapCommand,
+    111: ConditionalBranchCommand,
     411: ElseCommand,
     412: EndBranchCommand,
 }
