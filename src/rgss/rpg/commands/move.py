@@ -385,3 +385,51 @@ class SetOpacityCommand(RubyBaseMoveCommand):
     @override
     def unstructure(self, converter: Converter) -> dict[str, Any]:
         return {"command": "SetOpacityCommand", "opacity": self.opacity}
+
+
+@final
+class TurnRelativeAction(enum.Enum):
+    Right90 = 0
+    Left90 = 1
+    Full180 = 2
+
+
+@attrs.define(kw_only=True)
+@final
+class TurnRelativeCommand(RubyBaseMoveCommand):
+    """
+    A move command that turns the actor in a relative direction.
+    """
+
+    action: TurnRelativeAction = attrs.field()
+
+    @classmethod
+    @override
+    def from_raw_command(cls, cmd: RawCommand) -> TurnRelativeCommand:
+        action: TurnRelativeAction
+        if cmd.code == 20:
+            action = TurnRelativeAction.Right90
+        elif cmd.code == 21:
+            action = TurnRelativeAction.Left90
+        elif cmd.code == 22:
+            action = TurnRelativeAction.Full180
+        else:
+            raise ValueError(f"can't do a turn relative command for code {cmd.code}")
+
+        return cls(action=action)
+
+    @override
+    def to_raw_command(self) -> RawCommand:
+        code: int
+        if self.action == TurnRelativeAction.Right90:
+            code = 20
+        elif self.action == TurnRelativeAction.Left90:
+            code = 21
+        else:
+            code = 22
+
+        return RawCommand(code=code, parameters=[], indent=0)
+
+    @override
+    def unstructure(self, converter: Converter) -> dict[str, Any]:
+        return {"command": "TurnRelativeCommand", "action": self.action.name}
