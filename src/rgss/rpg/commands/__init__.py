@@ -28,6 +28,7 @@ from rgss.rpg.commands.effects import (
     PlaySfxCommand as PlaySfxCommand,
     ScreenFlashCommand as ScreenFlashCommand,
     ScrollMapCommand as ScrollMapCommand,
+    ShowAnimationCommand,
 )
 from rgss.rpg.commands.flow import (
     BreakLoopCommand as BreakLoopCommand,
@@ -138,6 +139,7 @@ COMMAND_MAPPING: dict[int, type[RubyBaseCommand]] = {
     113: BreakLoopCommand,
     413: RepeatAboveCommand,
     241: PlayBgmCommand,
+    207: ShowAnimationCommand,
 }
 # fmt: on
 

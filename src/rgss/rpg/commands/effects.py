@@ -216,3 +216,38 @@ class PlayBgmCommand(RubyBaseEventCommand):
             "command": "PlayBgmCommand",
             "audio": converter.unstructure(self.audio),
         }
+
+
+@attrs.define(kw_only=True)
+class ShowAnimationCommand(RubyBaseEventCommand):
+    """
+    An event command that shows an animation.
+    """
+
+    target: int = attrs.field()
+    animation_id: int = attrs.field()
+
+    @classmethod
+    @override
+    def from_raw_command(cls, cmd: RawCommand) -> ShowAnimationCommand:
+        return ShowAnimationCommand(
+            target=cast(int, cmd.parameters[0]),
+            animation_id=cast(int, cmd.parameters[1]),
+            indent=cmd.indent,
+        )
+
+    @override
+    def to_raw_command(self) -> RawCommand:
+        return RawCommand(
+            code=207,
+            parameters=[self.target, self.animation_id],
+            indent=self.indent,
+        )
+
+    @override
+    def unstructure(self, converter: Converter) -> dict[str, Any]:
+        return {
+            "command": "ShowAnimationCommand",
+            "target": self.target,
+            "animation_id": self.animation_id,
+        }
