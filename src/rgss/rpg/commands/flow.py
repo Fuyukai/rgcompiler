@@ -181,12 +181,21 @@ class CheckScriptReturnOpval:
     script: str = attrs.field()
 
 
+@attrs.define(kw_only=True, frozen=True)
+class CheckMoneyOpval:
+    money: int = attrs.field()
+    # values unknown, as rpg maker crashes if this is selected ...
+    # probably just is more or is less
+    op: int = attrs.field()
+
+
 type ComparisonOpvals = (
     CheckSwitchOpval
     | CompareVariableToConstantOpval
     | CompareVariableToVariableOpval
     | CheckFacingOpval
     | CheckScriptReturnOpval
+    | CheckMoneyOpval
 )
 
 
@@ -243,6 +252,12 @@ class ConditionalBranchCommand(RubyBaseEventCommand):
                 direction = RgssDirection(cmd.parameters[2])
                 wrapped = CheckFacingOpval(character_id=actor, direction=direction)
 
+            case 7:
+                # dunno what this actually is, my fucking rpg maker doesn't work
+                wrapped = CheckMoneyOpval(
+                    money=cast(int, cmd.parameters[1]), op=cast(int, cmd.parameters[2])
+                )
+
             case 12:  # Script
                 wrapped = CheckScriptReturnOpval(script=cast(str, cmd.parameters[1]))
 
@@ -271,6 +286,9 @@ class ConditionalBranchCommand(RubyBaseEventCommand):
 
         elif isinstance(self.wrapped, CheckScriptReturnOpval):
             params = [12, self.wrapped.script]
+
+        elif isinstance(self.wrapped, CheckMoneyOpval):
+            params = [7, self.wrapped.money, self.wrapped.op]
 
         else:
             # unify variable_id writing, the next code will overwrite params[2|3]

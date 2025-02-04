@@ -376,3 +376,42 @@ class ChangeMapSettingsCommand(RubyBaseEventCommand):
             "command": "ChangeMapSettingsCommand",
             "setting": converter.unstructure(self.setting),
         }
+
+
+@attrs.define(kw_only=True)
+@final
+class SetMoneyCommand(RubyBaseEventCommand):
+    """
+    An event command that sets the amount of money the player has.
+    """
+
+    subtract: bool = attrs.field()
+    use_variable: bool = attrs.field()
+    opval: int = attrs.field()
+
+    @classmethod
+    @override
+    def from_raw_command(cls, cmd: RawCommand) -> SetMoneyCommand:
+        return SetMoneyCommand(
+            subtract=bool(cmd.parameters[0]),
+            use_variable=bool(cmd.parameters[1]),
+            opval=cast(int, cmd.parameters[2]),
+            indent=cmd.indent,
+        )
+
+    @override
+    def to_raw_command(self) -> RawCommand:
+        return RawCommand(
+            code=125,
+            parameters=[self.subtract, self.use_variable, self.opval],
+            indent=self.indent,
+        )
+
+    @override
+    def unstructure(self, converter: Converter) -> dict[str, Any]:
+        return {
+            "command": "SetMoneyCommand",
+            "subtract": self.subtract,
+            "use_variable": self.use_variable,
+            "opval": self.opval,
+        }
