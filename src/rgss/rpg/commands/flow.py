@@ -343,3 +343,23 @@ class RepeatAboveCommand(RubyBaseEventCommand):
     @override
     def unstructure(self, converter: Converter) -> dict[str, Any]:
         return {"command": "RepeatAboveCommand"}
+
+
+@attrs.define(kw_only=True)
+class ExitEventProcesssingCommand(RubyBaseEventCommand):
+    """
+    An event command that stops processing the event.
+    """
+
+    @classmethod
+    @override
+    def from_raw_command(cls, cmd: RawCommand) -> ExitEventProcesssingCommand:
+        return ExitEventProcesssingCommand(indent=cmd.indent)
+
+    @override
+    def to_raw_command(self) -> RawCommand:
+        return RawCommand(code=115, indent=self.indent)
+
+    @override
+    def unstructure(self, converter: Converter) -> dict[str, Any]:
+        return {"command": "ExitEventProcesssingCommand"}
