@@ -90,6 +90,7 @@ COMMAND_MAPPING: dict[int, type[RubyBaseCommand]] = {
     18: TurnAbsoluteCommand,
     19: TurnAbsoluteCommand,
     41: SetGraphicMoveCommand,
+    44: PlaySfxCommand,
 
     101: ShowDialogueCommand,
     401: ContinueDialogueCommand,

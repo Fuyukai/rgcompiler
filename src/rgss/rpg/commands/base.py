@@ -87,7 +87,7 @@ class RubyBaseEventCommand(RubyBaseCommand, abc.ABC):
             raise ValueError(f"Can't make command {cmd.code} from {type}")
 
         return cls.from_raw_command(cmd)
-    
+
     @classmethod
     @abc.abstractmethod
     def from_raw_command(cls, cmd: RawCommand) -> Self:
@@ -115,7 +115,7 @@ class RubyBaseMoveCommand(RubyBaseCommand, abc.ABC):
             raise ValueError(f"Can't make command {cmd.code} from {type}")
 
         return cls.from_raw_command(cmd)
-    
+
     @classmethod
     @abc.abstractmethod
     def from_raw_command(cls, cmd: RawCommand) -> Self:

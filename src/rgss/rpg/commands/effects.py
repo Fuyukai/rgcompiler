@@ -5,9 +5,15 @@ from typing import Any, cast, override
 import attrs
 from cattr import Converter
 
-from rgss.rpg.commands.base import RawCommand, RubyBaseEventCommand
+from rgss.rpg.commands.base import (
+    RPG_EVENT_COMMAND,
+    RawCommand,
+    RubyBaseCommand,
+    RubyBaseEventCommand,
+)
 from rgss.rpg.misc import RubyAudioFile
 from rgss.types import RgssColour, RgssDirection, RgssTone
+from rhodochrosite.ruby import RubySymbol
 
 
 @attrs.define(kw_only=True)
@@ -73,21 +79,33 @@ class ScreenFlashCommand(RubyBaseEventCommand):
 
 
 @attrs.define(kw_only=True)
-class PlaySfxCommand(RubyBaseEventCommand):
+class PlaySfxCommand(RubyBaseCommand):
     """
-    An event command that plays a sound effect.
+    A command that plays a sound effect.
+
+    This is shared between event and move commands.
     """
 
+    type: RubySymbol = attrs.field()
     audio: RubyAudioFile = attrs.field()
+    indent: int = attrs.field()
 
     @classmethod
     @override
-    def from_raw_command(cls, cmd: RawCommand) -> PlaySfxCommand:
-        return PlaySfxCommand(audio=cast(RubyAudioFile, cmd.parameters[0]), indent=cmd.indent)
+    def from_raw_command_and_type(cls, type: RubySymbol, cmd: RawCommand) -> PlaySfxCommand:
+        return PlaySfxCommand(
+            type=type, audio=cast(RubyAudioFile, cmd.parameters[0]), indent=cmd.indent
+        )
+
+    @property
+    @override
+    def ruby_class_name(self) -> RubySymbol:
+        return self.type
 
     @override
     def to_raw_command(self) -> RawCommand:
-        return RawCommand(code=250, parameters=[self.audio], indent=self.indent)
+        code = 250 if self.type == RPG_EVENT_COMMAND else 44
+        return RawCommand(code=code, parameters=[self.audio], indent=self.indent)
 
     @override
     def unstructure(self, converter: Converter) -> dict[str, Any]:
