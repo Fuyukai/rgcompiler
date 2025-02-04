@@ -51,7 +51,6 @@ class RubyBaseCommand(RubyUserObject, abc.ABC):
         Gets the actual :class:`.RawCommand` that will be marshalled.
         """
 
-    @abc.abstractmethod
     def unstructure(self, converter: Converter) -> dict[str, Any]:
         """
         Converts this object to a dictionary.

@@ -151,3 +151,36 @@ class ScrollMapCommand(RubyBaseEventCommand):
             "distance": self.distance,
             "speed": self.speed,
         }
+
+
+@attrs.define(kw_only=True)
+class FadeOutBgmCommand(RubyBaseEventCommand):
+    """
+    Event command that fades out the BGM.
+    """
+
+    # in seconds, not frames?
+    fade_time: int = attrs.field()
+
+    @classmethod
+    @override
+    def from_raw_command(cls, cmd: RawCommand) -> FadeOutBgmCommand:
+        return FadeOutBgmCommand(
+            fade_time=cast(int, cmd.parameters[0]),
+            indent=cmd.indent,
+        )
+
+    @override
+    def to_raw_command(self) -> RawCommand:
+        return RawCommand(
+            code=242,
+            parameters=[self.fade_time],
+            indent=self.indent,
+        )
+
+    @override
+    def unstructure(self, converter: Converter) -> dict[str, Any]:
+        return {
+            "command": "FadeOutBgmCommand",
+            "fade_time": self.fade_time,
+        }
