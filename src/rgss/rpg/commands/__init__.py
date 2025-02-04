@@ -23,13 +23,14 @@ from rgss.rpg.commands.dialogue import (
 )
 from rgss.rpg.commands.effects import (
     ChangeScreenColourToneCommand as ChangeScreenColourToneCommand,
-    FadeOutBgmCommand,
-    PlayBgmCommand,
+    FadeOutBgmCommand as FadeOutBgmCommand,
+    PlayBgmCommand as PlayBgmCommand,
     PlaySfxCommand as PlaySfxCommand,
     ScreenFlashCommand as ScreenFlashCommand,
-    ScreenShakeCommand,
+    ScreenShakeCommand as ScreenShakeCommand,
     ScrollMapCommand as ScrollMapCommand,
-    ShowAnimationCommand,
+    SetTransparencyFlagCommand as SetTransparencyFlagCommand,
+    ShowAnimationCommand as ShowAnimationCommand,
 )
 from rgss.rpg.commands.flow import (
     BreakLoopCommand as BreakLoopCommand,
@@ -40,17 +41,17 @@ from rgss.rpg.commands.flow import (
     CompareVariableToConstantOpval as CompareVariableToConstantOpval,
     CompareVariableToVariableOpval as CompareVariableToVariableOpval,
     ConditionalBranchCommand as ConditionalBranchCommand,
-    DefineLabelEventCommand,
+    DefineLabelEventCommand as DefineLabelEventCommand,
     ElseCommand as ElseCommand,
     EndBranchCommand as EndBranchCommand,
     EnterLoopCommand as EnterLoopCommand,
     EraseThisEventCommand as EraseThisEventCommand,
     ExitEventProcesssingCommand as ExitEventProcesssingCommand,
-    JumpToLabelEventCommand,
+    JumpToLabelEventCommand as JumpToLabelEventCommand,
     RepeatAboveCommand as RepeatAboveCommand,
 )
 from rgss.rpg.commands.misc import (
-    ChangeMapSettingsCommand,
+    ChangeMapSettingsCommand as ChangeMapSettingsCommand,
     EmptyCommand as EmptyCommand,
     InlineRubyCommand as InlineRubyCommand,
     InlineRubyContinuedCommand as InlineRubyContinuedCommand,
@@ -73,14 +74,14 @@ from rgss.rpg.commands.move import (
     TogglePropertyMoveCommand as TogglePropertyMoveCommand,
     TurnAbsoluteCommand as TurnAbsoluteCommand,
     TurnRandomlyCommand as TurnRandomlyCommand,
-    TurnRelativeCommand,
+    TurnRelativeCommand as TurnRelativeCommand,
 )
 from rgss.rpg.commands.transfer import (
     SetEventLocationCommand as SetEventLocationCommand,
     TransferPlayerCommand as TransferPlayerCommand,
 )
 from rgss.rpg.commands.vars import (
-    InputNumberCommand,
+    InputNumberCommand as InputNumberCommand,
     SetSelfSwitchCommand as SetSelfSwitchCommand,
     SetSwitchCommand as SetSwitchCommand,
     SetVariableCommand as SetVariableCommand,
@@ -151,6 +152,7 @@ COMMAND_MAPPING: dict[int, type[RubyBaseCommand]] = {
     203: ScrollMapCommand,
     204: ChangeMapSettingsCommand,
     207: ShowAnimationCommand,
+    208: SetTransparencyFlagCommand,
     209: SetMoveRouteCommand,
     210: WaitForMoveCompletionCommand,
     223: ChangeScreenColourToneCommand,

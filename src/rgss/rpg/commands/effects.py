@@ -306,3 +306,38 @@ class ScreenShakeCommand(RubyBaseEventCommand):
             "speed": self.speed,
             "frames": self.frames,
         }
+
+
+@attrs.define(kw_only=True)
+@final
+class SetTransparencyFlagCommand(RubyBaseEventCommand):
+    """
+    Sets the transparency flag for this event.
+    """
+
+    # i.e. not transparent!
+    normal: bool = attrs.field()
+
+    @classmethod
+    @override
+    def from_raw_command(cls, cmd: RawCommand) -> SetTransparencyFlagCommand:
+        # wow, the first rgss event that ISN'T fucking inverted
+        return SetTransparencyFlagCommand(
+            normal=cast(bool, cmd.parameters[0]),
+            indent=cmd.indent,
+        )
+
+    @override
+    def to_raw_command(self) -> RawCommand:
+        return RawCommand(
+            code=208,
+            parameters=[self.normal],
+            indent=self.indent,
+        )
+
+    @override
+    def unstructure(self, converter: Converter) -> dict[str, Any]:
+        return {
+            "command": "SetTransparencyFlagCommand",
+            "flag": self.normal,
+        }
