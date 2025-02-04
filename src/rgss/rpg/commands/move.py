@@ -433,3 +433,27 @@ class TurnRelativeCommand(RubyBaseMoveCommand):
     @override
     def unstructure(self, converter: Converter) -> dict[str, Any]:
         return {"command": "TurnRelativeCommand", "action": self.action.name}
+
+
+@attrs.define(kw_only=True)
+@final
+class SetBlendingMoveCommand(RubyBaseMoveCommand):
+    """
+    A move command that sets the blending of the actor.
+    """
+
+    # kinda don't care to make this a proper enum!
+    blending: int = attrs.field()
+
+    @classmethod
+    @override
+    def from_raw_command(cls, cmd: RawCommand) -> SetBlendingMoveCommand:
+        return cls(blending=cast(int, cmd.parameters[0]))
+
+    @override
+    def to_raw_command(self) -> RawCommand:
+        return RawCommand(code=43, parameters=[self.blending], indent=0)
+
+    @override
+    def unstructure(self, converter: Converter) -> dict[str, Any]:
+        return {"command": "SetBlendingMoveCommand", "blending": self.blending}
