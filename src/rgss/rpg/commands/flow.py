@@ -165,12 +165,12 @@ class CheckFacingOpval:
 
 
 @attrs.define(kw_only=True, frozen=True)
-class UnknownOpval:
+class CheckScriptReturnOpval:
     """
-    Branch opval for any unknown comparison operation.
+    Branch opval for checking if a bit of Ruby code returns true.
     """
 
-    raw_parameters: list[RubyMarshalValue] = attrs.field()
+    script: str = attrs.field()
 
 
 type ComparisonOpvals = (
@@ -178,7 +178,7 @@ type ComparisonOpvals = (
     | CompareVariableToConstantOpval
     | CompareVariableToVariableOpval
     | CheckFacingOpval
-    | UnknownOpval
+    | CheckScriptReturnOpval
 )
 
 
@@ -235,8 +235,11 @@ class ConditionalBranchCommand(RubyBaseEventCommand):
                 direction = RgssDirection(cmd.parameters[2])
                 wrapped = CheckFacingOpval(character_id=actor, direction=direction)
 
-            case _:
-                wrapped = UnknownOpval(raw_parameters=cmd.parameters)
+            case 12:  # Script
+                wrapped = CheckScriptReturnOpval(script=cast(str, cmd.parameters[1]))
+
+            case code:
+                raise ValueError(f"unknown comparison opcode {code}")
 
         return ConditionalBranchCommand(indent=cmd.indent, wrapped=wrapped)
 
@@ -255,11 +258,11 @@ class ConditionalBranchCommand(RubyBaseEventCommand):
 
             params.append(0 if self.wrapped.is_on else 1)
 
-        elif isinstance(self.wrapped, UnknownOpval):
-            params = self.wrapped.raw_parameters
-
         elif isinstance(self.wrapped, CheckFacingOpval):
             params = [6, self.wrapped.character_id, self.wrapped.direction.value]
+
+        elif isinstance(self.wrapped, CheckScriptReturnOpval):
+            params = [12, self.wrapped.script]
 
         else:
             # unify variable_id writing, the next code will overwrite params[2|3]
