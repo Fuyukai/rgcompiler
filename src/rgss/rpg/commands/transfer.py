@@ -7,142 +7,78 @@ from cattr import Converter
 
 from rgss.rpg.commands.base import RawCommand, RubyBaseEventCommand
 from rgss.types import RgssDirection
-from rhodochrosite.ruby import RubyMarshalValue, RubySymbol
+from rhodochrosite.ruby import RubyMarshalValue
+
+
+@attrs.define(kw_only=True, frozen=True)
+class TransferDirect:
+    x: int = attrs.field()
+    y: int = attrs.field()
+
+
+@attrs.define(kw_only=True, frozen=True)
+class TransferByVariable:
+    x_variable: int = attrs.field()
+    y_variable: int = attrs.field()
 
 
 @attrs.define(kw_only=True)
-class DirectTransferPlayerCommand(RubyBaseEventCommand):
+@final
+class TransferPlayerCommand(RubyBaseEventCommand):
     """
-    An event command that transfers the player to a different map.
-
-    This is the variant that doesn't use variables.
+    An event command that transfers the player to a different position, possibly on another map.
     """
 
     map_id: int = attrs.field()
-    x: int = attrs.field()
-    y: int = attrs.field()
+    opval: TransferDirect | TransferByVariable = attrs.field()
     direction: RgssDirection = attrs.field(converter=RgssDirection)
     no_fade: bool = attrs.field()
 
     @classmethod
     @override
-    def from_raw_command(cls, cmd: RawCommand) -> DirectTransferPlayerCommand:
-        return DirectTransferPlayerCommand(
-            map_id=cast(int, cmd.parameters[1]),
-            x=cast(int, cmd.parameters[2]),
-            y=cast(int, cmd.parameters[3]),
-            direction=RgssDirection(cast(int, cmd.parameters[4])),
-            no_fade=cmd.parameters[5] == 1,
-            indent=cmd.indent,
+    def from_raw_command(cls, cmd: RawCommand) -> TransferPlayerCommand:
+        map_id = cast(int, cmd.parameters[1])
+        direction = RgssDirection(cmd.parameters[4])
+        no_fade = cmd.parameters[5] == 1
+
+        x = cast(int, cmd.parameters[2])
+        y = cast(int, cmd.parameters[3])
+
+        uses_variables = cmd.parameters[0] == 1
+        if uses_variables:
+            opval = TransferByVariable(x_variable=x, y_variable=y)
+        else:
+            opval = TransferDirect(x=x, y=y)
+
+        return TransferPlayerCommand(
+            map_id=map_id, opval=opval, direction=direction, no_fade=no_fade, indent=cmd.indent
         )
 
     @override
     def to_raw_command(self) -> RawCommand:
-        return RawCommand(
-            code=201,
-            parameters=[0, self.map_id, self.x, self.y, self.direction.value, int(self.no_fade)],
-            indent=self.indent,
-        )
+        params: list[RubyMarshalValue] = [0, self.map_id]
+
+        if isinstance(self.opval, TransferDirect):
+            params.extend([self.opval.x, self.opval.y])
+        else:
+            params.extend([self.opval.x_variable, self.opval.y_variable])
+
+        params.extend([self.direction.value, int(self.no_fade)])
+        return RawCommand(code=201, parameters=params, indent=self.indent)
 
     @override
     def unstructure(self, converter: Converter) -> dict[str, Any]:
         return {
             "command": "TransferPlayerCommand",
             "map_id": self.map_id,
-            "x": self.x,
-            "y": self.y,
+            "opval": converter.unstructure(self.opval),
             "direction": self.direction.name,
             "no_fade": self.no_fade,
         }
 
 
 @attrs.define(kw_only=True)
-class VariableTransferPlayerCommand(RubyBaseEventCommand):
-    """
-    An event command that transfers the player to a different map.
-
-    This is the variant that uses variables instead of a direct map ID.
-    """
-
-    map_id_variable: int = attrs.field()
-    x_variable: int = attrs.field()
-    y_variable: int = attrs.field()
-    direction: RgssDirection = attrs.field(converter=RgssDirection)
-    no_fade: bool = attrs.field()
-
-    @classmethod
-    @override
-    def from_raw_command(cls, cmd: RawCommand) -> VariableTransferPlayerCommand:
-        return VariableTransferPlayerCommand(
-            map_id_variable=cast(int, cmd.parameters[1]),
-            x_variable=cast(int, cmd.parameters[2]),
-            y_variable=cast(int, cmd.parameters[3]),
-            direction=cast(int, cmd.parameters[4]),
-            no_fade=cmd.parameters[5] == 1,
-            indent=cmd.indent,
-        )
-
-    @override
-    def to_raw_command(self) -> RawCommand:
-        return RawCommand(
-            code=201,
-            parameters=[
-                1,
-                self.map_id_variable,
-                self.x_variable,
-                self.y_variable,
-                self.direction.value,
-                int(self.no_fade),
-            ],
-            indent=self.indent,
-        )
-
-    @override
-    def unstructure(self, converter: Converter) -> dict[str, Any]:
-        return {
-            "command": "VariableTransferPlayerCommand",
-            "map_id_variable": self.map_id_variable,
-            "x_variable": self.x_variable,
-            "y_variable": self.y_variable,
-            "direction": self.direction.name,
-            "no_fade": self.no_fade,
-        }
-
-
-def make_transfer_command(_: RubySymbol, raw: RawCommand) -> RubyBaseEventCommand:
-    assert raw.parameters[0] in (0, 1), (
-        f"expected first param of code 201 to be (0, 1), not {raw.parameters[0]}"
-    )
-    uses_variables = raw.parameters[0] == 1
-
-    if uses_variables:
-        return VariableTransferPlayerCommand.from_raw_command(raw)
-
-    return DirectTransferPlayerCommand.from_raw_command(raw)
-
-
-@attrs.define(kw_only=True)
-class SetEventLocationAbsolute:
-    """
-    Sets the absolute location of an event.
-    """
-
-    x: int = attrs.field()
-    y: int = attrs.field()
-
-
-@attrs.define(kw_only=True)
-class SetEventLocationVariables:
-    """
-    Sets the location of an event using other variables.
-    """
-
-    x_var_id: int = attrs.field()
-    y_var_id: int = attrs.field()
-
-
-@attrs.define(kw_only=True)
-class SetEventLocationSwap:
+class TransferSwap:
     """
     Sets the location of an event by swapping it with another event.
     """
@@ -163,9 +99,7 @@ class SetEventLocationCommand(RubyBaseEventCommand):
     event_id: int = attrs.field()
 
     #: The actual value to move the event to using.
-    opval: SetEventLocationAbsolute | SetEventLocationVariables | SetEventLocationSwap = (
-        attrs.field()
-    )
+    opval: TransferDirect | TransferByVariable | TransferSwap = attrs.field()
 
     #: The resulting direction for the transferred event.
     direction: RgssDirection = attrs.field()
@@ -179,18 +113,18 @@ class SetEventLocationCommand(RubyBaseEventCommand):
 
         match opcode:
             case 0:
-                opval = SetEventLocationAbsolute(
+                opval = TransferDirect(
                     x=cast(int, cmd.parameters[2]), y=cast(int, cmd.parameters[3])
                 )
 
             case 1:
-                opval = SetEventLocationVariables(
-                    x_var_id=cast(int, cmd.parameters[2]), y_var_id=cast(int, cmd.parameters[3])
+                opval = TransferByVariable(
+                    x_variable=cast(int, cmd.parameters[2]), y_variable=cast(int, cmd.parameters[3])
                 )
 
             case 2:
                 # unusually generous for RGXP to keep this as 5 items long.
-                opval = SetEventLocationSwap(event_id=cast(int, cmd.parameters[2]))
+                opval = TransferSwap(event_id=cast(int, cmd.parameters[2]))
 
             case code:
                 raise ValueError(f"can't do {code} for set event location!")
@@ -203,10 +137,10 @@ class SetEventLocationCommand(RubyBaseEventCommand):
     def to_raw_command(self) -> RawCommand:
         params: list[RubyMarshalValue] = [self.event_id]
 
-        if isinstance(self.opval, SetEventLocationAbsolute):
+        if isinstance(self.opval, TransferDirect):
             params.extend([0, self.opval.x, self.opval.y])
-        elif isinstance(self.opval, SetEventLocationVariables):
-            params.extend([1, self.opval.x_var_id, self.opval.y_var_id])
+        elif isinstance(self.opval, TransferByVariable):
+            params.extend([1, self.opval.x_variable, self.opval.y_variable])
         else:
             params.extend([2, self.opval.event_id, 0])
 

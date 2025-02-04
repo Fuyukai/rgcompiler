@@ -1,4 +1,3 @@
-from collections.abc import Callable
 from typing import cast
 
 from rgss.rpg.commands.base import (
@@ -65,10 +64,8 @@ from rgss.rpg.commands.move import (
     TurnAbsoluteCommand as TurnAbsoluteCommand,
 )
 from rgss.rpg.commands.transfer import (
-    DirectTransferPlayerCommand as DirectTransferPlayerCommand,
     SetEventLocationCommand as SetEventLocationCommand,
-    VariableTransferPlayerCommand as VariableTransferPlayerCommand,
-    make_transfer_command,
+    TransferPlayerCommand,
 )
 from rgss.rpg.commands.vars import (
     SetSelfSwitchCommand as SetSelfSwitchCommand,
@@ -142,12 +139,9 @@ COMMAND_MAPPING: dict[int, type[RubyBaseCommand]] = {
     241: PlayBgmCommand,
     207: ShowAnimationCommand,
     202: SetEventLocationCommand,
+    201: TransferPlayerCommand,
 }
 # fmt: on
-
-COMMAND_OVERRIDDES: dict[int, Callable[[RubySymbol, RawCommand], RubyBaseCommand]] = {
-    201: make_transfer_command,
-}
 
 
 def make_raw_event_command(ivars: dict[RubySymbol, RubyMarshalValue]) -> RawCommand:
@@ -167,16 +161,11 @@ def make_command_from_ivars(
     if code == 0:
         return EmptyCommand(symbol=name, raw=raw_cmd)
 
-    fn = COMMAND_OVERRIDDES.get(code)
-    if fn is None:
-        klass = COMMAND_MAPPING.get(code)
-        if klass is not None:
-            fn = klass.from_raw_command_and_type
-
-    if fn is None:  # noqa: SIM108
-        result = UnknownCommand(name=name, raw=raw_cmd)
+    klass = COMMAND_MAPPING.get(code)
+    if klass is not None:
+        result = klass.from_raw_command_and_type(name, raw_cmd)
     else:
-        result = fn(name, raw_cmd)
+        result = UnknownCommand(name=name, raw=raw_cmd)
 
     if __debug__:
         if code < 100:
