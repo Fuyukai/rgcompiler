@@ -138,7 +138,7 @@ class ScrollMapCommand(RubyBaseEventCommand):
     @override
     def to_raw_command(self) -> RawCommand:
         return RawCommand(
-            code=204,
+            code=203,
             parameters=[self.direction.value, self.distance, self.speed],
             indent=self.indent,
         )
