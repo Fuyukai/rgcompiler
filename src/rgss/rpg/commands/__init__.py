@@ -49,6 +49,7 @@ from rgss.rpg.commands.misc import (
     EmptyCommand as EmptyCommand,
     InlineRubyCommand as InlineRubyCommand,
     InlineRubyContinuedCommand as InlineRubyContinuedCommand,
+    RecoverAllCommand,
     SetMoveRouteCommand as SetMoveRouteCommand,
     UnknownCommand as UnknownCommand,
     VisualMoveRouteCommand as VisualMoveRouteCommand,
@@ -142,6 +143,7 @@ COMMAND_MAPPING: dict[int, type[RubyBaseCommand]] = {
     242: FadeOutBgmCommand,
     249: PlayBgmCommand,  # For "ME"s,
     250: PlaySfxCommand,
+    314: RecoverAllCommand,
     355: InlineRubyCommand,
 
     # Psuedo-commands. These only exist in relation to another command and can only exist by

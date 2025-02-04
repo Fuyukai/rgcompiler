@@ -242,3 +242,31 @@ class WaitForMoveCompletionCommand(RubyBaseEventCommand):
     @override
     def unstructure(self, converter: Converter) -> dict[str, Any]:
         return {"command": "WaitForMoveCompletionCommand"}
+
+
+@attrs.define(kw_only=True)
+@final
+class RecoverAllCommand(RubyBaseEventCommand):
+    """
+    An event command that recovers all of the stats for a specific actor.
+
+    For Reborn, this is the same as visiting a Pokémon Center.
+    """
+
+    #: The ID of the actor to recover.
+    #:
+    #: If this is the special constant "0", it refers to the whole party.
+    actor_id: int = attrs.field()
+
+    @classmethod
+    @override
+    def from_raw_command(cls, cmd: RawCommand) -> RecoverAllCommand:
+        return RecoverAllCommand(actor_id=cast(int, cmd.parameters[0]), indent=cmd.indent)
+
+    @override
+    def to_raw_command(self) -> RawCommand:
+        return RawCommand(code=314, parameters=[self.actor_id], indent=self.indent)
+
+    @override
+    def unstructure(self, converter: Converter) -> dict[str, Any]:
+        return {"command": "RecoverAllCommand", "actor_id": self.actor_id}
