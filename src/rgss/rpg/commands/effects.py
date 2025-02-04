@@ -267,3 +267,42 @@ class ShowAnimationCommand(RubyBaseEventCommand):
             "target": self.target,
             "animation_id": self.animation_id,
         }
+
+
+@attrs.define(kw_only=True)
+@final
+class ScreenShakeCommand(RubyBaseEventCommand):
+    """
+    An event command that shakes the screen.
+    """
+
+    power: int = attrs.field()
+    speed: int = attrs.field()
+    frames: int = attrs.field()
+
+    @classmethod
+    @override
+    def from_raw_command(cls, cmd: RawCommand) -> ScreenShakeCommand:
+        return ScreenShakeCommand(
+            power=cast(int, cmd.parameters[0]),
+            speed=cast(int, cmd.parameters[1]),
+            frames=cast(int, cmd.parameters[2]),
+            indent=cmd.indent,
+        )
+
+    @override
+    def to_raw_command(self) -> RawCommand:
+        return RawCommand(
+            code=225,
+            parameters=[self.power, self.speed, self.frames],
+            indent=self.indent,
+        )
+
+    @override
+    def unstructure(self, converter: Converter) -> dict[str, Any]:
+        return {
+            "command": "ScreenShakeCommand",
+            "power": self.power,
+            "speed": self.speed,
+            "frames": self.frames,
+        }

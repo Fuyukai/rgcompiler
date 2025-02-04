@@ -27,6 +27,7 @@ from rgss.rpg.commands.effects import (
     PlayBgmCommand,
     PlaySfxCommand as PlaySfxCommand,
     ScreenFlashCommand as ScreenFlashCommand,
+    ScreenShakeCommand,
     ScrollMapCommand as ScrollMapCommand,
     ShowAnimationCommand,
 )
@@ -144,6 +145,7 @@ COMMAND_MAPPING: dict[int, type[RubyBaseCommand]] = {
     210: WaitForMoveCompletionCommand,
     223: ChangeScreenColourToneCommand,
     224: ScreenFlashCommand,
+    225: ScreenShakeCommand,
     241: PlayBgmCommand,
     242: FadeOutBgmCommand,
     249: PlayBgmCommand,  # For "ME"s,
