@@ -278,3 +278,23 @@ class SetGraphicMoveCommand(RubyBaseMoveCommand, HasGraphicProperties):
             "direction": self.direction.name,
             "pattern": self.pattern,
         }
+
+
+@attrs.define(kw_only=True)
+class TurnTowardsPlayerCommand(RubyBaseMoveCommand):
+    """
+    A move command for turning towards the player.
+    """
+
+    @classmethod
+    @override
+    def from_raw_command(cls, cmd: RawCommand) -> TurnTowardsPlayerCommand:
+        return cls()
+
+    @override
+    def to_raw_command(self) -> RawCommand:
+        return RawCommand(code=25, parameters=[], indent=0)
+
+    @override
+    def unstructure(self, converter: Converter) -> dict[str, Any]:
+        return {"command": "MoveTowardPlayerCommand"}

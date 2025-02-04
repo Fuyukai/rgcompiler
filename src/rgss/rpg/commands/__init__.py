@@ -48,11 +48,12 @@ from rgss.rpg.commands.move import (
     BasicDirectionMoveCommand as BasicDirectionMoveCommand,
     ChangeSpeedCommand as ChangeSpeedCommand,
     CornerMoveCommand as CornerMoveCommand,
-    SetGraphicMoveCommand,
+    SetGraphicMoveCommand as SetGraphicMoveCommand,
     StepOneCommand as StepOneCommand,
     ToggleDirectionFixCommand as ToggleDirectionFixCommand,
     ToggleMoveAnimationCommand as ToggleMoveAnimationCommand,
     TurnAbsoluteCommand as TurnAbsoluteCommand,
+    TurnTowardsPlayerCommand as TurnTowardsPlayerCommand,
     WaitMoveCommand as WaitMoveCommand,
 )
 from rgss.rpg.commands.transfer import (
@@ -91,6 +92,7 @@ COMMAND_MAPPING: dict[int, type[RubyBaseCommand]] = {
     19: TurnAbsoluteCommand,
     41: SetGraphicMoveCommand,
     44: PlaySfxCommand,
+    25: TurnTowardsPlayerCommand,
 
     101: ShowDialogueCommand,
     401: ContinueDialogueCommand,
