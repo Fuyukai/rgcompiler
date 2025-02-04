@@ -31,6 +31,7 @@ from rgss.rpg.commands.effects import (
 )
 from rgss.rpg.commands.flow import (
     BreakLoopCommand as BreakLoopCommand,
+    CallCommonEventCommand,
     CheckFacingOpval as CheckFacingOpval,
     CheckSwitchOpval as CheckSwitchOpval,
     CompareVariableOpcode as CompareVariableOpcode,
@@ -125,6 +126,7 @@ COMMAND_MAPPING: dict[int, type[RubyBaseCommand]] = {
     113: BreakLoopCommand,
     115: ExitEventProcesssingCommand,
     116: EraseThisEventCommand,
+    117: CallCommonEventCommand,
     121: SetSwitchCommand,
     122: SetVariableCommand,
     123: SetSelfSwitchCommand,

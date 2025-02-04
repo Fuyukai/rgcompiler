@@ -384,3 +384,29 @@ class EraseThisEventCommand(RubyBaseEventCommand):
     @override
     def unstructure(self, converter: Converter) -> dict[str, Any]:
         return {"command": "EraseThisEventCommand"}
+
+
+@attrs.define(kw_only=True)
+@final
+class CallCommonEventCommand(RubyBaseEventCommand):
+    """
+    An event command that calls a common event.
+    """
+
+    #: The ID of the common event to call.
+    common_event_id: int = attrs.field()
+
+    @classmethod
+    @override
+    def from_raw_command(cls, cmd: RawCommand) -> CallCommonEventCommand:
+        return CallCommonEventCommand(
+            common_event_id=cast(int, cmd.parameters[0]), indent=cmd.indent
+        )
+
+    @override
+    def to_raw_command(self) -> RawCommand:
+        return RawCommand(code=117, parameters=[self.common_event_id], indent=self.indent)
+
+    @override
+    def unstructure(self, converter: Converter) -> dict[str, Any]:
+        return {"command": "CallCommonEventCommand", "common_event_id": self.common_event_id}
