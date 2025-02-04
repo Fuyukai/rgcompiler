@@ -45,9 +45,9 @@ from rgss.rpg.commands.misc import (
     WaitForMoveCompletionCommand as WaitForMoveCompletionCommand,
 )
 from rgss.rpg.commands.move import (
-    BasicDirectionMoveCommand as BasicDirectionMoveCommand,
+    CardinalMoveCommand as CardinalMoveCommand,
     ChangeSpeedCommand as ChangeSpeedCommand,
-    CornerMoveCommand as CornerMoveCommand,
+    DiagonalMoveCommand as DiagonalMoveCommand,
     FaceRelativeToPlayerCommand as FaceRelativeToPlayerCommand,
     JumpMoveCommand as JumpMoveCommand,
     SetGraphicMoveCommand as SetGraphicMoveCommand,
@@ -70,33 +70,33 @@ from rhodochrosite.ruby import RubyMarshalValue, RubySymbol
 
 # fmt: off
 COMMAND_MAPPING: dict[int, type[RubyBaseCommand]] = {
-    1: BasicDirectionMoveCommand,    # Move Down
-    2: BasicDirectionMoveCommand,    # Move Left
-    3: BasicDirectionMoveCommand,    # Move Right
-    4: BasicDirectionMoveCommand,    # Move Up
-    5: CornerMoveCommand,            # Move Lower Left
-    6: CornerMoveCommand,            # Move Lower Right
-    7: CornerMoveCommand,            # Move Upper Left
-    8: CornerMoveCommand,            # Move Upper Right
-    12: StepOneCommand,              # Step Forwards
-    13: StepOneCommand,              # Step Backwards
+    1: CardinalMoveCommand,           # Move Down
+    2: CardinalMoveCommand,           # Move Left
+    3: CardinalMoveCommand,           # Move Right
+    4: CardinalMoveCommand,           # Move Up
+    5: DiagonalMoveCommand,           # Move Lower Left
+    6: DiagonalMoveCommand,           # Move Lower Right
+    7: DiagonalMoveCommand,           # Move Upper Left
+    8: DiagonalMoveCommand,           # Move Upper Right
+    12: StepOneCommand,               # Step Forwards
+    13: StepOneCommand,               # Step Backwards
     14: JumpMoveCommand,
     15: WaitMoveCommand,
-    16: TurnAbsoluteCommand,         # Turn Down
-    17: TurnAbsoluteCommand,         # Turn Left
-    18: TurnAbsoluteCommand,         # Turn Right
-    19: TurnAbsoluteCommand,         # Turn Up
+    16: TurnAbsoluteCommand,          # Turn Down
+    17: TurnAbsoluteCommand,          # Turn Left
+    18: TurnAbsoluteCommand,          # Turn Right
+    19: TurnAbsoluteCommand,          # Turn Up
     25: FaceRelativeToPlayerCommand,  # Face Player
     26: FaceRelativeToPlayerCommand,  # Face Away From Player
     29: ChangeSpeedCommand,
-    31: TogglePropertyMoveCommand,   # Direction Fix On
-    32: TogglePropertyMoveCommand,   # Direction Fix Off
-    35: TogglePropertyMoveCommand,   # Move Animation On
-    36: TogglePropertyMoveCommand,   # Move Animation Off
-    37: TogglePropertyMoveCommand,   # Through On
-    38: TogglePropertyMoveCommand,   # Through Off
-    39: TogglePropertyMoveCommand,   # Always On Top On
-    40: TogglePropertyMoveCommand,   # Always On Top Off
+    31: TogglePropertyMoveCommand,    # Direction Fix On
+    32: TogglePropertyMoveCommand,    # Direction Fix Off
+    35: TogglePropertyMoveCommand,    # Move Animation On
+    36: TogglePropertyMoveCommand,    # Move Animation Off
+    37: TogglePropertyMoveCommand,    # Through On
+    38: TogglePropertyMoveCommand,    # Through Off
+    39: TogglePropertyMoveCommand,    # Always On Top On
+    40: TogglePropertyMoveCommand,    # Always On Top Off
     41: SetGraphicMoveCommand,
     44: PlaySfxCommand,
 

@@ -25,7 +25,7 @@ DIRECTION_REVERSE_CODES = [
 
 # <MoveOnce direction="Left">
 @attrs.define(kw_only=True)
-class BasicDirectionMoveCommand(RubyBaseMoveCommand):
+class CardinalMoveCommand(RubyBaseMoveCommand):
     """
     A move command for moving in one of the four cardinal directions.
     """
@@ -34,7 +34,7 @@ class BasicDirectionMoveCommand(RubyBaseMoveCommand):
 
     @classmethod
     @override
-    def from_raw_command(cls, cmd: RawCommand) -> BasicDirectionMoveCommand:
+    def from_raw_command(cls, cmd: RawCommand) -> CardinalMoveCommand:
         direction = DIRECTION_REVERSE_CODES[cmd.code - 1]
         assert direction, "wtf? don't put me in the dict under non 1-4"
 
@@ -46,11 +46,11 @@ class BasicDirectionMoveCommand(RubyBaseMoveCommand):
 
     @override
     def unstructure(self, converter: Converter) -> dict[str, Any]:
-        return {"command": "BasicDirectionMoveCommand", "direction": self.direction.name}
+        return {"command": "CardinalMoveCommand", "direction": self.direction.name}
 
 
 @attrs.define(kw_only=True)
-class CornerMoveCommand(RubyBaseMoveCommand):
+class DiagonalMoveCommand(RubyBaseMoveCommand):
     """
     A move command for moving an actor left/right and also upper/lower.
     """
@@ -60,16 +60,16 @@ class CornerMoveCommand(RubyBaseMoveCommand):
 
     @classmethod
     @override
-    def from_raw_command(cls, cmd: RawCommand) -> CornerMoveCommand:
+    def from_raw_command(cls, cmd: RawCommand) -> DiagonalMoveCommand:
         match cmd.code:
             case 5:
-                return CornerMoveCommand(upper=False, left=True)
+                return DiagonalMoveCommand(upper=False, left=True)
             case 6:
-                return CornerMoveCommand(upper=False, left=False)
+                return DiagonalMoveCommand(upper=False, left=False)
             case 7:
-                return CornerMoveCommand(upper=True, left=True)
+                return DiagonalMoveCommand(upper=True, left=True)
             case 8:
-                return CornerMoveCommand(upper=True, left=False)
+                return DiagonalMoveCommand(upper=True, left=False)
             case _:
                 raise ValueError(f"Invalid corner move command code: {cmd.code}")
 
@@ -90,7 +90,7 @@ class CornerMoveCommand(RubyBaseMoveCommand):
     @override
     def unstructure(self, converter: Converter) -> dict[str, Any]:
         return {
-            "command": "CornerMoveCommand",
+            "command": "DiagonalMoveCommand",
             "upper": self.upper,
             "left": self.left,
         }
