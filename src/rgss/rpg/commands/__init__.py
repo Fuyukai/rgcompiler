@@ -115,7 +115,7 @@ COMMAND_MAPPING: dict[int, type[RubyBaseCommand]] = {
 }
 # fmt: on
 
-COMMAND_OVERRIDDES: dict[int, Callable[[RawCommand], RubyBaseCommand]] = {
+COMMAND_OVERRIDDES: dict[int, Callable[[RubySymbol, RawCommand], RubyBaseCommand]] = {
     201: make_transfer_command,
 }
 
@@ -141,12 +141,12 @@ def make_command_from_ivars(
     if fn is None:
         klass = COMMAND_MAPPING.get(code)
         if klass is not None:
-            fn = klass.from_raw_command
+            fn = klass.from_raw_command_and_type
 
     if fn is None:  # noqa: SIM108
         result = UnknownCommand(name=name, raw=raw_cmd)
     else:
-        result = fn(raw_cmd)
+        result = fn(name, raw_cmd)
 
     if __debug__:
         if code < 100:

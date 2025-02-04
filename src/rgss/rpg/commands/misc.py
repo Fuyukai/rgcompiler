@@ -29,8 +29,8 @@ class EmptyCommand(RubyBaseCommand):
 
     @classmethod
     @override
-    def from_raw_command(cls, cmd: RawCommand) -> EmptyCommand:
-        raise NotImplementedError("Can't do this with the empty command")
+    def from_raw_command_and_type(cls, type: RubySymbol, cmd: RawCommand) -> EmptyCommand:
+        return cls(symbol=type, raw=cmd)
 
     @override
     def to_raw_command(self) -> RawCommand:
@@ -58,8 +58,8 @@ class UnknownCommand(RubyBaseCommand):
 
     @classmethod
     @override
-    def from_raw_command(cls, cmd: RawCommand) -> UnknownCommand:
-        raise NotImplementedError("Special form can't be made using from_raw_command")
+    def from_raw_command_and_type(cls, type: RubySymbol, cmd: RawCommand) -> UnknownCommand:
+        return cls(name=type, raw=cmd)
 
     @override
     def to_raw_command(self) -> RawCommand:

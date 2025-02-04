@@ -40,7 +40,7 @@ class RubyBaseCommand(RubyUserObject, abc.ABC):
 
     @classmethod
     @abc.abstractmethod
-    def from_raw_command(cls, cmd: RawCommand) -> Self:
+    def from_raw_command_and_type(cls, type: RubySymbol, cmd: RawCommand) -> Self:
         """
         Creates a new command object from a :class:`.RawCommand`.
         """
@@ -80,6 +80,23 @@ class RubyBaseEventCommand(RubyBaseCommand, abc.ABC):
 
     indent: int = attrs.field()
 
+    @classmethod
+    @override
+    def from_raw_command_and_type(cls, type: RubySymbol, cmd: RawCommand) -> Self:
+        if type != RPG_EVENT_COMMAND:
+            raise ValueError(f"Can't make command {cmd.code} from {type}")
+
+        return cls.from_raw_command(cmd)
+    
+    @classmethod
+    @abc.abstractmethod
+    def from_raw_command(cls, cmd: RawCommand) -> Self:
+        """
+        Creates a new event command object from a :class:`.RawCommand`.
+
+        This is the method that should be overridden for event-only subclasses.
+        """
+
     @property
     @override
     def ruby_class_name(self) -> RubySymbol:
@@ -90,6 +107,23 @@ class RubyBaseMoveCommand(RubyBaseCommand, abc.ABC):
     """
     A single move command wrapped inside an event or event command.
     """
+
+    @classmethod
+    @override
+    def from_raw_command_and_type(cls, type: RubySymbol, cmd: RawCommand) -> Self:
+        if type != RPG_MOVE_COMMAND:
+            raise ValueError(f"Can't make command {cmd.code} from {type}")
+
+        return cls.from_raw_command(cmd)
+    
+    @classmethod
+    @abc.abstractmethod
+    def from_raw_command(cls, cmd: RawCommand) -> Self:
+        """
+        Creates a new move command object from a :class:`.RawCommand`.
+
+        This is the method that should be overridden for event-only subclasses.
+        """
 
     @property
     @override

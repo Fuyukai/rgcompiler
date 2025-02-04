@@ -7,6 +7,7 @@ from cattr import Converter
 
 from rgss.rpg.commands.base import RawCommand, RubyBaseEventCommand
 from rgss.types import RgssDirection
+from rhodochrosite.ruby import RubySymbol
 
 
 @attrs.define(kw_only=True)
@@ -108,7 +109,7 @@ class VariableTransferPlayerCommand(RubyBaseEventCommand):
         }
 
 
-def make_transfer_command(raw: RawCommand) -> RubyBaseEventCommand:
+def make_transfer_command(_: RubySymbol, raw: RawCommand) -> RubyBaseEventCommand:
     assert raw.parameters[0] in (0, 1), (
         f"expected first param of code 201 to be (0, 1), not {raw.parameters[0]}"
     )
