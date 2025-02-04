@@ -46,6 +46,7 @@ from rgss.rpg.commands.flow import (
     RepeatAboveCommand as RepeatAboveCommand,
 )
 from rgss.rpg.commands.misc import (
+    ChangeMapSettingsCommand,
     EmptyCommand as EmptyCommand,
     InlineRubyCommand as InlineRubyCommand,
     InlineRubyContinuedCommand as InlineRubyContinuedCommand,
@@ -134,6 +135,7 @@ COMMAND_MAPPING: dict[int, type[RubyBaseCommand]] = {
     201: TransferPlayerCommand,
     202: SetEventLocationCommand,
     203: ScrollMapCommand,
+    204: ChangeMapSettingsCommand,
     207: ShowAnimationCommand,
     209: SetMoveRouteCommand,
     210: WaitForMoveCompletionCommand,

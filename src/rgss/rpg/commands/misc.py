@@ -12,7 +12,7 @@ from rgss.rpg.commands.base import (
     RubyBaseEventCommand,
 )
 from rgss.rpg.moves import RubyMoveRoute
-from rhodochrosite.ruby import RubySymbol
+from rhodochrosite.ruby import RubyMarshalValue, RubySymbol
 
 
 @attrs.define(kw_only=True)
@@ -270,3 +270,101 @@ class RecoverAllCommand(RubyBaseEventCommand):
     @override
     def unstructure(self, converter: Converter) -> dict[str, Any]:
         return {"command": "RecoverAllCommand", "actor_id": self.actor_id}
+
+
+@attrs.define(kw_only=True, frozen=True)
+class PanoramaSetting:
+    name: str = attrs.field()
+    hue: int = attrs.field()
+
+
+@attrs.define(kw_only=True, frozen=True)
+class FogSetting:
+    name: str = attrs.field()
+    hue: int = attrs.field()
+    opacity: int = attrs.field()
+    blend_type: int = attrs.field()
+    zoom: int = attrs.field()
+    sx: int = attrs.field()
+    sy: int = attrs.field()
+
+
+@attrs.define(kw_only=True, frozen=True)
+class BattlebackSetting:
+    name: str = attrs.field()
+
+
+@attrs.define(kw_only=True)
+@final
+class ChangeMapSettingsCommand(RubyBaseEventCommand):
+    """
+    An event command that changes settings for how the map is rendered.
+    """
+
+    #: The actual setting being set.
+    setting: PanoramaSetting | FogSetting | BattlebackSetting = attrs.field()
+
+    @classmethod
+    @override
+    def from_raw_command(cls, cmd: RawCommand) -> ChangeMapSettingsCommand:
+        opcode = cast(int, cmd.parameters[0])
+        name = cast(str, cmd.parameters[1])
+
+        match opcode:
+            case 0:
+                opval = PanoramaSetting(name=name, hue=cast(int, cmd.parameters[2]))
+
+            case 1:
+                opval = FogSetting(
+                    name=name,
+                    hue=cast(int, cmd.parameters[2]),
+                    opacity=cast(int, cmd.parameters[3]),
+                    blend_type=cast(int, cmd.parameters[4]),
+                    zoom=cast(int, cmd.parameters[5]),
+                    sx=cast(int, cmd.parameters[6]),
+                    sy=cast(int, cmd.parameters[7]),
+                )
+
+            case 2:
+                opval = BattlebackSetting(name=name)
+
+            case code:
+                raise ValueError(f"can't handle opcode {code} for changing map settings!")
+
+        return ChangeMapSettingsCommand(
+            setting=opval,
+            indent=cmd.indent,
+        )
+
+    @override
+    def to_raw_command(self) -> RawCommand:
+        parameters: list[RubyMarshalValue] = [None, self.setting.name]
+
+        if isinstance(self.setting, PanoramaSetting):
+            parameters[0] = 0
+            parameters.append(self.setting.hue)
+        elif isinstance(self.setting, FogSetting):
+            parameters[0] = 1
+            parameters.extend([
+                self.setting.hue,
+                self.setting.opacity,
+                self.setting.blend_type,
+                self.setting.zoom,
+                self.setting.sx,
+                self.setting.sy,
+            ])
+        else:
+            parameters[0] = 2
+
+        return RawCommand(
+            code=204,
+            parameters=parameters,
+            indent=self.indent,
+        )
+
+    @override
+    def unstructure(self, converter: Converter) -> dict[str, Any]:
+        return {
+            "command": "ChangeMapSettingsCommand",
+            "setting": converter.unstructure(self.setting),
+        }
