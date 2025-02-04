@@ -67,6 +67,7 @@ from rhodochrosite.ruby import RubyMarshalValue
 
 
 @attrs.define(kw_only=True)
+@final
 class ElseCommand(RubyBaseEventCommand):
     """
     An event command that is the "else" part of a conditional branch.
@@ -89,6 +90,7 @@ class ElseCommand(RubyBaseEventCommand):
 
 
 @attrs.define(kw_only=True)
+@final
 class EndBranchCommand(RubyBaseEventCommand):
     """
     An event command that ends a conditional branch.
@@ -111,6 +113,7 @@ class EndBranchCommand(RubyBaseEventCommand):
 
 
 @attrs.define(kw_only=True, frozen=True)
+@final
 class CheckSwitchOpval:
     """
     Branch opval for checking if a switch is set or not.
@@ -122,6 +125,7 @@ class CheckSwitchOpval:
     is_on: bool = attrs.field()
 
 
+@final
 class CompareVariableOpcode(enum.Enum):
     Equal = 0
     GreaterThanEqual = 1
@@ -132,6 +136,7 @@ class CompareVariableOpcode(enum.Enum):
 
 
 @attrs.define(kw_only=True, frozen=True)
+@final
 class CompareVariableToConstantOpval:
     """
     Branch opval for comparing a variable to a constant.
@@ -143,6 +148,7 @@ class CompareVariableToConstantOpval:
 
 
 @attrs.define(kw_only=True, frozen=True)
+@final
 class CompareVariableToVariableOpval:
     """
     Branch opval for comparing a variable to another variable.
@@ -154,6 +160,7 @@ class CompareVariableToVariableOpval:
 
 
 @attrs.define(kw_only=True, frozen=True)
+@final
 class CheckFacingOpval:
     """
     Branch opval for checking if an RPG Maker "character" is facing a direction.
@@ -165,6 +172,7 @@ class CheckFacingOpval:
 
 
 @attrs.define(kw_only=True, frozen=True)
+@final
 class CheckScriptReturnOpval:
     """
     Branch opval for checking if a bit of Ruby code returns true.
@@ -329,6 +337,7 @@ class BreakLoopCommand(RubyBaseEventCommand):
 
 
 @attrs.define(kw_only=True)
+@final
 class RepeatAboveCommand(RubyBaseEventCommand):
     """
     An event command that repeats the commands above it.
@@ -349,6 +358,7 @@ class RepeatAboveCommand(RubyBaseEventCommand):
 
 
 @attrs.define(kw_only=True)
+@final
 class ExitEventProcesssingCommand(RubyBaseEventCommand):
     """
     An event command that stops processing the event.

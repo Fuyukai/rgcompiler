@@ -3,7 +3,7 @@ from __future__ import annotations
 from typing import Any, cast, final, override
 
 import attrs
-from cattr import Converter
+from cattrs import Converter
 
 from rgss.rpg.commands.base import (
     RPG_EVENT_COMMAND,
@@ -76,6 +76,7 @@ class UnknownCommand(RubyBaseCommand):
 
 
 @attrs.define(kw_only=True)
+@final
 class WaitCommand(RubyBaseCommand):
     """
     An event or move command that waits for a certain number of frames.
@@ -109,6 +110,7 @@ class WaitCommand(RubyBaseCommand):
 
 
 @attrs.define(kw_only=True)
+@final
 class InlineRubyCommand(RubyBaseEventCommand):
     """
     An event command that runs a Ruby script.
@@ -134,6 +136,7 @@ class InlineRubyCommand(RubyBaseEventCommand):
 
 
 @attrs.define(kw_only=True)
+@final
 class InlineRubyContinuedCommand(RubyBaseEventCommand):
     """
     Like :class:`.InlineRubyCommand`, but continued onto the next editor line.
@@ -159,6 +162,7 @@ class InlineRubyContinuedCommand(RubyBaseEventCommand):
 
 
 @attrs.define(kw_only=True)
+@final
 class SetMoveRouteCommand(RubyBaseEventCommand):
     """
     An event command that sets the move route of another event.
@@ -194,6 +198,7 @@ class SetMoveRouteCommand(RubyBaseEventCommand):
 
 
 @attrs.define(kw_only=True)
+@final
 class VisualMoveRouteCommand(RubyBaseEventCommand):
     """
     An event command that contains a single move route. This command is not bound to an event.
@@ -273,12 +278,14 @@ class RecoverAllCommand(RubyBaseEventCommand):
 
 
 @attrs.define(kw_only=True, frozen=True)
+@final
 class PanoramaSetting:
     name: str = attrs.field()
     hue: int = attrs.field()
 
 
 @attrs.define(kw_only=True, frozen=True)
+@final
 class FogSetting:
     name: str = attrs.field()
     hue: int = attrs.field()
@@ -290,6 +297,7 @@ class FogSetting:
 
 
 @attrs.define(kw_only=True, frozen=True)
+@final
 class BattlebackSetting:
     name: str = attrs.field()
 

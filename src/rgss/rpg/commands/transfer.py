@@ -3,7 +3,7 @@ from __future__ import annotations
 from typing import Any, cast, final, override
 
 import attrs
-from cattr import Converter
+from cattrs import Converter
 
 from rgss.rpg.commands.base import RawCommand, RubyBaseEventCommand
 from rgss.types import RgssDirection
@@ -78,6 +78,7 @@ class TransferPlayerCommand(RubyBaseEventCommand):
 
 
 @attrs.define(kw_only=True)
+@final
 class TransferSwap:
     """
     Sets the location of an event by swapping it with another event.

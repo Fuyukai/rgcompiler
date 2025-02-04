@@ -4,7 +4,7 @@ import enum
 from typing import Any, cast, final, override
 
 import attrs
-from cattr import Converter
+from cattrs import Converter
 
 from rgss.rpg.commands.base import RawCommand, RubyBaseEventCommand
 
@@ -38,6 +38,7 @@ class ShowDialogueCommand(RubyBaseEventCommand):
 
 
 @attrs.define(kw_only=True)
+@final
 class ContinueDialogueCommand(ShowDialogueCommand):
     """
     An event command that continues dialogue.
@@ -93,6 +94,7 @@ class CommentCommand(RubyBaseEventCommand):
 
 
 @attrs.define(kw_only=True)
+@final
 class ContinuedCommentCommand(CommentCommand):
     """
     An event command that continues a comment.
@@ -119,6 +121,7 @@ class ContinuedCommentCommand(CommentCommand):
         }
 
 
+@final
 class ChoiceCancelledAction(enum.IntEnum):
     Disallow = 0
     Choice1 = 1
@@ -129,6 +132,7 @@ class ChoiceCancelledAction(enum.IntEnum):
 
 
 @attrs.define(kw_only=True)
+@final
 class SelectChoiceCommand(RubyBaseEventCommand):
     """
     An event command that shows a choice to the player.
@@ -164,6 +168,7 @@ class SelectChoiceCommand(RubyBaseEventCommand):
 
 
 @attrs.define(kw_only=True)
+@final
 class CheckChoiceCommand(RubyBaseEventCommand):
     """
     An event command that will run a block depending on a previous :class:`.SelectChoiceCommand`.

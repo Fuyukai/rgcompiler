@@ -7,13 +7,14 @@ from rgss.rpg.commands.base import (
     RPG_EVENT_COMMAND,
     RPG_MOVE_COMMAND,
     RawCommand as RawCommand,
-    RubyBaseCommand,
+    RubyBaseCommand as RubyBaseCommand,
     RubyBaseEventCommand as RubyBaseEventCommand,
+    RubyBaseMoveCommand as RubyBaseMoveCommand,
 )
 from rgss.rpg.commands.dialogue import (
-    CheckChoiceCommand,
-    ChoiceElseCommand,
-    ChoiceEndCommand,
+    CheckChoiceCommand as CheckChoiceCommand,
+    ChoiceElseCommand as ChoiceElseCommand,
+    ChoiceEndCommand as ChoiceEndCommand,
     CommentCommand as CommentCommand,
     ContinuedCommentCommand as ContinuedCommentCommand,
     ContinueDialogueCommand as ContinueDialogueCommand,
@@ -31,7 +32,7 @@ from rgss.rpg.commands.effects import (
 )
 from rgss.rpg.commands.flow import (
     BreakLoopCommand as BreakLoopCommand,
-    CallCommonEventCommand,
+    CallCommonEventCommand as CallCommonEventCommand,
     CheckFacingOpval as CheckFacingOpval,
     CheckSwitchOpval as CheckSwitchOpval,
     CompareVariableOpcode as CompareVariableOpcode,
@@ -41,8 +42,8 @@ from rgss.rpg.commands.flow import (
     ElseCommand as ElseCommand,
     EndBranchCommand as EndBranchCommand,
     EnterLoopCommand as EnterLoopCommand,
-    EraseThisEventCommand,
-    ExitEventProcesssingCommand,
+    EraseThisEventCommand as EraseThisEventCommand,
+    ExitEventProcesssingCommand as ExitEventProcesssingCommand,
     RepeatAboveCommand as RepeatAboveCommand,
 )
 from rgss.rpg.commands.misc import (
@@ -50,7 +51,7 @@ from rgss.rpg.commands.misc import (
     EmptyCommand as EmptyCommand,
     InlineRubyCommand as InlineRubyCommand,
     InlineRubyContinuedCommand as InlineRubyContinuedCommand,
-    RecoverAllCommand,
+    RecoverAllCommand as RecoverAllCommand,
     SetMoveRouteCommand as SetMoveRouteCommand,
     UnknownCommand as UnknownCommand,
     VisualMoveRouteCommand as VisualMoveRouteCommand,
@@ -64,21 +65,21 @@ from rgss.rpg.commands.move import (
     FaceRelativeToPlayerCommand as FaceRelativeToPlayerCommand,
     JumpMoveCommand as JumpMoveCommand,
     SetGraphicMoveCommand as SetGraphicMoveCommand,
-    SetOpacityCommand,
+    SetOpacityCommand as SetOpacityCommand,
     StepOneCommand as StepOneCommand,
     TogglePropertyMoveCommand as TogglePropertyMoveCommand,
     TurnAbsoluteCommand as TurnAbsoluteCommand,
-    TurnRandomlyCommand,
+    TurnRandomlyCommand as TurnRandomlyCommand,
 )
 from rgss.rpg.commands.transfer import (
     SetEventLocationCommand as SetEventLocationCommand,
-    TransferPlayerCommand,
+    TransferPlayerCommand as TransferPlayerCommand,
 )
 from rgss.rpg.commands.vars import (
     SetSelfSwitchCommand as SetSelfSwitchCommand,
     SetSwitchCommand as SetSwitchCommand,
     SetVariableCommand as SetVariableCommand,
-    WaitForButtonPressCommand,
+    WaitForButtonPressCommand as WaitForButtonPressCommand,
 )
 from rhodochrosite.ruby import RubyMarshalValue, RubySymbol
 
@@ -119,7 +120,7 @@ COMMAND_MAPPING: dict[int, type[RubyBaseCommand]] = {
     42: SetOpacityCommand,
     44: PlaySfxCommand,
 
-    # = Event Commands =
+    # = Event Commands = #
     101: ShowDialogueCommand,
     102: SelectChoiceCommand,
     105: WaitForButtonPressCommand,

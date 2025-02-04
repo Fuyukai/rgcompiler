@@ -1,9 +1,9 @@
 from __future__ import annotations
 
-from typing import Any, cast, override
+from typing import Any, cast, final, override
 
 import attrs
-from cattr import Converter
+from cattrs import Converter
 
 from rgss.rpg.commands.base import (
     RPG_EVENT_COMMAND,
@@ -17,6 +17,7 @@ from rhodochrosite.ruby import RubySymbol
 
 
 @attrs.define(kw_only=True)
+@final
 class ChangeScreenColourToneCommand(RubyBaseEventCommand):
     """
     An event command that changes the screen's colour tone.
@@ -48,6 +49,7 @@ class ChangeScreenColourToneCommand(RubyBaseEventCommand):
 
 
 @attrs.define(kw_only=True)
+@final
 class ScreenFlashCommand(RubyBaseEventCommand):
     """
     An event command that flashes the screen.
@@ -79,6 +81,7 @@ class ScreenFlashCommand(RubyBaseEventCommand):
 
 
 @attrs.define(kw_only=True)
+@final
 class PlaySfxCommand(RubyBaseCommand):
     """
     A command that plays a sound effect.
@@ -116,6 +119,7 @@ class PlaySfxCommand(RubyBaseCommand):
 
 
 @attrs.define(kw_only=True)
+@final
 class ScrollMapCommand(RubyBaseEventCommand):
     """
     An event command that scrolls the map.
@@ -154,6 +158,7 @@ class ScrollMapCommand(RubyBaseEventCommand):
 
 
 @attrs.define(kw_only=True)
+@final
 class FadeOutBgmCommand(RubyBaseEventCommand):
     """
     Event command that fades out the BGM.
@@ -187,6 +192,7 @@ class FadeOutBgmCommand(RubyBaseEventCommand):
 
 
 @attrs.define(kw_only=True)
+@final
 class PlayBgmCommand(RubyBaseEventCommand):
     """
     Event command that starts playing music.
@@ -228,6 +234,7 @@ class PlayBgmCommand(RubyBaseEventCommand):
 
 
 @attrs.define(kw_only=True)
+@final
 class ShowAnimationCommand(RubyBaseEventCommand):
     """
     An event command that shows an animation.

@@ -25,6 +25,7 @@ DIRECTION_REVERSE_CODES = [
 
 # <MoveOnce direction="Left">
 @attrs.define(kw_only=True)
+@final
 class CardinalMoveCommand(RubyBaseMoveCommand):
     """
     A move command for moving in one of the four cardinal directions.
@@ -50,6 +51,7 @@ class CardinalMoveCommand(RubyBaseMoveCommand):
 
 
 @attrs.define(kw_only=True)
+@final
 class DiagonalMoveCommand(RubyBaseMoveCommand):
     """
     A move command for moving an actor left/right and also upper/lower.
@@ -98,6 +100,7 @@ class DiagonalMoveCommand(RubyBaseMoveCommand):
 
 # <MoveStep backwards="true">
 @attrs.define(kw_only=True)
+@final
 class StepOneCommand(RubyBaseMoveCommand):
     """
     A move command for stepping forwards or backwards.
@@ -122,6 +125,7 @@ class StepOneCommand(RubyBaseMoveCommand):
         }
 
 
+@final
 class ToggleCommandProperty(enum.Enum):
     MoveAnimation = 0
     DirectionFix = 1
@@ -187,6 +191,7 @@ class TogglePropertyMoveCommand(RubyBaseMoveCommand):
 
 
 @attrs.define(kw_only=True)
+@final
 class ChangeSpeedCommand(RubyBaseMoveCommand):
     """
     A move command for changing the speed of subsequent commands.
@@ -209,6 +214,7 @@ class ChangeSpeedCommand(RubyBaseMoveCommand):
 
 
 @attrs.define(kw_only=True)
+@final
 class TurnAbsoluteCommand(RubyBaseMoveCommand):
     """
     A move command for moving in one of the four cardinal directions.
@@ -280,6 +286,7 @@ class SetGraphicMoveCommand(RubyBaseMoveCommand, HasGraphicProperties):
 
 
 @attrs.define(kw_only=True)
+@final
 class FaceRelativeToPlayerCommand(RubyBaseMoveCommand):
     """
     A move command for turning towards or away from the player.
@@ -310,13 +317,13 @@ class FaceRelativeToPlayerCommand(RubyBaseMoveCommand):
 
 
 @attrs.define(kw_only=True)
+@final
 class JumpMoveCommand(RubyBaseMoveCommand):
     """
     A move command for jumping.
     """
 
-    # Is this to a new location? Or is it just in place?
-    # Needs more testing...
+    # Update: It's relative!
 
     x: int = attrs.field()
     y: int = attrs.field()

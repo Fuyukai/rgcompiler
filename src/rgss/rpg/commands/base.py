@@ -2,7 +2,7 @@ import abc
 from typing import Any, Self, final, override
 
 import attrs
-from cattr import Converter
+from cattrs import Converter
 
 from rhodochrosite.ruby import RubyMarshalValue, RubySymbol, RubyUserObject, atom
 

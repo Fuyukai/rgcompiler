@@ -11,6 +11,7 @@ from rhodochrosite.ruby import RubyMarshalValue
 
 
 @attrs.define(kw_only=True)
+@final
 class SetSwitchCommand(RubyBaseEventCommand):
     """
     An event command that sets one or more switches.
@@ -56,6 +57,7 @@ class SetSwitchCommand(RubyBaseEventCommand):
 
 
 @attrs.define(kw_only=True)
+@final
 class SetSelfSwitchCommand(RubyBaseEventCommand):
     """
     An event command that sets a self-switch.
@@ -92,12 +94,9 @@ class SetSelfSwitchCommand(RubyBaseEventCommand):
 
 # for Reborn purposes, Item/Actor/Enemy/Character can be completely ignored..
 
-SV_OPVAL_CONST = 0
-SV_OPVAL_VAR = 1
-SV_OPVAL_RANDOM = 2
-
 
 @attrs.define(kw_only=True, frozen=True)
+@final
 class SvOpvalConstant:
     __match_args__ = ("value",)
 
@@ -105,6 +104,7 @@ class SvOpvalConstant:
 
 
 @attrs.define(kw_only=True, frozen=True)
+@final
 class SvOpvalVariable:
     __match_args__ = ("other_variable_id",)
 
@@ -254,6 +254,7 @@ class SetVariableCommand(RubyBaseEventCommand):
 
 
 @attrs.define(kw_only=True)
+@final
 class WaitForButtonPressCommand(RubyBaseEventCommand):
     """
     An event command that waits for a button press.
