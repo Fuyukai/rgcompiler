@@ -65,7 +65,7 @@ class MarshalWriter:
             self.buffer.write((number - 5).to_bytes(length=1, byteorder="little", signed=True))
             return
 
-        size = int(math.ceil(number.bit_length() / 8.0))
+        size = math.ceil(number.bit_length() / 8.0)
         if size > 5:
             raise ValueError(f"{number} is too big for a fixnum")
 
