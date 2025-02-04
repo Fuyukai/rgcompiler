@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+import enum
 from typing import Any, cast, final, override
 
 import attrs
@@ -121,48 +122,63 @@ class StepOneCommand(RubyBaseMoveCommand):
         }
 
 
-@attrs.define(kw_only=True)
-class ToggleMoveAnimationCommand(RubyBaseMoveCommand):
-    """
-    A move command for toggling enabling actor move animations.
-    """
-
-    enable: bool = attrs.field()
-
-    @classmethod
-    @override
-    def from_raw_command(cls, cmd: RawCommand) -> ToggleMoveAnimationCommand:
-        return cls(enable=cmd.code == 31)
-
-    @override
-    def to_raw_command(self) -> RawCommand:
-        return RawCommand(code=31 if self.enable else 32, parameters=[], indent=0)
-
-    @override
-    def unstructure(self, converter: Converter) -> dict[str, Any]:
-        return {"command": "ToggleMoveAnimationCommand", "enable": self.enable}
+class ToggleCommandProperty(enum.Enum):
+    MoveAnimation = 0
+    DirectionFix = 1
+    Collision = 2
+    AlwaysOnTop = 3
 
 
 @attrs.define(kw_only=True)
-class ToggleDirectionFixCommand(RubyBaseMoveCommand):
+@final
+class TogglePropertyMoveCommand(RubyBaseMoveCommand):
     """
-    A move command for toggling enabling actor direction fix (?).
+    A move command for toggling various properties of an actor.
     """
 
-    enable: bool = attrs.field()
+    prop: ToggleCommandProperty = attrs.field()
+    toggle: bool = attrs.field()
 
     @classmethod
     @override
-    def from_raw_command(cls, cmd: RawCommand) -> ToggleDirectionFixCommand:
-        return cls(enable=cmd.code == 35)
+    def from_raw_command(cls, cmd: RawCommand) -> TogglePropertyMoveCommand:
+        prop: ToggleCommandProperty
+        if cmd.code == 31 or cmd.code == 32:
+            prop = ToggleCommandProperty.MoveAnimation
+        elif cmd.code == 35 or cmd.code == 36:
+            prop = ToggleCommandProperty.DirectionFix
+        elif cmd.code == 37 or cmd.code == 38:
+            prop = ToggleCommandProperty.Collision
+        elif cmd.code == 39 or cmd.code == 40:
+            prop = ToggleCommandProperty.AlwaysOnTop
+        else:
+            raise ValueError(f"Invalid toggle property command code: {cmd.code}")
+
+        return cls(prop=prop, toggle=cmd.code % 2 == 1)
 
     @override
     def to_raw_command(self) -> RawCommand:
-        return RawCommand(code=35 if self.enable else 36, parameters=[], indent=0)
+        code: int
+        if self.prop == ToggleCommandProperty.MoveAnimation:
+            code = 31 if self.toggle else 32
+        elif self.prop == ToggleCommandProperty.DirectionFix:
+            code = 35 if self.toggle else 36
+        elif self.prop == ToggleCommandProperty.Collision:
+            code = 37 if self.toggle else 38
+        elif self.prop == ToggleCommandProperty.AlwaysOnTop:
+            code = 39 if self.toggle else 40
+        else:
+            raise ValueError(f"Invalid toggle property command property: {self.prop}")
+
+        return RawCommand(code=code, parameters=[], indent=0)
 
     @override
     def unstructure(self, converter: Converter) -> dict[str, Any]:
-        return {"command": "ToggleDirectionFixCommand", "enable": self.enable}
+        return {
+            "command": "TogglePropertyMoveCommand",
+            "property": self.prop.name,
+            "toggle": self.toggle,
+        }
 
 
 @attrs.define(kw_only=True)
@@ -281,16 +297,16 @@ class SetGraphicMoveCommand(RubyBaseMoveCommand, HasGraphicProperties):
 
 
 @attrs.define(kw_only=True)
-class TurnRelativeToPlayerCommand(RubyBaseMoveCommand):
+class FaceRelativeToPlayerCommand(RubyBaseMoveCommand):
     """
-    A move command for turning towards the player.
+    A move command for turning towards or away from the player.
     """
 
     towards: bool = attrs.field()
 
     @classmethod
     @override
-    def from_raw_command(cls, cmd: RawCommand) -> TurnRelativeToPlayerCommand:
+    def from_raw_command(cls, cmd: RawCommand) -> FaceRelativeToPlayerCommand:
         towards: bool
         if cmd.code == 25:
             towards = True
@@ -307,7 +323,7 @@ class TurnRelativeToPlayerCommand(RubyBaseMoveCommand):
 
     @override
     def unstructure(self, converter: Converter) -> dict[str, Any]:
-        return {"command": "TurnRelativeToPlayerCommand", "towards": self.towards}
+        return {"command": "FaceRelativeToPlayerCommand", "towards": self.towards}
 
 
 @attrs.define(kw_only=True)

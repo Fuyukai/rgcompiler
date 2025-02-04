@@ -48,13 +48,12 @@ from rgss.rpg.commands.move import (
     BasicDirectionMoveCommand as BasicDirectionMoveCommand,
     ChangeSpeedCommand as ChangeSpeedCommand,
     CornerMoveCommand as CornerMoveCommand,
+    FaceRelativeToPlayerCommand as FaceRelativeToPlayerCommand,
     JumpMoveCommand as JumpMoveCommand,
     SetGraphicMoveCommand as SetGraphicMoveCommand,
     StepOneCommand as StepOneCommand,
-    ToggleDirectionFixCommand as ToggleDirectionFixCommand,
-    ToggleMoveAnimationCommand as ToggleMoveAnimationCommand,
+    TogglePropertyMoveCommand as TogglePropertyMoveCommand,
     TurnAbsoluteCommand as TurnAbsoluteCommand,
-    TurnRelativeToPlayerCommand as TurnRelativeToPlayerCommand,
     WaitMoveCommand as WaitMoveCommand,
 )
 from rgss.rpg.commands.transfer import (
@@ -71,31 +70,35 @@ from rhodochrosite.ruby import RubyMarshalValue, RubySymbol
 
 # fmt: off
 COMMAND_MAPPING: dict[int, type[RubyBaseCommand]] = {
-    1: BasicDirectionMoveCommand,
-    2: BasicDirectionMoveCommand,
-    3: BasicDirectionMoveCommand,
-    4: BasicDirectionMoveCommand,
-    5: CornerMoveCommand,
-    6: CornerMoveCommand,
-    7: CornerMoveCommand,
-    8: CornerMoveCommand,
-    12: StepOneCommand,
-    13: StepOneCommand,
-    31: ToggleMoveAnimationCommand,
-    32: ToggleMoveAnimationCommand,
-    35: ToggleDirectionFixCommand,
-    36: ToggleDirectionFixCommand,
-    29: ChangeSpeedCommand,
+    1: BasicDirectionMoveCommand,    # Move Down
+    2: BasicDirectionMoveCommand,    # Move Left
+    3: BasicDirectionMoveCommand,    # Move Right
+    4: BasicDirectionMoveCommand,    # Move Up
+    5: CornerMoveCommand,            # Move Lower Left
+    6: CornerMoveCommand,            # Move Lower Right
+    7: CornerMoveCommand,            # Move Upper Left
+    8: CornerMoveCommand,            # Move Upper Right
+    12: StepOneCommand,              # Step Forwards
+    13: StepOneCommand,              # Step Backwards
+    14: JumpMoveCommand,
     15: WaitMoveCommand,
-    16: TurnAbsoluteCommand,
-    17: TurnAbsoluteCommand,
-    18: TurnAbsoluteCommand,
-    19: TurnAbsoluteCommand,
+    16: TurnAbsoluteCommand,         # Turn Down
+    17: TurnAbsoluteCommand,         # Turn Left
+    18: TurnAbsoluteCommand,         # Turn Right
+    19: TurnAbsoluteCommand,         # Turn Up
+    25: FaceRelativeToPlayerCommand,  # Face Player
+    26: FaceRelativeToPlayerCommand,  # Face Away From Player
+    29: ChangeSpeedCommand,
+    31: TogglePropertyMoveCommand,   # Direction Fix On
+    32: TogglePropertyMoveCommand,   # Direction Fix Off
+    35: TogglePropertyMoveCommand,   # Move Animation On
+    36: TogglePropertyMoveCommand,   # Move Animation Off
+    37: TogglePropertyMoveCommand,   # Through On
+    38: TogglePropertyMoveCommand,   # Through Off
+    39: TogglePropertyMoveCommand,   # Always On Top On
+    40: TogglePropertyMoveCommand,   # Always On Top Off
     41: SetGraphicMoveCommand,
     44: PlaySfxCommand,
-    25: TurnRelativeToPlayerCommand,
-    26: TurnRelativeToPlayerCommand,
-    14: JumpMoveCommand,
 
     101: ShowDialogueCommand,
     401: ContinueDialogueCommand,
