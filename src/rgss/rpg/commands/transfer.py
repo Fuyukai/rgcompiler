@@ -1,13 +1,13 @@
 from __future__ import annotations
 
-from typing import Any, cast, override
+from typing import Any, cast, final, override
 
 import attrs
 from cattr import Converter
 
 from rgss.rpg.commands.base import RawCommand, RubyBaseEventCommand
 from rgss.types import RgssDirection
-from rhodochrosite.ruby import RubySymbol
+from rhodochrosite.ruby import RubyMarshalValue, RubySymbol
 
 
 @attrs.define(kw_only=True)
@@ -119,3 +119,105 @@ def make_transfer_command(_: RubySymbol, raw: RawCommand) -> RubyBaseEventComman
         return VariableTransferPlayerCommand.from_raw_command(raw)
 
     return DirectTransferPlayerCommand.from_raw_command(raw)
+
+
+@attrs.define(kw_only=True)
+class SetEventLocationAbsolute:
+    """
+    Sets the absolute location of an event.
+    """
+
+    x: int = attrs.field()
+    y: int = attrs.field()
+
+
+@attrs.define(kw_only=True)
+class SetEventLocationVariables:
+    """
+    Sets the location of an event using other variables.
+    """
+
+    x_var_id: int = attrs.field()
+    y_var_id: int = attrs.field()
+
+
+@attrs.define(kw_only=True)
+class SetEventLocationSwap:
+    """
+    Sets the location of an event by swapping it with another event.
+    """
+
+    event_id: int = attrs.field()
+
+
+@attrs.define(kw_only=True)
+@final
+class SetEventLocationCommand(RubyBaseEventCommand):
+    """
+    An event command that sets the temporary location of an event.
+    """
+
+    #: The ID of the event to move.
+    #:
+    #: ``0`` refers to this event; ``-1`` refers to the player.
+    event_id: int = attrs.field()
+
+    #: The actual value to move the event to using.
+    opval: SetEventLocationAbsolute | SetEventLocationVariables | SetEventLocationSwap = (
+        attrs.field()
+    )
+
+    #: The resulting direction for the transferred event.
+    direction: RgssDirection = attrs.field()
+
+    @classmethod
+    @override
+    def from_raw_command(cls, cmd: RawCommand) -> SetEventLocationCommand:
+        event_id = cast(int, cmd.parameters[0])
+        opcode = cast(int, cmd.parameters[1])
+        direction = RgssDirection(cmd.parameters[4])
+
+        match opcode:
+            case 0:
+                opval = SetEventLocationAbsolute(
+                    x=cast(int, cmd.parameters[2]), y=cast(int, cmd.parameters[3])
+                )
+
+            case 1:
+                opval = SetEventLocationVariables(
+                    x_var_id=cast(int, cmd.parameters[2]), y_var_id=cast(int, cmd.parameters[3])
+                )
+
+            case 2:
+                # unusually generous for RGXP to keep this as 5 items long.
+                opval = SetEventLocationSwap(event_id=cast(int, cmd.parameters[2]))
+
+            case code:
+                raise ValueError(f"can't do {code} for set event location!")
+
+        return SetEventLocationCommand(
+            event_id=event_id, opval=opval, direction=direction, indent=cmd.indent
+        )
+
+    @override
+    def to_raw_command(self) -> RawCommand:
+        params: list[RubyMarshalValue] = [self.event_id]
+
+        if isinstance(self.opval, SetEventLocationAbsolute):
+            params.extend([0, self.opval.x, self.opval.y])
+        elif isinstance(self.opval, SetEventLocationVariables):
+            params.extend([1, self.opval.x_var_id, self.opval.y_var_id])
+        else:
+            params.extend([2, self.opval.event_id, 0])
+
+        params.append(self.direction.value)
+        return RawCommand(code=202, parameters=params, indent=self.indent)
+
+    @override
+    def unstructure(self, converter: Converter) -> dict[str, Any]:
+        return {
+            "command": "SetEventLocationCommand",
+            "event_id": self.event_id,
+            "opval": converter.unstructure(self.opval),
+            "direction": self.direction.name,
+        }

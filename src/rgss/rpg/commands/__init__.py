@@ -66,6 +66,7 @@ from rgss.rpg.commands.move import (
 )
 from rgss.rpg.commands.transfer import (
     DirectTransferPlayerCommand as DirectTransferPlayerCommand,
+    SetEventLocationCommand as SetEventLocationCommand,
     VariableTransferPlayerCommand as VariableTransferPlayerCommand,
     make_transfer_command,
 )
@@ -140,6 +141,7 @@ COMMAND_MAPPING: dict[int, type[RubyBaseCommand]] = {
     413: RepeatAboveCommand,
     241: PlayBgmCommand,
     207: ShowAnimationCommand,
+    202: SetEventLocationCommand,
 }
 # fmt: on
 
