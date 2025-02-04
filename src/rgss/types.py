@@ -2,7 +2,7 @@ from __future__ import annotations
 
 import enum
 import struct
-from typing import Self, final, override
+from typing import Protocol, Self, final, override
 
 import attrs
 
@@ -124,3 +124,28 @@ class RgssDirection(enum.IntEnum):
     Right = 6
     Unk7 = 7
     Up = 8
+
+
+class HasGraphicProperties(Protocol):
+    """
+    Protocol for anything that has graphic properties.
+    """
+
+    #: The "character name" for this graphic.
+    #:
+    #: References a file in ``Graphics/Character``.
+    character_name: str | None
+
+    #: The adjusted hue (of HSL) of the graphic.
+    character_hue: int
+
+    #: The direction of the graphic.
+    #:
+    #: This indexes into the rows of the graphic file, always (?) divided by two. This is a
+    #: one-indexed value.
+    direction: RgssDirection
+
+    #: The "pattern" of the graphic.
+    #:
+    #: This is a zero-indexed value that will index into the columns of the graphic file.
+    pattern: int

@@ -1,12 +1,12 @@
 from __future__ import annotations
 
-from typing import Any, cast, override
+from typing import Any, cast, final, override
 
 import attrs
 from cattrs import Converter
 
 from rgss.rpg.commands.base import RawCommand, RubyBaseMoveCommand
-from rgss.types import RgssDirection
+from rgss.types import HasGraphicProperties, RgssDirection
 
 DIRECTION_CODES = {
     RgssDirection.Down: 1,
@@ -235,13 +235,14 @@ class TurnAbsoluteCommand(RubyBaseMoveCommand):
 
 
 @attrs.define(kw_only=True)
-class SetGraphicMoveCommand(RubyBaseMoveCommand):
+@final
+class SetGraphicMoveCommand(RubyBaseMoveCommand, HasGraphicProperties):
     """
     A move command for setting the graphic of the event.
     """
 
     character_name: str = attrs.field()
-    hue: int = attrs.field()
+    character_hue: int = attrs.field()
     direction: RgssDirection = attrs.field()
     pattern: int = attrs.field()
 
@@ -250,7 +251,7 @@ class SetGraphicMoveCommand(RubyBaseMoveCommand):
     def from_raw_command(cls, cmd: RawCommand) -> SetGraphicMoveCommand:
         return cls(
             character_name=cast(str, cmd.parameters[0]),
-            hue=cast(int, cmd.parameters[1]),
+            character_hue=cast(int, cmd.parameters[1]),
             direction=RgssDirection(cast(int, cmd.parameters[2])),
             pattern=cast(int, cmd.parameters[3]),
         )
@@ -259,7 +260,12 @@ class SetGraphicMoveCommand(RubyBaseMoveCommand):
     def to_raw_command(self) -> RawCommand:
         return RawCommand(
             code=41,
-            parameters=[self.character_name, self.hue, self.direction.value, self.pattern],
+            parameters=[
+                self.character_name,
+                self.character_hue,
+                self.direction.value,
+                self.pattern,
+            ],
             indent=0,
         )
 
@@ -268,7 +274,7 @@ class SetGraphicMoveCommand(RubyBaseMoveCommand):
         return {
             "command": "SetGraphicMoveCommand",
             "character_name": self.character_name,
-            "hue": self.hue,
+            "hue": self.character_hue,
             "direction": self.direction.name,
             "pattern": self.pattern,
         }

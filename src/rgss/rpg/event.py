@@ -4,7 +4,7 @@ import attrs
 
 from rgss.rpg.commands.base import RubyBaseEventCommand
 from rgss.rpg.moves import RubyMoveRoute
-from rgss.types import RgssDirection
+from rgss.types import HasGraphicProperties, RgssDirection
 from rhodochrosite.ruby import RubySymbol, RubyUserObject, atom, ruby_name
 
 RPG_EVENT = atom("RPG::Event")
@@ -40,7 +40,7 @@ class RubyEventPageCondition(RubyUserObject):
 
 @attrs.define()
 @final
-class RubyEventGraphic(RubyUserObject):
+class RubyEventGraphic(RubyUserObject, HasGraphicProperties):
     """
     A graphic for an event. This is per-page.
     """
@@ -48,7 +48,7 @@ class RubyEventGraphic(RubyUserObject):
     #: The "character name" for this graphic.
     #:
     #: References a file in ``Graphics/Character``.
-    character_name: str = attrs.field(default="")
+    character_name: str = attrs.field(default=None)
 
     #: The tile ID in the current map's tileset for this event, if any.
     tile_id: int = attrs.field(default=0)
