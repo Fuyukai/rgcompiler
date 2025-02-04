@@ -281,3 +281,65 @@ class ConditionalBranchCommand(RubyBaseEventCommand):
             "type": type(self.wrapped).__name__,
             "comparison": converter.unstructure(self.wrapped),
         }
+
+
+@attrs.define(kw_only=True)
+@final
+class EnterLoopCommand(RubyBaseEventCommand):
+    """
+    An event command that marks the start of a loop.
+    """
+
+    @classmethod
+    @override
+    def from_raw_command(cls, cmd: RawCommand) -> EnterLoopCommand:
+        return EnterLoopCommand(indent=cmd.indent)
+
+    @override
+    def to_raw_command(self) -> RawCommand:
+        return RawCommand(code=112, indent=self.indent)
+
+    @override
+    def unstructure(self, converter: Converter) -> dict[str, Any]:
+        return {"command": "EnterLoopCommand"}
+
+
+@attrs.define(kw_only=True)
+@final
+class BreakLoopCommand(RubyBaseEventCommand):
+    """
+    An event command that breaks out of a loop.
+    """
+
+    @classmethod
+    @override
+    def from_raw_command(cls, cmd: RawCommand) -> BreakLoopCommand:
+        return BreakLoopCommand(indent=cmd.indent)
+
+    @override
+    def to_raw_command(self) -> RawCommand:
+        return RawCommand(code=113, indent=self.indent)
+
+    @override
+    def unstructure(self, converter: Converter) -> dict[str, Any]:
+        return {"command": "BreakLoopCommand"}
+
+
+@attrs.define(kw_only=True)
+class RepeatAboveCommand(RubyBaseEventCommand):
+    """
+    An event command that repeats the commands above it.
+    """
+
+    @classmethod
+    @override
+    def from_raw_command(cls, cmd: RawCommand) -> RepeatAboveCommand:
+        return RepeatAboveCommand(indent=cmd.indent)
+
+    @override
+    def to_raw_command(self) -> RawCommand:
+        return RawCommand(code=413, parameters=[], indent=self.indent)
+
+    @override
+    def unstructure(self, converter: Converter) -> dict[str, Any]:
+        return {"command": "RepeatAboveCommand"}

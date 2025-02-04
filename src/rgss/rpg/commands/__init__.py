@@ -29,6 +29,7 @@ from rgss.rpg.commands.effects import (
     ScrollMapCommand as ScrollMapCommand,
 )
 from rgss.rpg.commands.flow import (
+    BreakLoopCommand as BreakLoopCommand,
     CheckFacingOpval as CheckFacingOpval,
     CheckSwitchOpval as CheckSwitchOpval,
     CompareVariableOpcode as CompareVariableOpcode,
@@ -37,6 +38,8 @@ from rgss.rpg.commands.flow import (
     ConditionalBranchCommand as ConditionalBranchCommand,
     ElseCommand as ElseCommand,
     EndBranchCommand as EndBranchCommand,
+    EnterLoopCommand as EnterLoopCommand,
+    RepeatAboveCommand as RepeatAboveCommand,
 )
 from rgss.rpg.commands.misc import (
     EmptyCommand as EmptyCommand,
@@ -130,6 +133,9 @@ COMMAND_MAPPING: dict[int, type[RubyBaseCommand]] = {
     403: ChoiceElseCommand,
     404: ChoiceEndCommand,
     242: FadeOutBgmCommand,
+    112: EnterLoopCommand,
+    113: BreakLoopCommand,
+    413: RepeatAboveCommand,
 }
 # fmt: on
 
