@@ -78,6 +78,7 @@ from rgss.rpg.commands.vars import (
     SetSelfSwitchCommand as SetSelfSwitchCommand,
     SetSwitchCommand as SetSwitchCommand,
     SetVariableCommand as SetVariableCommand,
+    WaitForButtonPressCommand,
 )
 from rhodochrosite.ruby import RubyMarshalValue, RubySymbol
 
@@ -121,6 +122,7 @@ COMMAND_MAPPING: dict[int, type[RubyBaseCommand]] = {
     # = Event Commands =
     101: ShowDialogueCommand,
     102: SelectChoiceCommand,
+    105: WaitForButtonPressCommand,
     106: WaitCommand,
     108: CommentCommand,
     111: ConditionalBranchCommand,

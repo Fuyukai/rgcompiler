@@ -251,3 +251,35 @@ class SetVariableCommand(RubyBaseEventCommand):
             base["variable_end"] = self.variable_end
 
         return base
+
+
+@attrs.define(kw_only=True)
+class WaitForButtonPressCommand(RubyBaseEventCommand):
+    """
+    An event command that waits for a button press.
+    """
+
+    output_variable: int = attrs.field()
+
+    @classmethod
+    @override
+    def from_raw_command(cls, cmd: RawCommand) -> WaitForButtonPressCommand:
+        return WaitForButtonPressCommand(
+            output_variable=cast(int, cmd.parameters[0]),
+            indent=cmd.indent,
+        )
+
+    @override
+    def to_raw_command(self) -> RawCommand:
+        return RawCommand(
+            code=105,
+            parameters=[self.output_variable],
+            indent=self.indent,
+        )
+
+    @override
+    def unstructure(self, converter: Converter) -> dict[str, Any]:
+        return {
+            "command": "WaitForButtonPressCommand",
+            "output_variable": self.output_variable,
+        }
