@@ -79,6 +79,7 @@ from rhodochrosite.ruby import RubyMarshalValue, RubySymbol
 
 # fmt: off
 COMMAND_MAPPING: dict[int, type[RubyBaseCommand]] = {
+    # = Move Commands = #
     1: CardinalMoveCommand,           # Move Down
     2: CardinalMoveCommand,           # Move Left
     3: CardinalMoveCommand,           # Move Right
@@ -99,12 +100,12 @@ COMMAND_MAPPING: dict[int, type[RubyBaseCommand]] = {
     25: FaceRelativeToPlayerCommand,  # Face Player
     26: FaceRelativeToPlayerCommand,  # Face Away From Player
     29: ChangeSpeedCommand,
-    31: TogglePropertyMoveCommand,    # Direction Fix On
-    32: TogglePropertyMoveCommand,    # Direction Fix Off
+    31: TogglePropertyMoveCommand,    # Move Animation On
+    32: TogglePropertyMoveCommand,    # Move Animation Off
     33: TogglePropertyMoveCommand,    # Stop Animation On
     34: TogglePropertyMoveCommand,    # Stop Animation Off
-    35: TogglePropertyMoveCommand,    # Move Animation On
-    36: TogglePropertyMoveCommand,    # Move Animation Off
+    35: TogglePropertyMoveCommand,    # Direction Fix On
+    36: TogglePropertyMoveCommand,    # Direction Fix Off
     37: TogglePropertyMoveCommand,    # Through On
     38: TogglePropertyMoveCommand,    # Through Off
     39: TogglePropertyMoveCommand,    # Always On Top On
@@ -112,40 +113,44 @@ COMMAND_MAPPING: dict[int, type[RubyBaseCommand]] = {
     41: SetGraphicMoveCommand,
     44: PlaySfxCommand,
 
+    # = Event Commands =
     101: ShowDialogueCommand,
-    401: ContinueDialogueCommand,
-    223: ChangeScreenColourToneCommand,
-    106: WaitCommand,
-    121: SetSwitchCommand,
-    355: InlineRubyCommand,
-    655: InlineRubyContinuedCommand,
-    108: CommentCommand,
-    408: ContinuedCommentCommand,
-    224: ScreenFlashCommand,
-    250: PlaySfxCommand,
-    123: SetSelfSwitchCommand,
-    209: SetMoveRouteCommand,
-    509: VisualMoveRouteCommand,
-    122: SetVariableCommand,
     102: SelectChoiceCommand,
-    203: ScrollMapCommand,
+    106: WaitCommand,
+    108: CommentCommand,
     111: ConditionalBranchCommand,
-    411: ElseCommand,
-    412: EndBranchCommand,
+    112: EnterLoopCommand,
+    113: BreakLoopCommand,
+    115: ExitEventProcesssingCommand,
+    116: EraseThisEventCommand,
+    121: SetSwitchCommand,
+    122: SetVariableCommand,
+    123: SetSelfSwitchCommand,
+    201: TransferPlayerCommand,
+    202: SetEventLocationCommand,
+    203: ScrollMapCommand,
+    207: ShowAnimationCommand,
+    209: SetMoveRouteCommand,
     210: WaitForMoveCompletionCommand,
+    223: ChangeScreenColourToneCommand,
+    224: ScreenFlashCommand,
+    241: PlayBgmCommand,
+    242: FadeOutBgmCommand,
+    250: PlaySfxCommand,
+    355: InlineRubyCommand,
+
+    # Psuedo-commands. These only exist in relation to another command and can only exist by
+    # themselves if the event is corrupted.
+    401: ContinueDialogueCommand,
     402: CheckChoiceCommand,
     403: ChoiceElseCommand,
     404: ChoiceEndCommand,
-    242: FadeOutBgmCommand,
-    112: EnterLoopCommand,
-    113: BreakLoopCommand,
+    408: ContinuedCommentCommand,
+    411: ElseCommand,
+    412: EndBranchCommand,
     413: RepeatAboveCommand,
-    241: PlayBgmCommand,
-    207: ShowAnimationCommand,
-    202: SetEventLocationCommand,
-    201: TransferPlayerCommand,
-    115: ExitEventProcesssingCommand,
-    116: EraseThisEventCommand,
+    509: VisualMoveRouteCommand,
+    655: InlineRubyContinuedCommand,
 }
 # fmt: on
 
