@@ -79,6 +79,7 @@ from rgss.rpg.commands.transfer import (
     TransferPlayerCommand as TransferPlayerCommand,
 )
 from rgss.rpg.commands.vars import (
+    InputNumberCommand,
     SetSelfSwitchCommand as SetSelfSwitchCommand,
     SetSwitchCommand as SetSwitchCommand,
     SetVariableCommand as SetVariableCommand,
@@ -126,6 +127,7 @@ COMMAND_MAPPING: dict[int, type[RubyBaseCommand]] = {
     # = Event Commands = #
     101: ShowDialogueCommand,
     102: SelectChoiceCommand,
+    103: InputNumberCommand,
     105: WaitForButtonPressCommand,
     106: WaitCommand,
     108: CommentCommand,

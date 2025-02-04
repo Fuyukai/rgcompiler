@@ -284,3 +284,36 @@ class WaitForButtonPressCommand(RubyBaseEventCommand):
             "command": "WaitForButtonPressCommand",
             "output_variable": self.output_variable,
         }
+
+
+@attrs.define(kw_only=True)
+@final
+class InputNumberCommand(RubyBaseEventCommand):
+    """
+    An event command that waits for a number input.
+    """
+
+    output_variable: int = attrs.field()
+
+    @classmethod
+    @override
+    def from_raw_command(cls, cmd: RawCommand) -> InputNumberCommand:
+        return InputNumberCommand(
+            output_variable=cast(int, cmd.parameters[0]),
+            indent=cmd.indent,
+        )
+
+    @override
+    def to_raw_command(self) -> RawCommand:
+        return RawCommand(
+            code=103,
+            parameters=[self.output_variable],
+            indent=self.indent,
+        )
+
+    @override
+    def unstructure(self, converter: Converter) -> dict[str, Any]:
+        return {
+            "command": "InputNumberCommand",
+            "output_variable": self.output_variable,
+        }
