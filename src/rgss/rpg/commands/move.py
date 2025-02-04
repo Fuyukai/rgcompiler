@@ -298,3 +298,29 @@ class TurnTowardsPlayerCommand(RubyBaseMoveCommand):
     @override
     def unstructure(self, converter: Converter) -> dict[str, Any]:
         return {"command": "MoveTowardPlayerCommand"}
+
+
+@attrs.define(kw_only=True)
+class JumpMoveCommand(RubyBaseMoveCommand):
+    """
+    A move command for jumping.
+    """
+
+    # Is this to a new location? Or is it just in place?
+    # Needs more testing...
+
+    x: int = attrs.field()
+    y: int = attrs.field()
+
+    @classmethod
+    @override
+    def from_raw_command(cls, cmd: RawCommand) -> JumpMoveCommand:
+        return cls(x=cast(int, cmd.parameters[0]), y=cast(int, cmd.parameters[1]))
+
+    @override
+    def to_raw_command(self) -> RawCommand:
+        return RawCommand(code=14, parameters=[self.x, self.y], indent=0)
+
+    @override
+    def unstructure(self, converter: Converter) -> dict[str, Any]:
+        return {"command": "JumpMoveCommand", "x": self.x, "y": self.y}
