@@ -335,6 +335,8 @@ class JumpMoveCommand(RubyBaseMoveCommand):
         return {"command": "JumpMoveCommand", "x": self.x, "y": self.y}
 
 
+@attrs.define(kw_only=True)
+@final
 class TurnRandomlyCommand(RubyBaseMoveCommand):
     """
     A move command that turns the actor in a random direction.
@@ -352,3 +354,27 @@ class TurnRandomlyCommand(RubyBaseMoveCommand):
     @override
     def unstructure(self, converter: Converter) -> dict[str, Any]:
         return {"command": "TurnRandomlyCommand"}
+
+
+@attrs.define(kw_only=True)
+@final
+class SetOpacityCommand(RubyBaseMoveCommand):
+    """
+    A move command that sets the opacity of the actor.
+    """
+
+    # between 0 and 255?
+    opacity: int = attrs.field()
+
+    @classmethod
+    @override
+    def from_raw_command(cls, cmd: RawCommand) -> SetOpacityCommand:
+        return cls(opacity=cast(int, cmd.parameters[0]))
+
+    @override
+    def to_raw_command(self) -> RawCommand:
+        return RawCommand(code=42, parameters=[self.opacity], indent=0)
+
+    @override
+    def unstructure(self, converter: Converter) -> dict[str, Any]:
+        return {"command": "SetOpacityCommand", "opacity": self.opacity}

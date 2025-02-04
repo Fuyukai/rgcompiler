@@ -61,6 +61,7 @@ from rgss.rpg.commands.move import (
     FaceRelativeToPlayerCommand as FaceRelativeToPlayerCommand,
     JumpMoveCommand as JumpMoveCommand,
     SetGraphicMoveCommand as SetGraphicMoveCommand,
+    SetOpacityCommand,
     StepOneCommand as StepOneCommand,
     TogglePropertyMoveCommand as TogglePropertyMoveCommand,
     TurnAbsoluteCommand as TurnAbsoluteCommand,
@@ -111,6 +112,7 @@ COMMAND_MAPPING: dict[int, type[RubyBaseCommand]] = {
     39: TogglePropertyMoveCommand,    # Always On Top On
     40: TogglePropertyMoveCommand,    # Always On Top Off
     41: SetGraphicMoveCommand,
+    42: SetOpacityCommand,
     44: PlaySfxCommand,
 
     # = Event Commands =
