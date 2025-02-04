@@ -333,3 +333,22 @@ class JumpMoveCommand(RubyBaseMoveCommand):
     @override
     def unstructure(self, converter: Converter) -> dict[str, Any]:
         return {"command": "JumpMoveCommand", "x": self.x, "y": self.y}
+
+
+class TurnRandomlyCommand(RubyBaseMoveCommand):
+    """
+    A move command that turns the actor in a random direction.
+    """
+
+    @classmethod
+    @override
+    def from_raw_command(cls, cmd: RawCommand) -> TurnRandomlyCommand:
+        return cls()
+
+    @override
+    def to_raw_command(self) -> RawCommand:
+        return RawCommand(code=24, parameters=[], indent=0)
+
+    @override
+    def unstructure(self, converter: Converter) -> dict[str, Any]:
+        return {"command": "TurnRandomlyCommand"}

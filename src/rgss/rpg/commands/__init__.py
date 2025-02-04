@@ -63,6 +63,7 @@ from rgss.rpg.commands.move import (
     StepOneCommand as StepOneCommand,
     TogglePropertyMoveCommand as TogglePropertyMoveCommand,
     TurnAbsoluteCommand as TurnAbsoluteCommand,
+    TurnRandomlyCommand,
 )
 from rgss.rpg.commands.transfer import (
     SetEventLocationCommand as SetEventLocationCommand,
@@ -93,6 +94,7 @@ COMMAND_MAPPING: dict[int, type[RubyBaseCommand]] = {
     17: TurnAbsoluteCommand,          # Turn Left
     18: TurnAbsoluteCommand,          # Turn Right
     19: TurnAbsoluteCommand,          # Turn Up
+    24: TurnRandomlyCommand,
     25: FaceRelativeToPlayerCommand,  # Face Player
     26: FaceRelativeToPlayerCommand,  # Face Away From Player
     29: ChangeSpeedCommand,
