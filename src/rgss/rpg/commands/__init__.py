@@ -22,6 +22,9 @@ from rgss.rpg.commands.branch import (
     EndBranchCommand as EndBranchCommand,
 )
 from rgss.rpg.commands.dialogue import (
+    CheckChoiceCommand,
+    ChoiceElseCommand,
+    ChoiceEndCommand,
     CommentCommand as CommentCommand,
     ContinuedCommentCommand as ContinuedCommentCommand,
     ContinueDialogueCommand as ContinueDialogueCommand,
@@ -122,6 +125,9 @@ COMMAND_MAPPING: dict[int, type[RubyBaseCommand]] = {
     411: ElseCommand,
     412: EndBranchCommand,
     210: WaitForMoveCompletionCommand,
+    402: CheckChoiceCommand,
+    403: ChoiceElseCommand,
+    404: ChoiceEndCommand,
 }
 # fmt: on
 

@@ -1,7 +1,7 @@
 from __future__ import annotations
 
 import enum
-from typing import Any, cast, override
+from typing import Any, cast, final, override
 
 import attrs
 from cattr import Converter
@@ -134,9 +134,6 @@ class SelectChoiceCommand(RubyBaseEventCommand):
     An event command that shows a choice to the player.
     """
 
-    # Who fucking knows what the default index is for.
-    # It's either been zero, len(choices), len(choices) + 1.
-
     choices: list[str] = attrs.field()
     when_cancelled: ChoiceCancelledAction = attrs.field()
 
@@ -164,3 +161,82 @@ class SelectChoiceCommand(RubyBaseEventCommand):
             "choices": self.choices,
             "when_cancelled": self.when_cancelled.name,
         }
+
+
+@attrs.define(kw_only=True)
+class CheckChoiceCommand(RubyBaseEventCommand):
+    """
+    An event command that will run a block depending on a previous :class:`.SelectChoiceCommand`.
+    """
+
+    # not sure why this has both...
+
+    choice_index: int = attrs.field()
+    choice_name: str = attrs.field()
+
+    @classmethod
+    @override
+    def from_raw_command(cls, cmd: RawCommand) -> CheckChoiceCommand:
+        return CheckChoiceCommand(
+            choice_index=cast(int, cmd.parameters[0]),
+            choice_name=cast(str, cmd.parameters[1]),
+            indent=cmd.indent,
+        )
+
+    @override
+    def to_raw_command(self) -> RawCommand:
+        return RawCommand(
+            code=402,
+            parameters=[self.choice_index, self.choice_name],
+            indent=self.indent,
+        )
+
+    @override
+    def unstructure(self, converter: Converter) -> dict[str, Any]:
+        return {
+            "command": "CheckChoiceCommand",
+            "choice_index": self.choice_index,
+            "branch_index": self.choice_name,
+        }
+
+
+@attrs.define(kw_only=True)
+@final
+class ChoiceElseCommand(RubyBaseEventCommand):
+    """
+    An event command that marks the "cancelled" branch of a choice.
+    """
+
+    @classmethod
+    @override
+    def from_raw_command(cls, cmd: RawCommand) -> ChoiceElseCommand:
+        return ChoiceElseCommand(indent=cmd.indent)
+
+    @override
+    def to_raw_command(self) -> RawCommand:
+        return RawCommand(code=403, indent=self.indent)
+
+    @override
+    def unstructure(self, converter: Converter) -> dict[str, Any]:
+        return {"command": "ChoiceElseCommand"}
+
+
+@attrs.define(kw_only=True)
+@final
+class ChoiceEndCommand(RubyBaseEventCommand):
+    """
+    An event command that ends a choice block.
+    """
+
+    @classmethod
+    @override
+    def from_raw_command(cls, cmd: RawCommand) -> ChoiceEndCommand:
+        return ChoiceEndCommand(indent=cmd.indent)
+
+    @override
+    def to_raw_command(self) -> RawCommand:
+        return RawCommand(code=404, indent=self.indent)
+
+    @override
+    def unstructure(self, converter: Converter) -> dict[str, Any]:
+        return {"command": "ChoiceEndCommand"}
