@@ -232,3 +232,43 @@ class TurnAbsoluteCommand(RubyBaseMoveCommand):
     @override
     def unstructure(self, converter: Converter) -> dict[str, Any]:
         return {"command": "TurnAbsoluteCommand", "direction": self.direction.name}
+
+
+@attrs.define(kw_only=True)
+class SetGraphicMoveCommand(RubyBaseMoveCommand):
+    """
+    A move command for setting the graphic of the event.
+    """
+
+    character_name: str = attrs.field()
+    hue: int = attrs.field()
+    direction: RgssDirection = attrs.field()
+    pattern: int = attrs.field()
+
+    @classmethod
+    @override
+    def from_raw_command(cls, cmd: RawCommand) -> SetGraphicMoveCommand:
+        return cls(
+            character_name=cast(str, cmd.parameters[0]),
+            hue=cast(int, cmd.parameters[1]),
+            direction=RgssDirection(cast(int, cmd.parameters[2])),
+            pattern=cast(int, cmd.parameters[3]),
+        )
+
+    @override
+    def to_raw_command(self) -> RawCommand:
+        return RawCommand(
+            code=41,
+            parameters=[self.character_name, self.hue, self.direction.value, self.pattern],
+            indent=0,
+        )
+
+    @override
+    def unstructure(self, converter: Converter) -> dict[str, Any]:
+        return {
+            "command": "SetGraphicMoveCommand",
+            "character_name": self.character_name,
+            "hue": self.hue,
+            "direction": self.direction.name,
+            "pattern": self.pattern,
+        }

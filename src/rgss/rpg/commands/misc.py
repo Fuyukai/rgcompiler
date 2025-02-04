@@ -151,6 +151,10 @@ class SetMoveRouteCommand(RubyBaseEventCommand):
     An event command that sets the move route of another event.
     """
 
+    #: The ID of the event to set the route of.
+    #:
+    #: If this is the special constant "0", it refers to the current event. If this is the special
+    #: constant "-1", it refers to the current player.
     event_id: int = attrs.field()
     move_route: RubyMoveRoute = attrs.field()
 
