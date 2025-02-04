@@ -119,7 +119,24 @@ class SvOpvalRandom:
     upper: int = attrs.field()
 
 
-type SetVariableOpval = SvOpvalConstant | SvOpvalVariable | SvOpvalRandom
+class SvActorRefAttribute(enum.IntEnum):
+    MapX = 0
+    MapY = 1
+    Direction = 2
+    ScreenX = 3
+    ScreenY = 4
+    TerrainTag = 5
+
+
+@attrs.define(kw_only=True, frozen=True)
+class SvOpvalActorRefAttr:
+    __match_args__ = ("actor_id", "attribute")
+
+    actor_id: int = attrs.field()
+    attribute: SvActorRefAttribute = attrs.field(converter=SvActorRefAttribute)
+
+
+type SetVariableOpval = SvOpvalConstant | SvOpvalVariable | SvOpvalRandom | SvOpvalActorRefAttr
 
 
 class SetVariableOpcode(enum.IntEnum):
@@ -168,8 +185,15 @@ class SetVariableCommand(RubyBaseEventCommand):
                 upper = cast(int, cmd.parameters[5])
                 opval = SvOpvalRandom(lower=lower, upper=upper)
 
+            case 6:
+                actor_id = cast(int, cmd.parameters[4])
+                attribute = SvActorRefAttribute(cast(int, cmd.parameters[5]))
+                opval = SvOpvalActorRefAttr(actor_id=actor_id, attribute=attribute)
+
             case _:
-                raise NotImplementedError(f"Unknown set variable opval {code}")
+                raise NotImplementedError(
+                    f"Unknown set variable opval {code} with params {cmd.parameters}"
+                )
 
         return SetVariableCommand(
             variable_start=cast(int, cmd.parameters[0]),
@@ -200,6 +224,11 @@ class SetVariableCommand(RubyBaseEventCommand):
                 parameters.append(2)
                 parameters.append(lower)
                 parameters.append(upper)
+
+            case SvOpvalActorRefAttr(actor_id, attribute):
+                parameters.append(6)
+                parameters.append(actor_id)
+                parameters.append(attribute.value)
 
         return RawCommand(
             code=122,

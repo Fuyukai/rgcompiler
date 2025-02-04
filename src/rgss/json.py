@@ -5,6 +5,7 @@ from cattrs import Converter
 from cattrs.gen import make_dict_unstructure_fn
 
 from rgss.rpg.commands.base import RubyBaseCommand
+from rgss.rpg.commands.vars import SvActorRefAttribute
 from rgss.rpg.event import RubyEventGraphic, RubyEventPageCondition
 from rgss.types import RgssDirection
 from rhodochrosite.ruby import GenericRubyUserObject, RubySymbol
@@ -27,13 +28,21 @@ def unstructure_generic_ruby_object(
     }
 
 
+ENUMS_BY_NAME = [
+    RgssDirection,
+    SvActorRefAttribute,
+]
+
+
 def make_converter() -> Converter:
     """
     Creates a new :class:`cattrs.Converter` that can be used for serialising RGSS objects.
     """
 
     converter = Converter()
-    converter.register_unstructure_hook(RgssDirection, lambda it: it.name)
+
+    for enum in ENUMS_BY_NAME:
+        converter.register_unstructure_hook(enum, lambda it: it.name)
 
     converter.register_unstructure_hook(
         RubyEventPageCondition,
