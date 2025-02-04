@@ -40,6 +40,7 @@ from rgss.rpg.commands.flow import (
     ElseCommand as ElseCommand,
     EndBranchCommand as EndBranchCommand,
     EnterLoopCommand as EnterLoopCommand,
+    EraseThisEventCommand,
     ExitEventProcesssingCommand,
     RepeatAboveCommand as RepeatAboveCommand,
 )
@@ -144,6 +145,7 @@ COMMAND_MAPPING: dict[int, type[RubyBaseCommand]] = {
     202: SetEventLocationCommand,
     201: TransferPlayerCommand,
     115: ExitEventProcesssingCommand,
+    116: EraseThisEventCommand,
 }
 # fmt: on
 

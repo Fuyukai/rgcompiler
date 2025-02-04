@@ -223,6 +223,8 @@ class VisualMoveRouteCommand(RubyBaseEventCommand):
         }
 
 
+@attrs.define(kw_only=True)
+@final
 class WaitForMoveCompletionCommand(RubyBaseEventCommand):
     """
     Waits for the move route to complete.

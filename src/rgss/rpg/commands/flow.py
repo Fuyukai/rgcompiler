@@ -363,3 +363,24 @@ class ExitEventProcesssingCommand(RubyBaseEventCommand):
     @override
     def unstructure(self, converter: Converter) -> dict[str, Any]:
         return {"command": "ExitEventProcesssingCommand"}
+
+
+@attrs.define(kw_only=True)
+@final
+class EraseThisEventCommand(RubyBaseEventCommand):
+    """
+    An event command that (temporarily) erases the current event.
+    """
+
+    @classmethod
+    @override
+    def from_raw_command(cls, cmd: RawCommand) -> EraseThisEventCommand:
+        return EraseThisEventCommand(indent=cmd.indent)
+
+    @override
+    def to_raw_command(self) -> RawCommand:
+        return RawCommand(code=116, indent=self.indent)
+
+    @override
+    def unstructure(self, converter: Converter) -> dict[str, Any]:
+        return {"command": "EraseThisEventCommand"}
