@@ -1,7 +1,7 @@
 from __future__ import annotations
 
 import enum
-from typing import Any, Literal, NewType, cast, final, override
+from typing import Any, Literal, cast, final, override
 
 import attrs
 from cattrs import Converter
@@ -41,12 +41,18 @@ class SetSwitchCommand(RubyBaseEventCommand):
 
     @override
     def unstructure(self, converter: Converter) -> dict[str, Any]:
-        return {
+        base: dict[str, Any] = {
             "command": "SetSwitchCommand",
-            "switch_start": self.switch_start,
-            "switch_end": self.switch_end,
             "switch_value": self.switch_value,
         }
+
+        if self.switch_start == self.switch_end:
+            base["switch"] = self.switch_start
+        else:
+            base["switch_start"] = self.switch_start
+            base["switch_end"] = self.switch_end
+
+        return base
 
 
 @attrs.define(kw_only=True)
@@ -84,24 +90,45 @@ class SetSelfSwitchCommand(RubyBaseEventCommand):
         }
 
 
-# annoyingly, this is one of the few times i actually want rust-style enums!
 # for Reborn purposes, Item/Actor/Enemy/Character can be completely ignored..
 
-
-class SetVariableOpvalType(enum.IntEnum):
-    Constant = 0
-    Variable = 1
-    Random = 2
+SV_OPVAL_CONST = 0
+SV_OPVAL_VAR = 1
+SV_OPVAL_RANDOM = 2
 
 
-SvOpvalConstant = NewType("SvOpvalConstant", int)
-SvOpvalVariable = NewType("SvOpvalVariable", int)
-SvOpvalRandom = NewType("SvOpvalRandom", tuple[int, int])
+@attrs.define(kw_only=True, frozen=True)
+class SvOpvalConstant:
+    __match_args__ = ("value",)
+
+    value: int = attrs.field()
+
+
+@attrs.define(kw_only=True, frozen=True)
+class SvOpvalVariable:
+    __match_args__ = ("other_variable_id",)
+
+    other_variable_id: int = attrs.field()
+
+
+@attrs.define(kw_only=True, frozen=True)
+class SvOpvalRandom:
+    __match_args__ = ("lower", "upper")
+
+    lower: int = attrs.field()
+    upper: int = attrs.field()
+
 
 type SetVariableOpval = SvOpvalConstant | SvOpvalVariable | SvOpvalRandom
 
 
 class SetVariableOpcode(enum.IntEnum):
+    """
+    The opcode for the set variable command.
+
+    ``$v[start:end] = $v[start:end] OP opval``
+    """
+
     Set = 0
     Add = 1
     Sub = 2
@@ -121,8 +148,6 @@ class SetVariableCommand(RubyBaseEventCommand):
     variable_end: int = attrs.field()
 
     opcode: SetVariableOpcode = attrs.field()
-
-    opval_type: SetVariableOpvalType = attrs.field()
     opval: SetVariableOpval = attrs.field()
 
     @classmethod
@@ -130,26 +155,26 @@ class SetVariableCommand(RubyBaseEventCommand):
     def from_raw_command(cls, cmd: RawCommand) -> SetVariableCommand:
         # fucking variable length format, ugh.
         opcode = SetVariableOpcode(cast(int, cmd.parameters[2]))
-        opval_type = SetVariableOpvalType(cast(int, cmd.parameters[3]))
 
-        opval: SetVariableOpval
-        match opval_type:
-            case SetVariableOpvalType.Constant:
-                opval = SvOpvalConstant(cast(int, cmd.parameters[4]))
+        match code := cast(int, cmd.parameters[3]):
+            case 0:
+                opval = SvOpvalConstant(value=cast(int, cmd.parameters[4]))
 
-            case SetVariableOpvalType.Variable:
-                opval = SvOpvalVariable(cast(int, cmd.parameters[4]))
+            case 1:
+                opval = SvOpvalVariable(other_variable_id=cast(int, cmd.parameters[4]))
 
-            case SetVariableOpvalType.Random:
+            case 2:
                 lower = cast(int, cmd.parameters[4])
                 upper = cast(int, cmd.parameters[5])
-                opval = SvOpvalRandom((lower, upper))
+                opval = SvOpvalRandom(lower=lower, upper=upper)
+
+            case _:
+                raise NotImplementedError(f"Unknown set variable opval {code}")
 
         return SetVariableCommand(
             variable_start=cast(int, cmd.parameters[0]),
             variable_end=cast(int, cmd.parameters[1]),
             opcode=opcode,
-            opval_type=opval_type,
             opval=opval,
             indent=cmd.indent,
         )
@@ -160,16 +185,21 @@ class SetVariableCommand(RubyBaseEventCommand):
             self.variable_start,
             self.variable_end,
             self.opcode.value,
-            self.opval_type.value,
         ]
 
-        match self.opval_type:
-            case SetVariableOpvalType.Constant | SetVariableOpvalType.Variable:
-                parameters.append(int(self.opval))  # type: ignore
+        match self.opval:
+            case SvOpvalConstant(value):
+                parameters.append(0)
+                parameters.append(value)
 
-            case SetVariableOpvalType.Random:
-                lower, upper = cast(SvOpvalRandom, self.opval)
-                parameters.extend([lower, upper])
+            case SvOpvalVariable(other_variable_id):
+                parameters.append(1)
+                parameters.append(other_variable_id)
+
+            case SvOpvalRandom(lower, upper):
+                parameters.append(2)
+                parameters.append(lower)
+                parameters.append(upper)
 
         return RawCommand(
             code=122,
@@ -179,11 +209,16 @@ class SetVariableCommand(RubyBaseEventCommand):
 
     @override
     def unstructure(self, converter: Converter) -> dict[str, Any]:
-        return {
+        base = {
             "command": "SetVariableCommand",
-            "variable_start": self.variable_start,
-            "variable_end": self.variable_end,
             "opcode": self.opcode.name,
-            "opval_type": self.opval_type.name,
-            "opval": self.opval,
+            "opval": converter.unstructure(self.opval),
         }
+
+        if self.variable_start == self.variable_end:
+            base["variable"] = self.variable_start
+        else:
+            base["variable_start"] = self.variable_start
+            base["variable_end"] = self.variable_end
+
+        return base
