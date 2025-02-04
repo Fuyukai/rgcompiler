@@ -11,16 +11,6 @@ from rgss.rpg.commands.base import (
     RubyBaseCommand,
     RubyBaseEventCommand as RubyBaseEventCommand,
 )
-from rgss.rpg.commands.branch import (
-    CheckFacingOpval as CheckFacingOpval,
-    CheckSwitchOpval as CheckSwitchOpval,
-    CompareVariableOpcode as CompareVariableOpcode,
-    CompareVariableToConstantOpval as CompareVariableToConstantOpval,
-    CompareVariableToVariableOpval as CompareVariableToVariableOpval,
-    ConditionalBranchCommand as ConditionalBranchCommand,
-    ElseCommand as ElseCommand,
-    EndBranchCommand as EndBranchCommand,
-)
 from rgss.rpg.commands.dialogue import (
     CheckChoiceCommand,
     ChoiceElseCommand,
@@ -37,6 +27,16 @@ from rgss.rpg.commands.effects import (
     PlaySfxCommand as PlaySfxCommand,
     ScreenFlashCommand as ScreenFlashCommand,
     ScrollMapCommand as ScrollMapCommand,
+)
+from rgss.rpg.commands.flow import (
+    CheckFacingOpval as CheckFacingOpval,
+    CheckSwitchOpval as CheckSwitchOpval,
+    CompareVariableOpcode as CompareVariableOpcode,
+    CompareVariableToConstantOpval as CompareVariableToConstantOpval,
+    CompareVariableToVariableOpval as CompareVariableToVariableOpval,
+    ConditionalBranchCommand as ConditionalBranchCommand,
+    ElseCommand as ElseCommand,
+    EndBranchCommand as EndBranchCommand,
 )
 from rgss.rpg.commands.misc import (
     EmptyCommand as EmptyCommand,
