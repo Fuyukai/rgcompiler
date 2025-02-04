@@ -184,3 +184,35 @@ class FadeOutBgmCommand(RubyBaseEventCommand):
             "command": "FadeOutBgmCommand",
             "fade_time": self.fade_time,
         }
+
+
+@attrs.define(kw_only=True)
+class PlayBgmCommand(RubyBaseEventCommand):
+    """
+    Event command that starts playing music.
+    """
+
+    audio: RubyAudioFile = attrs.field()
+
+    @classmethod
+    @override
+    def from_raw_command(cls, cmd: RawCommand) -> PlayBgmCommand:
+        return PlayBgmCommand(
+            audio=cast(RubyAudioFile, cmd.parameters[0]),
+            indent=cmd.indent,
+        )
+
+    @override
+    def to_raw_command(self) -> RawCommand:
+        return RawCommand(
+            code=241,
+            parameters=[self.audio],
+            indent=self.indent,
+        )
+
+    @override
+    def unstructure(self, converter: Converter) -> dict[str, Any]:
+        return {
+            "command": "PlayBgmCommand",
+            "audio": converter.unstructure(self.audio),
+        }

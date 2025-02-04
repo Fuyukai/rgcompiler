@@ -24,6 +24,7 @@ from rgss.rpg.commands.dialogue import (
 from rgss.rpg.commands.effects import (
     ChangeScreenColourToneCommand as ChangeScreenColourToneCommand,
     FadeOutBgmCommand,
+    PlayBgmCommand,
     PlaySfxCommand as PlaySfxCommand,
     ScreenFlashCommand as ScreenFlashCommand,
     ScrollMapCommand as ScrollMapCommand,
@@ -136,6 +137,7 @@ COMMAND_MAPPING: dict[int, type[RubyBaseCommand]] = {
     112: EnterLoopCommand,
     113: BreakLoopCommand,
     413: RepeatAboveCommand,
+    241: PlayBgmCommand,
 }
 # fmt: on
 
