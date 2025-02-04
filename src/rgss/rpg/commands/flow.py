@@ -423,3 +423,51 @@ class CallCommonEventCommand(RubyBaseEventCommand):
     @override
     def unstructure(self, converter: Converter) -> dict[str, Any]:
         return {"command": "CallCommonEventCommand", "common_event_id": self.common_event_id}
+
+
+@attrs.define(kw_only=True)
+@final
+class DefineLabelEventCommand(RubyBaseEventCommand):
+    """
+    An event command that defines a label.
+    """
+
+    #: The name of the label.
+    label_name: str = attrs.field()
+
+    @classmethod
+    @override
+    def from_raw_command(cls, cmd: RawCommand) -> DefineLabelEventCommand:
+        return DefineLabelEventCommand(label_name=cast(str, cmd.parameters[0]), indent=cmd.indent)
+
+    @override
+    def to_raw_command(self) -> RawCommand:
+        return RawCommand(code=118, parameters=[self.label_name], indent=self.indent)
+
+    @override
+    def unstructure(self, converter: Converter) -> dict[str, Any]:
+        return {"command": "DefineLabelEventCommand", "label_name": self.label_name}
+
+
+@attrs.define(kw_only=True)
+@final
+class JumpToLabelEventCommand(RubyBaseEventCommand):
+    """
+    An event command that jumps to a label.
+    """
+
+    #: The name of the label.
+    label_name: str = attrs.field()
+
+    @classmethod
+    @override
+    def from_raw_command(cls, cmd: RawCommand) -> JumpToLabelEventCommand:
+        return JumpToLabelEventCommand(label_name=cast(str, cmd.parameters[0]), indent=cmd.indent)
+
+    @override
+    def to_raw_command(self) -> RawCommand:
+        return RawCommand(code=119, parameters=[self.label_name], indent=self.indent)
+
+    @override
+    def unstructure(self, converter: Converter) -> dict[str, Any]:
+        return {"command": "JumpToLabelEventCommand", "label_name": self.label_name}

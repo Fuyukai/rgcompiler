@@ -40,11 +40,13 @@ from rgss.rpg.commands.flow import (
     CompareVariableToConstantOpval as CompareVariableToConstantOpval,
     CompareVariableToVariableOpval as CompareVariableToVariableOpval,
     ConditionalBranchCommand as ConditionalBranchCommand,
+    DefineLabelEventCommand,
     ElseCommand as ElseCommand,
     EndBranchCommand as EndBranchCommand,
     EnterLoopCommand as EnterLoopCommand,
     EraseThisEventCommand as EraseThisEventCommand,
     ExitEventProcesssingCommand as ExitEventProcesssingCommand,
+    JumpToLabelEventCommand,
     RepeatAboveCommand as RepeatAboveCommand,
 )
 from rgss.rpg.commands.misc import (
@@ -133,6 +135,8 @@ COMMAND_MAPPING: dict[int, type[RubyBaseCommand]] = {
     115: ExitEventProcesssingCommand,
     116: EraseThisEventCommand,
     117: CallCommonEventCommand,
+    118: DefineLabelEventCommand,
+    119: JumpToLabelEventCommand,
     121: SetSwitchCommand,
     122: SetVariableCommand,
     123: SetSelfSwitchCommand,
