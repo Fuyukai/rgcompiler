@@ -193,19 +193,27 @@ class PlayBgmCommand(RubyBaseEventCommand):
     """
 
     audio: RubyAudioFile = attrs.field()
+    #: If True, this is an "ME", which temporarily replaces the BGM.
+    #:
+    #: What does "ME" stand for? Who fucking knows.
+    is_me: bool = attrs.field()
 
     @classmethod
     @override
     def from_raw_command(cls, cmd: RawCommand) -> PlayBgmCommand:
+        is_me = cmd.code == 249
         return PlayBgmCommand(
             audio=cast(RubyAudioFile, cmd.parameters[0]),
             indent=cmd.indent,
+            is_me=is_me,
         )
 
     @override
     def to_raw_command(self) -> RawCommand:
+        code = 249 if self.is_me else 241
+
         return RawCommand(
-            code=241,
+            code=code,
             parameters=[self.audio],
             indent=self.indent,
         )
@@ -215,6 +223,7 @@ class PlayBgmCommand(RubyBaseEventCommand):
         return {
             "command": "PlayBgmCommand",
             "audio": converter.unstructure(self.audio),
+            "is_me": self.is_me,
         }
 
 

@@ -140,6 +140,7 @@ COMMAND_MAPPING: dict[int, type[RubyBaseCommand]] = {
     224: ScreenFlashCommand,
     241: PlayBgmCommand,
     242: FadeOutBgmCommand,
+    249: PlayBgmCommand,  # For "ME"s,
     250: PlaySfxCommand,
     355: InlineRubyCommand,
 
