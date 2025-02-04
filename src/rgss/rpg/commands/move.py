@@ -281,15 +281,25 @@ class SetGraphicMoveCommand(RubyBaseMoveCommand, HasGraphicProperties):
 
 
 @attrs.define(kw_only=True)
-class TurnTowardsPlayerCommand(RubyBaseMoveCommand):
+class TurnRelativeToPlayerCommand(RubyBaseMoveCommand):
     """
     A move command for turning towards the player.
     """
 
+    towards: bool = attrs.field()
+
     @classmethod
     @override
-    def from_raw_command(cls, cmd: RawCommand) -> TurnTowardsPlayerCommand:
-        return cls()
+    def from_raw_command(cls, cmd: RawCommand) -> TurnRelativeToPlayerCommand:
+        towards: bool
+        if cmd.code == 25:
+            towards = True
+        elif cmd.code == 26:
+            towards = False
+        else:
+            raise ValueError(f"code {cmd.code} ain't valid for a turn relative to player")
+
+        return cls(towards=towards)
 
     @override
     def to_raw_command(self) -> RawCommand:
@@ -297,7 +307,7 @@ class TurnTowardsPlayerCommand(RubyBaseMoveCommand):
 
     @override
     def unstructure(self, converter: Converter) -> dict[str, Any]:
-        return {"command": "MoveTowardPlayerCommand"}
+        return {"command": "TurnRelativeToPlayerCommand", "towards": self.towards}
 
 
 @attrs.define(kw_only=True)
