@@ -54,7 +54,6 @@ from rgss.rpg.commands.move import (
     StepOneCommand as StepOneCommand,
     TogglePropertyMoveCommand as TogglePropertyMoveCommand,
     TurnAbsoluteCommand as TurnAbsoluteCommand,
-    WaitMoveCommand as WaitMoveCommand,
 )
 from rgss.rpg.commands.transfer import (
     DirectTransferPlayerCommand as DirectTransferPlayerCommand,
@@ -81,7 +80,7 @@ COMMAND_MAPPING: dict[int, type[RubyBaseCommand]] = {
     12: StepOneCommand,               # Step Forwards
     13: StepOneCommand,               # Step Backwards
     14: JumpMoveCommand,
-    15: WaitMoveCommand,
+    15: WaitCommand,
     16: TurnAbsoluteCommand,          # Turn Down
     17: TurnAbsoluteCommand,          # Turn Left
     18: TurnAbsoluteCommand,          # Turn Right

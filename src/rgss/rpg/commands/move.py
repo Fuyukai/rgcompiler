@@ -209,28 +209,6 @@ class ChangeSpeedCommand(RubyBaseMoveCommand):
 
 
 @attrs.define(kw_only=True)
-class WaitMoveCommand(RubyBaseMoveCommand):
-    """
-    A move command for waiting a certain number of frames.
-    """
-
-    frames: int = attrs.field()
-
-    @classmethod
-    @override
-    def from_raw_command(cls, cmd: RawCommand) -> WaitMoveCommand:
-        return cls(frames=cast(int, cmd.parameters[0]))
-
-    @override
-    def to_raw_command(self) -> RawCommand:
-        return RawCommand(code=15, parameters=[self.frames], indent=0)
-
-    @override
-    def unstructure(self, converter: Converter) -> dict[str, Any]:
-        return {"command": "WaitMoveCommand", "frames": self.frames}
-
-
-@attrs.define(kw_only=True)
 class TurnAbsoluteCommand(RubyBaseMoveCommand):
     """
     A move command for moving in one of the four cardinal directions.

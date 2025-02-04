@@ -5,7 +5,12 @@ from typing import Any, cast, final, override
 import attrs
 from cattr import Converter
 
-from rgss.rpg.commands.base import RawCommand, RubyBaseCommand, RubyBaseEventCommand
+from rgss.rpg.commands.base import (
+    RPG_EVENT_COMMAND,
+    RawCommand,
+    RubyBaseCommand,
+    RubyBaseEventCommand,
+)
 from rgss.rpg.moves import RubyMoveRoute
 from rhodochrosite.ruby import RubySymbol
 
@@ -71,21 +76,29 @@ class UnknownCommand(RubyBaseCommand):
 
 
 @attrs.define(kw_only=True)
-class WaitCommand(RubyBaseEventCommand):
+class WaitCommand(RubyBaseCommand):
     """
-    An event command that waits for a certain number of frames.
+    An event or move command that waits for a certain number of frames.
     """
 
+    type: RubySymbol = attrs.field()
     frames: int = attrs.field()
+    indent: int = attrs.field()
 
     @classmethod
     @override
-    def from_raw_command(cls, cmd: RawCommand) -> WaitCommand:
-        return WaitCommand(frames=cast(int, cmd.parameters[0]), indent=cmd.indent)
+    def from_raw_command_and_type(cls, type: RubySymbol, cmd: RawCommand) -> WaitCommand:
+        return WaitCommand(type=type, frames=cast(int, cmd.parameters[0]), indent=cmd.indent)
+
+    @property
+    @override
+    def ruby_class_name(self) -> RubySymbol:
+        return self.type
 
     @override
     def to_raw_command(self) -> RawCommand:
-        return RawCommand(code=106, parameters=[self.frames], indent=self.indent)
+        code = 106 if self.type == RPG_EVENT_COMMAND else 15
+        return RawCommand(code=code, parameters=[self.frames], indent=self.indent)
 
     @override
     def unstructure(self, converter: Converter) -> dict[str, Any]:
