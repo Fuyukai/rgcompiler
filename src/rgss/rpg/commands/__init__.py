@@ -91,6 +91,8 @@ COMMAND_MAPPING: dict[int, type[RubyBaseCommand]] = {
     29: ChangeSpeedCommand,
     31: TogglePropertyMoveCommand,    # Direction Fix On
     32: TogglePropertyMoveCommand,    # Direction Fix Off
+    33: TogglePropertyMoveCommand,    # Stop Animation On
+    34: TogglePropertyMoveCommand,    # Stop Animation Off
     35: TogglePropertyMoveCommand,    # Move Animation On
     36: TogglePropertyMoveCommand,    # Move Animation Off
     37: TogglePropertyMoveCommand,    # Through On

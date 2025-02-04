@@ -127,6 +127,7 @@ class ToggleCommandProperty(enum.Enum):
     DirectionFix = 1
     Collision = 2
     AlwaysOnTop = 3
+    StopAnimation = 4
 
 
 @attrs.define(kw_only=True)
@@ -145,6 +146,8 @@ class TogglePropertyMoveCommand(RubyBaseMoveCommand):
         prop: ToggleCommandProperty
         if cmd.code == 31 or cmd.code == 32:
             prop = ToggleCommandProperty.MoveAnimation
+        elif cmd.code == 33 or cmd.code == 34:
+            prop = ToggleCommandProperty.StopAnimation
         elif cmd.code == 35 or cmd.code == 36:
             prop = ToggleCommandProperty.DirectionFix
         elif cmd.code == 37 or cmd.code == 38:
@@ -161,6 +164,8 @@ class TogglePropertyMoveCommand(RubyBaseMoveCommand):
         code: int
         if self.prop == ToggleCommandProperty.MoveAnimation:
             code = 31 if self.toggle else 32
+        elif self.prop == ToggleCommandProperty.StopAnimation:
+            code = 33 if self.toggle else 34
         elif self.prop == ToggleCommandProperty.DirectionFix:
             code = 35 if self.toggle else 36
         elif self.prop == ToggleCommandProperty.Collision:
