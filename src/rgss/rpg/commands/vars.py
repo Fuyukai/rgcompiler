@@ -136,7 +136,26 @@ class SvOpvalActorRefAttr:
     attribute: SvActorRefAttribute = attrs.field(converter=SvActorRefAttribute)
 
 
-type SetVariableOpval = SvOpvalConstant | SvOpvalVariable | SvOpvalRandom | SvOpvalActorRefAttr
+class SvOtherCategory(enum.Enum):
+    MapID = 0
+    PartyMembers = 1  # unused
+    Gold = 2
+    Steps = 3
+    PlayTime = 4
+    Timer = 5
+    SaveCount = 6
+
+
+@attrs.define(kw_only=True, frozen=True)
+class SvOpvalOther:
+    __match_args__ = ("other",)
+
+    other: SvOtherCategory = attrs.field()
+
+
+type SetVariableOpval = (
+    SvOpvalConstant | SvOpvalVariable | SvOpvalRandom | SvOpvalActorRefAttr | SvOpvalOther
+)
 
 
 class SetVariableOpcode(enum.IntEnum):
@@ -190,6 +209,9 @@ class SetVariableCommand(RubyBaseEventCommand):
                 attribute = SvActorRefAttribute(cast(int, cmd.parameters[5]))
                 opval = SvOpvalActorRefAttr(actor_id=actor_id, attribute=attribute)
 
+            case 7:
+                opval = SvOpvalOther(other=SvOtherCategory(cmd.parameters[4]))
+
             case _:
                 raise NotImplementedError(
                     f"Unknown set variable opval {code} with params {cmd.parameters}"
@@ -229,6 +251,10 @@ class SetVariableCommand(RubyBaseEventCommand):
                 parameters.append(6)
                 parameters.append(actor_id)
                 parameters.append(attribute.value)
+
+            case SvOpvalOther(other):
+                parameters.append(7)
+                parameters.append(other.value)
 
         return RawCommand(
             code=122,

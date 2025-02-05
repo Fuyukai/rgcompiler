@@ -5,7 +5,7 @@ from cattrs import Converter
 from cattrs.gen import make_dict_unstructure_fn
 
 from rgss.rpg.commands.base import RubyBaseCommand
-from rgss.rpg.commands.vars import SvActorRefAttribute
+from rgss.rpg.commands.vars import SvActorRefAttribute, SvOtherCategory
 from rgss.rpg.event import RubyEventGraphic, RubyEventPageCondition
 from rgss.types import RgssDirection
 from rhodochrosite.ruby import GenericRubyUserObject, RubySymbol
@@ -31,6 +31,7 @@ def unstructure_generic_ruby_object(
 ENUMS_BY_NAME = [
     RgssDirection,
     SvActorRefAttribute,
+    SvOtherCategory,
 ]
 
 
