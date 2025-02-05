@@ -648,3 +648,50 @@ class RotatePictureCommand(RubyBaseEventCommand):
             "picture_id": self.picture_id,
             "speed": self.speed,
         }
+
+
+@final
+class WeatherEffectType(enum.Enum):
+    Clear = 0
+    Rain = 1
+    Storm = 2
+    Snow = 3
+
+
+@attrs.define(kw_only=True)
+@final
+class SetWeatherEffectsCommand(RubyBaseEventCommand):
+    """
+    Sets weather effects on the screen.
+    """
+
+    type: WeatherEffectType = attrs.field()
+    strength: int = attrs.field()
+    frames: int = attrs.field()
+
+    @classmethod
+    @override
+    def from_raw_command(cls, cmd: RawCommand) -> SetWeatherEffectsCommand:
+        return SetWeatherEffectsCommand(
+            type=WeatherEffectType(cmd.parameters[0]),
+            strength=cast(int, cmd.parameters[1]),
+            frames=cast(int, cmd.parameters[2]),
+            indent=cmd.indent,
+        )
+
+    @override
+    def to_raw_command(self) -> RawCommand:
+        return RawCommand(
+            code=236,
+            parameters=[self.type.value, self.strength, self.frames],
+            indent=self.indent,
+        )
+
+    @override
+    def unstructure(self, converter: Converter) -> dict[str, Any]:
+        return {
+            "command": "SetWeatherEffectsCommand",
+            "type": self.type.name,
+            "strength": self.strength,
+            "frames": self.frames,
+        }
