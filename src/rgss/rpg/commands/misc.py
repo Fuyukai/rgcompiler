@@ -437,3 +437,22 @@ class MemoriseBgmCommand(RubyBaseEventCommand):
     @override
     def unstructure(self, converter: Converter) -> dict[str, Any]:
         return {"command": "MemoriseBgmCommand"}
+
+
+class RestoreBgmCommand(RubyBaseEventCommand):
+    """
+    I have no fucking clue what this command does pt 2?
+    """
+
+    @classmethod
+    @override
+    def from_raw_command(cls, cmd: RawCommand) -> RestoreBgmCommand:
+        return cls(indent=cmd.indent)
+
+    @override
+    def to_raw_command(self) -> RawCommand:
+        return RawCommand(code=248, parameters=[], indent=self.indent)
+
+    @override
+    def unstructure(self, converter: Converter) -> dict[str, Any]:
+        return {"command": "RestoreBgmCommand"}
