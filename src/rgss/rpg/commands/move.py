@@ -1,7 +1,7 @@
 from __future__ import annotations
 
 import enum
-from typing import Any, cast, final, override
+from typing import Any, assert_never, cast, final, override
 
 import attrs
 from cattrs import Converter
@@ -392,6 +392,7 @@ class TurnRelativeAction(enum.Enum):
     Right90 = 0
     Left90 = 1
     Full180 = 2
+    Random90 = 3
 
 
 @attrs.define(kw_only=True)
@@ -413,6 +414,8 @@ class TurnRelativeCommand(RubyBaseMoveCommand):
             action = TurnRelativeAction.Left90
         elif cmd.code == 22:
             action = TurnRelativeAction.Full180
+        elif cmd.code == 23:
+            action = TurnRelativeAction.Random90
         else:
             raise ValueError(f"can't do a turn relative command for code {cmd.code}")
 
@@ -425,8 +428,12 @@ class TurnRelativeCommand(RubyBaseMoveCommand):
             code = 20
         elif self.action == TurnRelativeAction.Left90:
             code = 21
-        else:
+        elif self.action == TurnRelativeAction.Full180:
             code = 22
+        elif self.action == TurnRelativeAction.Random90:
+            code = 23
+        else:
+            assert_never(self.action)
 
         return RawCommand(code=code, parameters=[], indent=0)
 

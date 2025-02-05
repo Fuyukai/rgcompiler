@@ -127,6 +127,7 @@ COMMAND_MAPPING: dict[int, type[RubyBaseCommand]] = {
     20: TurnRelativeCommand,          # Turn 90° Right
     21: TurnRelativeCommand,          # Turn 90° Left
     22: TurnRelativeCommand,          # Turn 180°
+    23: TurnRelativeCommand,          # Turn 90° Right or Left
     24: TurnRandomlyCommand,
     25: FaceRelativeToPlayerCommand,  # Face Player
     26: FaceRelativeToPlayerCommand,  # Face Away From Player
