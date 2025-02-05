@@ -28,7 +28,27 @@ Notes
 Usage
 -----
 
-WIP
+``rgcompiler`` currently contains a set of debugging commands used to test and develop the internal
+functionality of the project.
+
+- ``rgd-ruby-unmarshal``: Unmarshal a Ruby marshal file to JSON. This was used to figure out the
+  format of the RPG Maker event files; these JSON files do not contain enough information to be
+  re-marshaled.
+
+- ``rgd-ruby-roundtrip``: Round-trips a Ruby marshal file. This loads a Ruby marshal file then
+  immediately re-saves it. This was used to test the correctness of ``rhodochrosite``, and to verify
+  that ``mkxp-z`` and the editor could read the round-tripped files.
+
+- ``rgd-verify-maps``: Verifies that ``rgcompiler`` can read all possible maps from a project. This
+  was used to easily isolate and implement unknown commands and is not useful anymore; it is kept
+  around for potentially enabling ``rgcompiler`` to work with newer RPG Maker games.
+
+Tests
+-----
+
+``rgcompiler`` has a test suite that can be ran with ``pytest``. It is recommended to run this
+with ``-n <THREADS> --dist worksteal`` as the roundtrip tests are expensive and embarassingly
+arallel.
 
 License
 -------
