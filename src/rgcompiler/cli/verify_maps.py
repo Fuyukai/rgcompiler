@@ -4,9 +4,8 @@ from collections import Counter, defaultdict
 from collections.abc import Iterable
 from pathlib import Path
 
-import rich
-import rich.progress
 from rich import print
+from rich.progress import track
 
 from rgss import read_object_rgxp
 from rgss.rpg.commands.base import RubyBaseCommand
@@ -43,7 +42,8 @@ def main():
 
     before = time.monotonic()
 
-    for map in rich.progress.track(list(maps), description="loading maps..."):
+    maps = list(maps)
+    for map in track(maps, description="loading maps..."):
         if map.name == "MapInfos.rxdata":
             continue
 
@@ -68,12 +68,19 @@ def main():
 
     print(f"checked all maps in {after - before:.2f} seconds!")
     print()
-    print(f"total events: [pink]{total}[/pink], failed: [red]{failed}[/red]")
+    print(f"total event commands: [pink]{total}[/pink], failed: [red]{failed}[/red]")
     print(f"success rate: [green]{(total - failed) / total * 100:.3f}%[/green]")
     print(
         f"failed to load entirely: [red]{len(actual_errors)}[/red] "
         f"(failure rate: [red]{len(actual_errors) / total * 100:.3f}%[/red])"
     )
+
+    print(
+        f"{len(found_unknown)} maps with unknown commands "
+        f"(%age: {len(found_unknown) / len(list(maps)) * 100:.3f}%)"
+    )
+
+    print()
     print("unknown commands:")
 
     for map in found_unknown:

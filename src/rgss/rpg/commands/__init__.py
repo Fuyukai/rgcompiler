@@ -37,6 +37,7 @@ from rgss.rpg.commands.effects import (
     SetTransparencyFlagCommand as SetTransparencyFlagCommand,
     ShowAnimationCommand as ShowAnimationCommand,
     ShowPictureCommand as ShowPictureCommand,
+    StopSfxCommand,
 )
 from rgss.rpg.commands.flow import (
     BreakLoopCommand as BreakLoopCommand,
@@ -187,6 +188,7 @@ COMMAND_MAPPING: dict[int, type[RubyBaseCommand]] = {
     247: MemoriseBgmCommand,
     249: PlayBgmCommand,  # For "ME"s,
     250: PlaySfxCommand,
+    251: StopSfxCommand,
     314: RecoverAllCommand,
     355: InlineRubyCommand,
 

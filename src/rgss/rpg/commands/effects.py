@@ -123,6 +123,29 @@ class PlaySfxCommand(RubyBaseCommand):
 
 @attrs.define(kw_only=True)
 @final
+class StopSfxCommand(RubyBaseEventCommand):
+    """
+    Stops the currently playing sound effect.
+    """
+
+    @classmethod
+    @override
+    def from_raw_command(cls, cmd: RawCommand) -> StopSfxCommand:
+        return StopSfxCommand(indent=cmd.indent)
+
+    @override
+    def to_raw_command(self) -> RawCommand:
+        return RawCommand(code=251, parameters=[], indent=self.indent)
+
+    @override
+    def unstructure(self, converter: Converter) -> dict[str, Any]:
+        return {
+            "command": "StopSfxCommand",
+        }
+
+
+@attrs.define(kw_only=True)
+@final
 class ScrollMapCommand(RubyBaseEventCommand):
     """
     An event command that scrolls the map.
