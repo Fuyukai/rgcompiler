@@ -60,12 +60,16 @@ from rgss.rpg.commands.flow import (
 )
 from rgss.rpg.commands.misc import (
     ChangeMapSettingsCommand as ChangeMapSettingsCommand,
+    ChangeTextOptionsCommand,
     EmptyCommand as EmptyCommand,
+    ExecuteTransistionCommand,
     InlineRubyCommand as InlineRubyCommand,
     InlineRubyContinuedCommand as InlineRubyContinuedCommand,
     MemoriseBgmCommand as MemoriseBgmCommand,
+    PrepareForTransitionCommand,
     RecoverAllCommand as RecoverAllCommand,
     RestoreBgmCommand,
+    ReturnToTitleCommand,
     SetMoneyCommand as SetMoneyCommand,
     SetMoveRouteCommand as SetMoveRouteCommand,
     UnknownCommand as UnknownCommand,
@@ -156,6 +160,7 @@ COMMAND_MAPPING: dict[int, type[RubyBaseCommand]] = {
     101: ShowDialogueCommand,
     102: SelectChoiceCommand,
     103: InputNumberCommand,
+    104: ChangeTextOptionsCommand,
     105: WaitForButtonPressCommand,
     106: WaitCommand,
     108: CommentCommand,
@@ -181,6 +186,8 @@ COMMAND_MAPPING: dict[int, type[RubyBaseCommand]] = {
     208: SetTransparencyFlagCommand,
     209: SetMoveRouteCommand,
     210: WaitForMoveCompletionCommand,
+    221: PrepareForTransitionCommand,
+    222: ExecuteTransistionCommand,
     223: ChangeScreenColourToneCommand,
     224: ScreenFlashCommand,
     225: ScreenShakeCommand,
@@ -199,6 +206,7 @@ COMMAND_MAPPING: dict[int, type[RubyBaseCommand]] = {
     250: PlaySfxCommand,
     251: StopSfxCommand,
     314: RecoverAllCommand,
+    354: ReturnToTitleCommand,
     355: InlineRubyCommand,
 
     # Psuedo-commands. These only exist in relation to another command and can only exist by

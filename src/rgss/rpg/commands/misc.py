@@ -439,6 +439,8 @@ class MemoriseBgmCommand(RubyBaseEventCommand):
         return {"command": "MemoriseBgmCommand"}
 
 
+@attrs.define(kw_only=True)
+@final
 class RestoreBgmCommand(RubyBaseEventCommand):
     """
     I have no fucking clue what this command does pt 2?
@@ -456,3 +458,107 @@ class RestoreBgmCommand(RubyBaseEventCommand):
     @override
     def unstructure(self, converter: Converter) -> dict[str, Any]:
         return {"command": "RestoreBgmCommand"}
+
+
+@attrs.define(kw_only=True)
+@final
+class ReturnToTitleCommand(RubyBaseEventCommand):
+    """
+    An event command that returns the player to the title screen.
+    """
+
+    @classmethod
+    @override
+    def from_raw_command(cls, cmd: RawCommand) -> ReturnToTitleCommand:
+        return cls(indent=cmd.indent)
+
+    @override
+    def to_raw_command(self) -> RawCommand:
+        return RawCommand(code=354, parameters=[], indent=self.indent)
+
+    @override
+    def unstructure(self, converter: Converter) -> dict[str, Any]:
+        return {"command": "ReturnToTitleCommand"}
+
+
+@attrs.define(kw_only=True)
+@final
+class ChangeTextOptionsCommand(RubyBaseEventCommand):
+    """
+    An event command that changes options for dialogue displays.
+    """
+
+    position: int = attrs.field()
+    hide: bool = attrs.field()
+
+    @classmethod
+    @override
+    def from_raw_command(cls, cmd: RawCommand) -> ChangeTextOptionsCommand:
+        return ChangeTextOptionsCommand(
+            position=cast(int, cmd.parameters[0]),
+            hide=cmd.parameters[0] == 1,
+            indent=cmd.indent,
+        )
+
+    @override
+    def to_raw_command(self) -> RawCommand:
+        return RawCommand(
+            code=104,
+            parameters=[self.position, int(self.hide)],
+            indent=self.indent,
+        )
+
+    @override
+    def unstructure(self, converter: Converter) -> dict[str, Any]:
+        return {
+            "command": "ChangeTextOptionsCommand",
+            "position": self.position,
+            "hide": self.hide,
+        }
+
+
+@attrs.define(kw_only=True)
+@final
+class PrepareForTransitionCommand(RubyBaseEventCommand):
+    """
+    An event command that prepares for a screen transition.
+    """
+
+    @classmethod
+    @override
+    def from_raw_command(cls, cmd: RawCommand) -> PrepareForTransitionCommand:
+        return cls(indent=cmd.indent)
+
+    @override
+    def to_raw_command(self) -> RawCommand:
+        return RawCommand(code=221, parameters=[], indent=self.indent)
+
+    @override
+    def unstructure(self, converter: Converter) -> dict[str, Any]:
+        return {"command": "PrepareForTransitionCommand"}
+
+
+@attrs.define(kw_only=True)
+@final
+class ExecuteTransistionCommand(RubyBaseEventCommand):
+    """
+    An event command that executes a screen transition.
+    """
+
+    transition_name: str = attrs.field()
+
+    @classmethod
+    @override
+    def from_raw_command(cls, cmd: RawCommand) -> ExecuteTransistionCommand:
+        return ExecuteTransistionCommand(
+            transition_name=cast(str, cmd.parameters[0]),
+            indent=cmd.indent,
+        )
+
+    @override
+    def to_raw_command(self) -> RawCommand:
+        return RawCommand(code=222, parameters=[self.transition_name], indent=self.indent)
+
+    @override
+    def unstructure(self, converter: Converter) -> dict[str, Any]:
+        return {"command": "ExecuteTransistionCommand"}
