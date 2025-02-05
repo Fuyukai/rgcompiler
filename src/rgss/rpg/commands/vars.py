@@ -352,12 +352,14 @@ class InputNumberCommand(RubyBaseEventCommand):
     """
 
     output_variable: int = attrs.field()
+    digits: int = attrs.field()
 
     @classmethod
     @override
     def from_raw_command(cls, cmd: RawCommand) -> InputNumberCommand:
         return InputNumberCommand(
             output_variable=cast(int, cmd.parameters[0]),
+            digits=cast(int, cmd.parameters[1]),
             indent=cmd.indent,
         )
 
@@ -365,7 +367,7 @@ class InputNumberCommand(RubyBaseEventCommand):
     def to_raw_command(self) -> RawCommand:
         return RawCommand(
             code=103,
-            parameters=[self.output_variable],
+            parameters=[self.output_variable, self.digits],
             indent=self.indent,
         )
 

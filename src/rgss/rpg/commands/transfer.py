@@ -49,11 +49,13 @@ class TransferPlayerCommand(RubyBaseEventCommand):
 
     @override
     def to_raw_command(self) -> RawCommand:
-        params: list[RubyMarshalValue] = [0, self.map_id]
+        params: list[RubyMarshalValue] = [None, self.map_id]
 
         if isinstance(self.opval, ConstantCoords):
+            params[0] = 0
             params.extend([self.opval.x, self.opval.y])
         else:
+            params[0] = 1
             params.extend([self.opval.x_variable, self.opval.y_variable])
 
         params.extend([self.direction.value, int(self.no_fade)])

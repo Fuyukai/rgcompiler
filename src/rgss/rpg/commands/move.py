@@ -309,7 +309,12 @@ class FaceRelativeToPlayerCommand(RubyBaseMoveCommand):
 
     @override
     def to_raw_command(self) -> RawCommand:
-        return RawCommand(code=25, parameters=[], indent=0)
+        if self.towards:
+            code = 25
+        else:
+            code = 26
+
+        return RawCommand(code=code, parameters=[], indent=0)
 
     @override
     def unstructure(self, converter: Converter) -> dict[str, Any]:

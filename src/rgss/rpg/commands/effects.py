@@ -637,7 +637,7 @@ class AlterPictureCommand(RubyBaseEventCommand):
 
     @override
     def to_raw_command(self) -> RawCommand:
-        params: list[RubyMarshalValue] = [self.picture_id, self.inner.origin.value]
+        params: list[RubyMarshalValue] = [self.picture_id, self.frames, self.inner.origin.value]
 
         if isinstance(self.inner.coords, ConstantCoords):
             params.extend([0, self.inner.coords.x, self.inner.coords.y])
