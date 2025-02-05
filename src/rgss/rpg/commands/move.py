@@ -510,3 +510,24 @@ class ChangeFrequencyCommand(RubyBaseMoveCommand):
     @override
     def unstructure(self, converter: Converter) -> dict[str, Any]:
         return {"command": "ChangeFrequencyCommand", "frequency": self.frequency}
+
+
+@attrs.define(kw_only=True)
+@final
+class MoveRandomCommand(RubyBaseMoveCommand):
+    """
+    Moves the actor randomly.
+    """
+
+    @classmethod
+    @override
+    def from_raw_command(cls, cmd: RawCommand) -> MoveRandomCommand:
+        return cls()
+
+    @override
+    def to_raw_command(self) -> RawCommand:
+        return RawCommand(code=19, parameters=[], indent=0)
+
+    @override
+    def unstructure(self, converter: Converter) -> dict[str, Any]:
+        return {"command": "MoveRandomCommand"}

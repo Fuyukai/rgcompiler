@@ -80,6 +80,7 @@ from rgss.rpg.commands.move import (
     DiagonalMoveCommand as DiagonalMoveCommand,
     FaceRelativeToPlayerCommand as FaceRelativeToPlayerCommand,
     JumpMoveCommand as JumpMoveCommand,
+    MoveRandomCommand,
     MoveRelativeToPlayerCommand as MoveRelativeToPlayerCommand,
     SetBlendingMoveCommand as SetBlendingMoveCommand,
     SetGraphicMoveCommand as SetGraphicMoveCommand,
@@ -114,6 +115,7 @@ COMMAND_MAPPING: dict[int, type[RubyBaseCommand]] = {
     6: DiagonalMoveCommand,           # Move Lower Right
     7: DiagonalMoveCommand,           # Move Upper Left
     8: DiagonalMoveCommand,           # Move Upper Right
+    9: MoveRandomCommand,
     10: MoveRelativeToPlayerCommand,  # Move Towards Player
     11: MoveRelativeToPlayerCommand,  # Move Away From Player
     12: StepOneCommand,               # Step Forwards
