@@ -124,6 +124,8 @@ COMMAND_MAPPING: dict[int, type[RubyBaseCommand]] = {
     24: TurnRandomlyCommand,
     25: FaceRelativeToPlayerCommand,  # Face Player
     26: FaceRelativeToPlayerCommand,  # Face Away From Player
+    27: SetSwitchCommand,             # Switch On
+    28: SetSwitchCommand,             # Switch Off
     29: ChangeSpeedCommand,
     30: ChangeFrequencyCommand,
     31: TogglePropertyMoveCommand,    # Move Animation On

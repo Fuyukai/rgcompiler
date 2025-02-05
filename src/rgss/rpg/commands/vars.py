@@ -6,34 +6,66 @@ from typing import Any, Literal, cast, final, override
 import attrs
 from cattrs import Converter
 
-from rgss.rpg.commands.base import RawCommand, RubyBaseEventCommand
-from rhodochrosite.ruby import RubyMarshalValue
+from rgss.rpg.commands.base import (
+    RPG_MOVE_COMMAND,
+    RawCommand,
+    RubyBaseCommand,
+    RubyBaseEventCommand,
+)
+from rhodochrosite.ruby import RubyMarshalValue, RubySymbol
 
 
 @attrs.define(kw_only=True)
 @final
-class SetSwitchCommand(RubyBaseEventCommand):
+class SetSwitchCommand(RubyBaseCommand):
     """
     An event command that sets one or more switches.
     """
+
+    type: RubySymbol = attrs.field()
+    indent: int = attrs.field()
 
     switch_start: int = attrs.field()
     switch_end: int = attrs.field()
     switch_value: bool = attrs.field()
 
+    @property
+    @override
+    def ruby_class_name(self) -> RubySymbol:
+        return self.type
+
     @classmethod
     @override
-    def from_raw_command(cls, cmd: RawCommand) -> SetSwitchCommand:
+    def from_raw_command_and_type(cls, type: RubySymbol, cmd: RawCommand) -> SetSwitchCommand:
+        # for move commands, 27 = Switch On and 28 = Switch Off. why are these not merged? who
+        # knows!
+        if type == RPG_MOVE_COMMAND:
+            is_on = cmd.code == 27
+            start = cast(int, cmd.parameters[0])
+            end = start
+        else:
+            # bools are fucking INVERTED in rgss, why!!!!!!!!
+            is_on = cmd.parameters[2] == 0
+            start = cast(int, cmd.parameters[0])
+            end = cast(int, cmd.parameters[1])
+
         return SetSwitchCommand(
-            switch_start=cast(int, cmd.parameters[0]),
-            switch_end=cast(int, cmd.parameters[1]),
-            # THIS IS CORRECT, FOR SOME STUPID FUCKING REASON IT'S INVERTED?
-            switch_value=cmd.parameters[2] == 0,
+            type=type,
+            switch_start=start,
+            switch_end=end,
+            switch_value=is_on,
             indent=cmd.indent,
         )
 
     @override
     def to_raw_command(self) -> RawCommand:
+        if self.type == RPG_MOVE_COMMAND:
+            return RawCommand(
+                code=27 if self.switch_value else 28,
+                parameters=[self.switch_start],
+                indent=self.indent,
+            )
+
         return RawCommand(
             code=121,
             parameters=[self.switch_start, self.switch_end, int(not self.switch_value)],

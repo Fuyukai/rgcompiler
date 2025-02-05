@@ -104,6 +104,7 @@ ignore = [
     "UP038",  # Slower than isinstance(thing, tuple)?
     # wtf is this?
     "RUF036",
+    "SIM108",
 ]
 
 [tool.ruff.lint.per-file-ignores]
