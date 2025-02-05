@@ -69,7 +69,11 @@ def main():
     print(f"checked all maps in {after - before:.2f} seconds!")
     print()
     print(f"total events: [pink]{total}[/pink], failed: [red]{failed}[/red]")
-    print(f"success rate: [green]{(total - failed) / total * 100:.2f}%[/green]")
+    print(f"success rate: [green]{(total - failed) / total * 100:.3f}%[/green]")
+    print(
+        f"failed to load entirely: [red]{len(actual_errors)}[/red] "
+        f"(failure rate: [red]{len(actual_errors) / total * 100:.3f}%[/red])"
+    )
     print("unknown commands:")
 
     for map in found_unknown:

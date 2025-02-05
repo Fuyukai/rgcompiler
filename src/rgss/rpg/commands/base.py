@@ -136,3 +136,27 @@ class RubyBaseMoveCommand(RubyBaseCommand, abc.ABC):
             (PARAMS_SYMBOL, cmd.parameters),
             (CODE_SYMBOL, cmd.code),
         ]
+
+
+@attrs.define(kw_only=True, frozen=True)
+class ConstantCoords:
+    """
+    Union class used whenever something has a pair of constant coordinates.
+    """
+
+    __match_args__ = ("x", "y")
+
+    x: int = attrs.field()
+    y: int = attrs.field()
+
+
+@attrs.define(kw_only=True, frozen=True)
+class LoadVariableCoords:
+    """
+    Union class used whenever something has a pair of coordinates loaded from variables.
+    """
+
+    __match_args__ = ("x", "y")
+
+    x_variable: int = attrs.field()
+    y_variable: int = attrs.field()

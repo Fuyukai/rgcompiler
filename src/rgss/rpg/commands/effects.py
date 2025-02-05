@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+import enum
 from typing import Any, cast, final, override
 
 import attrs
@@ -7,13 +8,15 @@ from cattrs import Converter
 
 from rgss.rpg.commands.base import (
     RPG_EVENT_COMMAND,
+    ConstantCoords,
+    LoadVariableCoords,
     RawCommand,
     RubyBaseCommand,
     RubyBaseEventCommand,
 )
 from rgss.rpg.misc import RubyAudioFile
 from rgss.types import RgssColour, RgssDirection, RgssTone
-from rhodochrosite.ruby import RubySymbol
+from rhodochrosite.ruby import RubyMarshalValue, RubySymbol
 
 
 @attrs.define(kw_only=True)
@@ -409,4 +412,85 @@ class ChangeFogOpacityCommand(RubyBaseEventCommand):
             "command": "ChangeFogOpacityCommand",
             "opacity": self.opacity,
             "frames": self.frames,
+        }
+
+
+class ShowPictureOrigin(enum.Enum):
+    """
+    The origin of the picture.
+    """
+
+    UPPER_LEFT = 0
+    CENTER = 1
+
+
+@attrs.define(kw_only=True)
+@final
+class ShowPictureCommand(RubyBaseEventCommand):
+    """
+    Shows a picture on the screen.
+    """
+
+    # matched with an erase command
+    picture_id: int = attrs.field()
+    filename: str = attrs.field()
+    origin: ShowPictureOrigin = attrs.field()
+
+    # relative to origin selection
+    coords: ConstantCoords | LoadVariableCoords = attrs.field()
+    zoom_x: int = attrs.field()
+    zoom_y: int = attrs.field()
+    opacity: int = attrs.field()
+    blend_type: int = attrs.field()
+
+    @classmethod
+    @override
+    def from_raw_command(cls, cmd: RawCommand) -> ShowPictureCommand:
+        origin = ShowPictureOrigin(cmd.parameters[2])
+        x = cast(int, cmd.parameters[4])
+        y = cast(int, cmd.parameters[5])
+
+        uses_variables = cmd.parameters[3] == 1
+
+        if uses_variables:
+            coords = LoadVariableCoords(x_variable=x, y_variable=y)
+        else:
+            coords = ConstantCoords(x=x, y=y)
+
+        return ShowPictureCommand(
+            picture_id=cast(int, cmd.parameters[0]),
+            filename=cast(str, cmd.parameters[1]),
+            origin=origin,
+            coords=coords,
+            zoom_x=cast(int, cmd.parameters[6]),
+            zoom_y=cast(int, cmd.parameters[7]),
+            opacity=cast(int, cmd.parameters[8]),
+            blend_type=cast(int, cmd.parameters[9]),
+            indent=cmd.indent,
+        )
+
+    @override
+    def to_raw_command(self) -> RawCommand:
+        params: list[RubyMarshalValue] = [self.picture_id, self.filename, self.origin.value]
+
+        if isinstance(self.coords, ConstantCoords):
+            params.extend([0, self.coords.x, self.coords.y])
+        else:
+            params.extend([1, self.coords.x_variable, self.coords.y_variable])
+
+        params.extend([self.zoom_x, self.zoom_y, self.opacity, self.blend_type])
+        return RawCommand(code=231, parameters=params, indent=self.indent)
+
+    @override
+    def unstructure(self, converter: Converter) -> dict[str, Any]:
+        return {
+            "command": "ShowPictureCommand",
+            "picture_id": self.picture_id,
+            "filename": self.filename,
+            "origin": self.origin.name,
+            "coords": converter.unstructure(self.coords),
+            "zoom_x": self.zoom_x,
+            "zoom_y": self.zoom_y,
+            "opacity": self.opacity,
+            "blend_type": self.blend_type,
         }

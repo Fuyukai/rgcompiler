@@ -5,21 +5,14 @@ from typing import Any, cast, final, override
 import attrs
 from cattrs import Converter
 
-from rgss.rpg.commands.base import RawCommand, RubyBaseEventCommand
+from rgss.rpg.commands.base import (
+    ConstantCoords,
+    LoadVariableCoords,
+    RawCommand,
+    RubyBaseEventCommand,
+)
 from rgss.types import RgssDirection
 from rhodochrosite.ruby import RubyMarshalValue
-
-
-@attrs.define(kw_only=True, frozen=True)
-class TransferDirect:
-    x: int = attrs.field()
-    y: int = attrs.field()
-
-
-@attrs.define(kw_only=True, frozen=True)
-class TransferByVariable:
-    x_variable: int = attrs.field()
-    y_variable: int = attrs.field()
 
 
 @attrs.define(kw_only=True)
@@ -30,7 +23,7 @@ class TransferPlayerCommand(RubyBaseEventCommand):
     """
 
     map_id: int = attrs.field()
-    opval: TransferDirect | TransferByVariable = attrs.field()
+    opval: ConstantCoords | LoadVariableCoords = attrs.field()
     direction: RgssDirection = attrs.field(converter=RgssDirection)
     no_fade: bool = attrs.field()
 
@@ -46,9 +39,9 @@ class TransferPlayerCommand(RubyBaseEventCommand):
 
         uses_variables = cmd.parameters[0] == 1
         if uses_variables:
-            opval = TransferByVariable(x_variable=x, y_variable=y)
+            opval = LoadVariableCoords(x_variable=x, y_variable=y)
         else:
-            opval = TransferDirect(x=x, y=y)
+            opval = ConstantCoords(x=x, y=y)
 
         return TransferPlayerCommand(
             map_id=map_id, opval=opval, direction=direction, no_fade=no_fade, indent=cmd.indent
@@ -58,7 +51,7 @@ class TransferPlayerCommand(RubyBaseEventCommand):
     def to_raw_command(self) -> RawCommand:
         params: list[RubyMarshalValue] = [0, self.map_id]
 
-        if isinstance(self.opval, TransferDirect):
+        if isinstance(self.opval, ConstantCoords):
             params.extend([self.opval.x, self.opval.y])
         else:
             params.extend([self.opval.x_variable, self.opval.y_variable])
@@ -100,7 +93,7 @@ class SetEventLocationCommand(RubyBaseEventCommand):
     event_id: int = attrs.field()
 
     #: The actual value to move the event to using.
-    opval: TransferDirect | TransferByVariable | TransferSwap = attrs.field()
+    opval: ConstantCoords | LoadVariableCoords | TransferSwap = attrs.field()
 
     #: The resulting direction for the transferred event.
     direction: RgssDirection = attrs.field()
@@ -114,12 +107,12 @@ class SetEventLocationCommand(RubyBaseEventCommand):
 
         match opcode:
             case 0:
-                opval = TransferDirect(
+                opval = ConstantCoords(
                     x=cast(int, cmd.parameters[2]), y=cast(int, cmd.parameters[3])
                 )
 
             case 1:
-                opval = TransferByVariable(
+                opval = LoadVariableCoords(
                     x_variable=cast(int, cmd.parameters[2]), y_variable=cast(int, cmd.parameters[3])
                 )
 
@@ -138,9 +131,9 @@ class SetEventLocationCommand(RubyBaseEventCommand):
     def to_raw_command(self) -> RawCommand:
         params: list[RubyMarshalValue] = [self.event_id]
 
-        if isinstance(self.opval, TransferDirect):
+        if isinstance(self.opval, ConstantCoords):
             params.extend([0, self.opval.x, self.opval.y])
-        elif isinstance(self.opval, TransferByVariable):
+        elif isinstance(self.opval, LoadVariableCoords):
             params.extend([1, self.opval.x_variable, self.opval.y_variable])
         else:
             params.extend([2, self.opval.event_id, 0])

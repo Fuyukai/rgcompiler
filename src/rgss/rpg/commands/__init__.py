@@ -22,8 +22,8 @@ from rgss.rpg.commands.dialogue import (
     ShowDialogueCommand as ShowDialogueCommand,
 )
 from rgss.rpg.commands.effects import (
-    ChangeBattleBgmCommand,
-    ChangeFogOpacityCommand,
+    ChangeBattleBgmCommand as ChangeBattleBgmCommand,
+    ChangeFogOpacityCommand as ChangeFogOpacityCommand,
     ChangeScreenColourToneCommand as ChangeScreenColourToneCommand,
     FadeOutBgmCommand as FadeOutBgmCommand,
     PlayBgmCommand as PlayBgmCommand,
@@ -33,6 +33,7 @@ from rgss.rpg.commands.effects import (
     ScrollMapCommand as ScrollMapCommand,
     SetTransparencyFlagCommand as SetTransparencyFlagCommand,
     ShowAnimationCommand as ShowAnimationCommand,
+    ShowPictureCommand as ShowPictureCommand,
 )
 from rgss.rpg.commands.flow import (
     BreakLoopCommand as BreakLoopCommand,
@@ -57,9 +58,9 @@ from rgss.rpg.commands.misc import (
     EmptyCommand as EmptyCommand,
     InlineRubyCommand as InlineRubyCommand,
     InlineRubyContinuedCommand as InlineRubyContinuedCommand,
-    MemoriseBgmCommand,
+    MemoriseBgmCommand as MemoriseBgmCommand,
     RecoverAllCommand as RecoverAllCommand,
-    SetMoneyCommand,
+    SetMoneyCommand as SetMoneyCommand,
     SetMoveRouteCommand as SetMoveRouteCommand,
     UnknownCommand as UnknownCommand,
     VisualMoveRouteCommand as VisualMoveRouteCommand,
@@ -68,13 +69,13 @@ from rgss.rpg.commands.misc import (
 )
 from rgss.rpg.commands.move import (
     CardinalMoveCommand as CardinalMoveCommand,
-    ChangeFrequencyCommand,
+    ChangeFrequencyCommand as ChangeFrequencyCommand,
     ChangeSpeedCommand as ChangeSpeedCommand,
     DiagonalMoveCommand as DiagonalMoveCommand,
     FaceRelativeToPlayerCommand as FaceRelativeToPlayerCommand,
     JumpMoveCommand as JumpMoveCommand,
-    MoveRelativeToPlayerCommand,
-    SetBlendingMoveCommand,
+    MoveRelativeToPlayerCommand as MoveRelativeToPlayerCommand,
+    SetBlendingMoveCommand as SetBlendingMoveCommand,
     SetGraphicMoveCommand as SetGraphicMoveCommand,
     SetOpacityCommand as SetOpacityCommand,
     StepOneCommand as StepOneCommand,
@@ -172,6 +173,7 @@ COMMAND_MAPPING: dict[int, type[RubyBaseCommand]] = {
     223: ChangeScreenColourToneCommand,
     224: ScreenFlashCommand,
     225: ScreenShakeCommand,
+    231: ShowPictureCommand,
     241: PlayBgmCommand,
     242: FadeOutBgmCommand,
     247: MemoriseBgmCommand,
