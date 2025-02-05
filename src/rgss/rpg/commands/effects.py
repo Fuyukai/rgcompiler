@@ -426,6 +426,45 @@ class ShowPictureOrigin(enum.Enum):
 
 @attrs.define(kw_only=True)
 @final
+class PictureEffectData:
+    """
+    Contains shared fields for how a picture is rendered.
+    """
+
+    origin: ShowPictureOrigin = attrs.field(default=ShowPictureOrigin.UPPER_LEFT)
+
+    # relative to origin selection
+    coords: ConstantCoords | LoadVariableCoords = attrs.field(default=ConstantCoords(x=0, y=0))
+    zoom_x: int = attrs.field(default=100)
+    zoom_y: int = attrs.field(default=100)
+    opacity: int = attrs.field(default=255)
+    blend_type: int = attrs.field(default=0)
+
+    @classmethod
+    def from_ruby_params(cls, params: list[RubyMarshalValue]) -> PictureEffectData:
+        origin = ShowPictureOrigin(params[0])
+        x = cast(int, params[2])
+        y = cast(int, params[3])
+
+        uses_variables = params[1] == 1
+
+        if uses_variables:
+            coords = LoadVariableCoords(x_variable=x, y_variable=y)
+        else:
+            coords = ConstantCoords(x=x, y=y)
+
+        return PictureEffectData(
+            origin=origin,
+            coords=coords,
+            zoom_x=cast(int, params[4]),
+            zoom_y=cast(int, params[5]),
+            opacity=cast(int, params[6]),
+            blend_type=cast(int, params[7]),
+        )
+
+
+@attrs.define(kw_only=True)
+@final
 class ShowPictureCommand(RubyBaseEventCommand):
     """
     Shows a picture on the screen.
@@ -434,51 +473,34 @@ class ShowPictureCommand(RubyBaseEventCommand):
     # matched with an erase command
     picture_id: int = attrs.field()
     filename: str = attrs.field()
-    origin: ShowPictureOrigin = attrs.field()
-
-    # relative to origin selection
-    coords: ConstantCoords | LoadVariableCoords = attrs.field()
-    zoom_x: int = attrs.field()
-    zoom_y: int = attrs.field()
-    opacity: int = attrs.field()
-    blend_type: int = attrs.field()
+    inner: PictureEffectData = attrs.field()
 
     @classmethod
     @override
     def from_raw_command(cls, cmd: RawCommand) -> ShowPictureCommand:
-        origin = ShowPictureOrigin(cmd.parameters[2])
-        x = cast(int, cmd.parameters[4])
-        y = cast(int, cmd.parameters[5])
-
-        uses_variables = cmd.parameters[3] == 1
-
-        if uses_variables:
-            coords = LoadVariableCoords(x_variable=x, y_variable=y)
-        else:
-            coords = ConstantCoords(x=x, y=y)
-
+        inner = PictureEffectData.from_ruby_params(cmd.parameters[2:])
         return ShowPictureCommand(
             picture_id=cast(int, cmd.parameters[0]),
             filename=cast(str, cmd.parameters[1]),
-            origin=origin,
-            coords=coords,
-            zoom_x=cast(int, cmd.parameters[6]),
-            zoom_y=cast(int, cmd.parameters[7]),
-            opacity=cast(int, cmd.parameters[8]),
-            blend_type=cast(int, cmd.parameters[9]),
+            inner=inner,
             indent=cmd.indent,
         )
 
     @override
     def to_raw_command(self) -> RawCommand:
-        params: list[RubyMarshalValue] = [self.picture_id, self.filename, self.origin.value]
+        params: list[RubyMarshalValue] = [self.picture_id, self.filename, self.inner.origin.value]
 
-        if isinstance(self.coords, ConstantCoords):
-            params.extend([0, self.coords.x, self.coords.y])
+        if isinstance(self.inner.coords, ConstantCoords):
+            params.extend([0, self.inner.coords.x, self.inner.coords.y])
         else:
-            params.extend([1, self.coords.x_variable, self.coords.y_variable])
+            params.extend([1, self.inner.coords.x_variable, self.inner.coords.y_variable])
 
-        params.extend([self.zoom_x, self.zoom_y, self.opacity, self.blend_type])
+        params.extend([
+            self.inner.zoom_x,
+            self.inner.zoom_y,
+            self.inner.opacity,
+            self.inner.blend_type,
+        ])
         return RawCommand(code=231, parameters=params, indent=self.indent)
 
     @override
@@ -487,10 +509,119 @@ class ShowPictureCommand(RubyBaseEventCommand):
             "command": "ShowPictureCommand",
             "picture_id": self.picture_id,
             "filename": self.filename,
-            "origin": self.origin.name,
-            "coords": converter.unstructure(self.coords),
-            "zoom_x": self.zoom_x,
-            "zoom_y": self.zoom_y,
-            "opacity": self.opacity,
-            "blend_type": self.blend_type,
+            "inner": converter.unstructure(self.inner),
+        }
+
+
+@attrs.define(kw_only=True)
+@final
+class ErasePictureCommand(RubyBaseEventCommand):
+    """
+    Erases a picture from the screen.
+    """
+
+    picture_id: int = attrs.field()
+
+    @classmethod
+    @override
+    def from_raw_command(cls, cmd: RawCommand) -> ErasePictureCommand:
+        return ErasePictureCommand(
+            picture_id=cast(int, cmd.parameters[0]),
+            indent=cmd.indent,
+        )
+
+    @override
+    def to_raw_command(self) -> RawCommand:
+        return RawCommand(code=235, parameters=[self.picture_id], indent=self.indent)
+
+    @override
+    def unstructure(self, converter: Converter) -> dict[str, Any]:
+        return {
+            "command": "ErasePictureCommand",
+            "picture_id": self.picture_id,
+        }
+
+
+@attrs.define(kw_only=True)
+@final
+class AlterPictureCommand(RubyBaseEventCommand):
+    """
+    Moves or alters a picture on the screen.
+    """
+
+    # in the editor, this is "Move Picture", but you can just not move it and do things like adjust
+    # zoom and opacity for fade-ins or fade-outs.
+
+    picture_id: int = attrs.field()
+    frames: int = attrs.field()
+    inner: PictureEffectData = attrs.field()
+
+    @classmethod
+    @override
+    def from_raw_command(cls, cmd: RawCommand) -> AlterPictureCommand:
+        frames = cast(int, cmd.parameters[1])
+        inner = PictureEffectData.from_ruby_params(cmd.parameters[2:])
+        return AlterPictureCommand(
+            picture_id=cast(int, cmd.parameters[0]),
+            frames=frames,
+            inner=inner,
+            indent=cmd.indent,
+        )
+
+    @override
+    def to_raw_command(self) -> RawCommand:
+        params: list[RubyMarshalValue] = [self.picture_id, self.inner.origin.value]
+
+        if isinstance(self.inner.coords, ConstantCoords):
+            params.extend([0, self.inner.coords.x, self.inner.coords.y])
+        else:
+            params.extend([1, self.inner.coords.x_variable, self.inner.coords.y_variable])
+
+        params.extend([
+            self.inner.zoom_x,
+            self.inner.zoom_y,
+            self.inner.opacity,
+            self.inner.blend_type,
+        ])
+        return RawCommand(code=232, parameters=params, indent=self.indent)
+
+    @override
+    def unstructure(self, converter: Converter) -> dict[str, Any]:
+        return {
+            "command": "AlterPictureCommand",
+            "picture_id": self.picture_id,
+            "inner": converter.unstructure(self.inner),
+        }
+
+
+@attrs.define(kw_only=True)
+@final
+class RotatePictureCommand(RubyBaseEventCommand):
+    """
+    Rotates a picture on the screen.
+    """
+
+    picture_id: int = attrs.field()
+    # ? what is this
+    speed: int = attrs.field()
+
+    @classmethod
+    @override
+    def from_raw_command(cls, cmd: RawCommand) -> RotatePictureCommand:
+        return RotatePictureCommand(
+            picture_id=cast(int, cmd.parameters[0]),
+            speed=cast(int, cmd.parameters[1]),
+            indent=cmd.indent,
+        )
+
+    @override
+    def to_raw_command(self) -> RawCommand:
+        return RawCommand(code=233, parameters=[self.picture_id, self.speed], indent=self.indent)
+
+    @override
+    def unstructure(self, converter: Converter) -> dict[str, Any]:
+        return {
+            "command": "RotatePictureCommand",
+            "picture_id": self.picture_id,
+            "speed": self.speed,
         }

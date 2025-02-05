@@ -5,6 +5,7 @@ from cattrs import Converter
 from cattrs.gen import make_dict_unstructure_fn
 
 from rgss.rpg.commands.base import RubyBaseCommand
+from rgss.rpg.commands.effects import PictureEffectData, ShowPictureOrigin
 from rgss.rpg.commands.vars import SvActorRefAttribute, SvOtherCategory
 from rgss.rpg.event import RubyEventGraphic, RubyEventPageCondition
 from rgss.types import RgssDirection
@@ -32,6 +33,7 @@ ENUMS_BY_NAME = [
     RgssDirection,
     SvActorRefAttribute,
     SvOtherCategory,
+    ShowPictureOrigin,
 ]
 
 
@@ -52,6 +54,10 @@ def make_converter() -> Converter:
     converter.register_unstructure_hook(
         RubyEventGraphic,
         make_dict_unstructure_fn(RubyEventGraphic, converter, _cattrs_omit_if_default=True),
+    )
+    converter.register_unstructure_hook(
+        PictureEffectData,
+        make_dict_unstructure_fn(PictureEffectData, converter, _cattrs_omit_if_default=True),
     )
 
     converter.register_unstructure_hook(RubySymbol, partial(unstructure_symbol, converter))
