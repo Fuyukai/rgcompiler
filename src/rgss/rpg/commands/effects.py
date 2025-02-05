@@ -1,7 +1,7 @@
 from __future__ import annotations
 
 import enum
-from typing import Any, cast, final, override
+from typing import Any, assert_never, cast, final, override
 
 import attrs
 from cattrs import Converter
@@ -183,20 +183,104 @@ class ScrollMapCommand(RubyBaseEventCommand):
         }
 
 
+@final
+class BackgroundSoundType(enum.Enum):
+    BGM = 1
+    BGS = 2
+    ME = 3
+
+    @classmethod
+    def from_raw_event_code(cls, code: int) -> BackgroundSoundType:
+        """
+        Gets a new background sound type from the raw event code.
+        """
+
+        if code == 241 or code == 242:
+            return BackgroundSoundType.BGM
+
+        if code == 245 or code == 246:
+            return cls.BGS
+
+        if code == 249:
+            return cls.ME
+
+        raise ValueError(f"Invalid background sound code: {code}")
+
+    def as_raw_event_code(self, fade_out: bool) -> int:
+        """
+        Converts this enum into a raw event code.
+        """
+
+        if self == BackgroundSoundType.BGM:
+            return 242 if fade_out else 241
+
+        if self == BackgroundSoundType.BGS:
+            return 246 if fade_out else 245
+
+        if self == BackgroundSoundType.ME:
+            return 249
+
+        assert_never(self)
+
+
 @attrs.define(kw_only=True)
 @final
-class FadeOutBgmCommand(RubyBaseEventCommand):
+class PlayBackgroundAudioCommand(RubyBaseEventCommand):
     """
-    Event command that fades out the BGM.
+    Event command that plays some form of background audio.
+    """
+
+    audio: RubyAudioFile = attrs.field()
+    type: BackgroundSoundType = attrs.field()
+
+    @classmethod
+    @override
+    def from_raw_command(cls, cmd: RawCommand) -> PlayBackgroundAudioCommand:
+        typecode = BackgroundSoundType.from_raw_event_code(cmd.code)
+
+        return PlayBackgroundAudioCommand(
+            type=typecode,
+            audio=cast(RubyAudioFile, cmd.parameters[0]),
+            indent=cmd.indent,
+        )
+
+    @override
+    def to_raw_command(self) -> RawCommand:
+        return RawCommand(
+            code=self.type.as_raw_event_code(fade_out=False),
+            parameters=[self.audio],
+            indent=self.indent,
+        )
+
+    @override
+    def unstructure(self, converter: Converter) -> dict[str, Any]:
+        name: str = f"Play{self.type.name.capitalize()}Command"
+
+        return {
+            "command": name,
+            "audio": converter.unstructure(self.audio),
+        }
+
+
+@attrs.define(kw_only=True)
+@final
+class FadeOutBackgroundAudioCommand(RubyBaseEventCommand):
+    """
+    Event command that fades out some form of background audio.
     """
 
     # in seconds, not frames?
     fade_time: int = attrs.field()
 
+    type: BackgroundSoundType = attrs.field()
+
     @classmethod
     @override
-    def from_raw_command(cls, cmd: RawCommand) -> FadeOutBgmCommand:
-        return FadeOutBgmCommand(
+    def from_raw_command(cls, cmd: RawCommand) -> FadeOutBackgroundAudioCommand:
+        type = BackgroundSoundType.from_raw_event_code(cmd.code)
+
+        return FadeOutBackgroundAudioCommand(
+            type=type,
             fade_time=cast(int, cmd.parameters[0]),
             indent=cmd.indent,
         )
@@ -204,58 +288,18 @@ class FadeOutBgmCommand(RubyBaseEventCommand):
     @override
     def to_raw_command(self) -> RawCommand:
         return RawCommand(
-            code=242,
+            code=self.type.as_raw_event_code(fade_out=True),
             parameters=[self.fade_time],
             indent=self.indent,
         )
 
     @override
     def unstructure(self, converter: Converter) -> dict[str, Any]:
+        name: str = f"FadeOut{self.type.name.capitalize()}Command"
+
         return {
-            "command": "FadeOutBgmCommand",
+            "command": name,
             "fade_time": self.fade_time,
-        }
-
-
-@attrs.define(kw_only=True)
-@final
-class PlayBgmCommand(RubyBaseEventCommand):
-    """
-    Event command that starts playing music.
-    """
-
-    audio: RubyAudioFile = attrs.field()
-    #: If True, this is an "ME", which temporarily replaces the BGM.
-    #:
-    #: What does "ME" stand for? Who fucking knows.
-    is_me: bool = attrs.field()
-
-    @classmethod
-    @override
-    def from_raw_command(cls, cmd: RawCommand) -> PlayBgmCommand:
-        is_me = cmd.code == 249
-        return PlayBgmCommand(
-            audio=cast(RubyAudioFile, cmd.parameters[0]),
-            indent=cmd.indent,
-            is_me=is_me,
-        )
-
-    @override
-    def to_raw_command(self) -> RawCommand:
-        code = 249 if self.is_me else 241
-
-        return RawCommand(
-            code=code,
-            parameters=[self.audio],
-            indent=self.indent,
-        )
-
-    @override
-    def unstructure(self, converter: Converter) -> dict[str, Any]:
-        return {
-            "command": "PlayBgmCommand",
-            "audio": converter.unstructure(self.audio),
-            "is_me": self.is_me,
         }
 
 

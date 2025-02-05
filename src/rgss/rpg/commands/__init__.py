@@ -27,8 +27,8 @@ from rgss.rpg.commands.effects import (
     ChangeFogOpacityCommand as ChangeFogOpacityCommand,
     ChangeScreenColourToneCommand as ChangeScreenColourToneCommand,
     ErasePictureCommand,
-    FadeOutBgmCommand as FadeOutBgmCommand,
-    PlayBgmCommand as PlayBgmCommand,
+    FadeOutBackgroundAudioCommand,
+    PlayBackgroundAudioCommand as PlayBackgroundAudioCommand,
     PlaySfxCommand as PlaySfxCommand,
     RotatePictureCommand,
     ScreenFlashCommand as ScreenFlashCommand,
@@ -186,11 +186,13 @@ COMMAND_MAPPING: dict[int, type[RubyBaseCommand]] = {
     233: RotatePictureCommand,
     235: ErasePictureCommand,
     236: SetWeatherEffectsCommand,
-    241: PlayBgmCommand,
-    242: FadeOutBgmCommand,
+    241: PlayBackgroundAudioCommand,     # Play BGM
+    242: FadeOutBackgroundAudioCommand,  # Fade Out BGM
+    245: PlayBackgroundAudioCommand,     # Play BGS
+    246: FadeOutBackgroundAudioCommand,  # Fade Out BGS
     247: MemoriseBgmCommand,
     248: RestoreBgmCommand,
-    249: PlayBgmCommand,  # For "ME"s,
+    249: PlayBackgroundAudioCommand,     # Play ME
     250: PlaySfxCommand,
     251: StopSfxCommand,
     314: RecoverAllCommand,
