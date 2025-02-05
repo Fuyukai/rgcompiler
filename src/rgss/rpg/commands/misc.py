@@ -10,6 +10,7 @@ from rgss.rpg.commands.base import (
     RawCommand,
     RubyBaseCommand,
     RubyBaseEventCommand,
+    RubyBaseMoveCommand,
 )
 from rgss.rpg.moves import RubyMoveRoute
 from rhodochrosite.ruby import RubyMarshalValue, RubySymbol
@@ -201,30 +202,30 @@ class SetMoveRouteCommand(RubyBaseEventCommand):
 @final
 class VisualMoveRouteCommand(RubyBaseEventCommand):
     """
-    An event command that contains a single move route. This command is not bound to an event.
+    An event command that contains a single move command. This command is not bound to an event.
 
     The differernce between this class and the other move route class is unknown, but the official
     editor seems to emit both? This command is likely entirely visual for editor purposes.
     """
 
-    move_route: RubyMoveRoute = attrs.field()
+    command: RubyBaseMoveCommand = attrs.field()
 
     @classmethod
     @override
     def from_raw_command(cls, cmd: RawCommand) -> VisualMoveRouteCommand:
         return VisualMoveRouteCommand(
-            move_route=cast(RubyMoveRoute, cmd.parameters[0]), indent=cmd.indent
+            command=cast(RubyBaseMoveCommand, cmd.parameters[0]), indent=cmd.indent
         )
 
     @override
     def to_raw_command(self) -> RawCommand:
-        return RawCommand(code=509, parameters=[self.move_route], indent=self.indent)
+        return RawCommand(code=509, parameters=[self.command], indent=self.indent)
 
     @override
     def unstructure(self, converter: Converter) -> dict[str, Any]:
         return {
             "command": "VisualMoveRouteCommand",
-            "move_route": converter.unstructure(self.move_route),
+            "subcommand": self.command.unstructure(converter),
         }
 
 
