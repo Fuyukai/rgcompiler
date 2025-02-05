@@ -415,3 +415,24 @@ class SetMoneyCommand(RubyBaseEventCommand):
             "use_variable": self.use_variable,
             "opval": self.opval,
         }
+
+
+@attrs.define(kw_only=True)
+@final
+class MemoriseBgmCommand(RubyBaseEventCommand):
+    """
+    I have no fucking clue what this command does?
+    """
+
+    @classmethod
+    @override
+    def from_raw_command(cls, cmd: RawCommand) -> MemoriseBgmCommand:
+        return cls(indent=cmd.indent)
+
+    @override
+    def to_raw_command(self) -> RawCommand:
+        return RawCommand(code=247, parameters=[], indent=self.indent)
+
+    @override
+    def unstructure(self, converter: Converter) -> dict[str, Any]:
+        return {"command": "MemoriseBgmCommand"}

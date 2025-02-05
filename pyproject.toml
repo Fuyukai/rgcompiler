@@ -20,6 +20,7 @@ license = { text = "AGPL-3.0-or-later" }
 [project.scripts]
 rg-ruby-unmarshal = "rgcompiler.cli.dump_json:main"
 rg-ruby-roundtrip = "rgcompiler.cli.roundtrip:main"
+rg-verify-maps = "rgcompiler.cli.verify_maps:main"
 
 [dependency-groups]
 dev = [

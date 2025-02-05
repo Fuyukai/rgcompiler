@@ -22,6 +22,8 @@ from rgss.rpg.commands.dialogue import (
     ShowDialogueCommand as ShowDialogueCommand,
 )
 from rgss.rpg.commands.effects import (
+    ChangeBattleBgmCommand,
+    ChangeFogOpacityCommand,
     ChangeScreenColourToneCommand as ChangeScreenColourToneCommand,
     FadeOutBgmCommand as FadeOutBgmCommand,
     PlayBgmCommand as PlayBgmCommand,
@@ -55,6 +57,7 @@ from rgss.rpg.commands.misc import (
     EmptyCommand as EmptyCommand,
     InlineRubyCommand as InlineRubyCommand,
     InlineRubyContinuedCommand as InlineRubyContinuedCommand,
+    MemoriseBgmCommand,
     RecoverAllCommand as RecoverAllCommand,
     SetMoneyCommand,
     SetMoveRouteCommand as SetMoveRouteCommand,
@@ -65,10 +68,12 @@ from rgss.rpg.commands.misc import (
 )
 from rgss.rpg.commands.move import (
     CardinalMoveCommand as CardinalMoveCommand,
+    ChangeFrequencyCommand,
     ChangeSpeedCommand as ChangeSpeedCommand,
     DiagonalMoveCommand as DiagonalMoveCommand,
     FaceRelativeToPlayerCommand as FaceRelativeToPlayerCommand,
     JumpMoveCommand as JumpMoveCommand,
+    MoveRelativeToPlayerCommand,
     SetBlendingMoveCommand,
     SetGraphicMoveCommand as SetGraphicMoveCommand,
     SetOpacityCommand as SetOpacityCommand,
@@ -102,6 +107,8 @@ COMMAND_MAPPING: dict[int, type[RubyBaseCommand]] = {
     6: DiagonalMoveCommand,           # Move Lower Right
     7: DiagonalMoveCommand,           # Move Upper Left
     8: DiagonalMoveCommand,           # Move Upper Right
+    10: MoveRelativeToPlayerCommand,  # Move Towards Player
+    11: MoveRelativeToPlayerCommand,  # Move Away From Player
     12: StepOneCommand,               # Step Forwards
     13: StepOneCommand,               # Step Backwards
     14: JumpMoveCommand,
@@ -117,6 +124,7 @@ COMMAND_MAPPING: dict[int, type[RubyBaseCommand]] = {
     25: FaceRelativeToPlayerCommand,  # Face Player
     26: FaceRelativeToPlayerCommand,  # Face Away From Player
     29: ChangeSpeedCommand,
+    30: ChangeFrequencyCommand,
     31: TogglePropertyMoveCommand,    # Move Animation On
     32: TogglePropertyMoveCommand,    # Move Animation Off
     33: TogglePropertyMoveCommand,    # Stop Animation On
@@ -151,10 +159,12 @@ COMMAND_MAPPING: dict[int, type[RubyBaseCommand]] = {
     122: SetVariableCommand,
     123: SetSelfSwitchCommand,
     125: SetMoneyCommand,
+    132: ChangeBattleBgmCommand,
     201: TransferPlayerCommand,
     202: SetEventLocationCommand,
     203: ScrollMapCommand,
     204: ChangeMapSettingsCommand,
+    206: ChangeFogOpacityCommand,
     207: ShowAnimationCommand,
     208: SetTransparencyFlagCommand,
     209: SetMoveRouteCommand,
@@ -164,6 +174,7 @@ COMMAND_MAPPING: dict[int, type[RubyBaseCommand]] = {
     225: ScreenShakeCommand,
     241: PlayBgmCommand,
     242: FadeOutBgmCommand,
+    247: MemoriseBgmCommand,
     249: PlayBgmCommand,  # For "ME"s,
     250: PlaySfxCommand,
     314: RecoverAllCommand,

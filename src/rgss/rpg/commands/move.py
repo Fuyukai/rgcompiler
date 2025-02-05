@@ -457,3 +457,49 @@ class SetBlendingMoveCommand(RubyBaseMoveCommand):
     @override
     def unstructure(self, converter: Converter) -> dict[str, Any]:
         return {"command": "SetBlendingMoveCommand", "blending": self.blending}
+
+
+@attrs.define(kw_only=True)
+@final
+class MoveRelativeToPlayerCommand(RubyBaseMoveCommand):
+    """
+    Moves the actor backwards or forwards relative to the player.
+    """
+
+    away: bool = attrs.field()
+
+    @classmethod
+    @override
+    def from_raw_command(cls, cmd: RawCommand) -> MoveRelativeToPlayerCommand:
+        return cls(away=cmd.code == 11)
+
+    @override
+    def to_raw_command(self) -> RawCommand:
+        return RawCommand(code=11 if self.away else 10, parameters=[], indent=0)
+
+    @override
+    def unstructure(self, converter: Converter) -> dict[str, Any]:
+        return {"command": "MoveRelativeToPlayerCommand", "away": self.away}
+
+
+@attrs.define(kw_only=True)
+@final
+class ChangeFrequencyCommand(RubyBaseMoveCommand):
+    """
+    Changes the frequency of the actor's movement.
+    """
+
+    frequency: int = attrs.field()
+
+    @classmethod
+    @override
+    def from_raw_command(cls, cmd: RawCommand) -> ChangeFrequencyCommand:
+        return cls(frequency=cast(int, cmd.parameters[0]))
+
+    @override
+    def to_raw_command(self) -> RawCommand:
+        return RawCommand(code=30, parameters=[self.frequency], indent=0)
+
+    @override
+    def unstructure(self, converter: Converter) -> dict[str, Any]:
+        return {"command": "ChangeFrequencyCommand", "frequency": self.frequency}

@@ -235,6 +235,39 @@ class PlayBgmCommand(RubyBaseEventCommand):
 
 @attrs.define(kw_only=True)
 @final
+class ChangeBattleBgmCommand(RubyBaseEventCommand):
+    """
+    Changes the battle BGM.
+    """
+
+    audio: RubyAudioFile = attrs.field()
+
+    @classmethod
+    @override
+    def from_raw_command(cls, cmd: RawCommand) -> ChangeBattleBgmCommand:
+        return ChangeBattleBgmCommand(
+            audio=cast(RubyAudioFile, cmd.parameters[0]),
+            indent=cmd.indent,
+        )
+
+    @override
+    def to_raw_command(self) -> RawCommand:
+        return RawCommand(
+            code=132,
+            parameters=[self.audio],
+            indent=self.indent,
+        )
+
+    @override
+    def unstructure(self, converter: Converter) -> dict[str, Any]:
+        return {
+            "command": "ChangeBattleBgmCommand",
+            "audio": converter.unstructure(self.audio),
+        }
+
+
+@attrs.define(kw_only=True)
+@final
 class ShowAnimationCommand(RubyBaseEventCommand):
     """
     An event command that shows an animation.
@@ -340,4 +373,40 @@ class SetTransparencyFlagCommand(RubyBaseEventCommand):
         return {
             "command": "SetTransparencyFlagCommand",
             "flag": self.normal,
+        }
+
+
+@attrs.define(kw_only=True)
+@final
+class ChangeFogOpacityCommand(RubyBaseEventCommand):
+    """
+    Changes the fog's opacity.
+    """
+
+    opacity: int = attrs.field()
+    frames: int = attrs.field()
+
+    @classmethod
+    @override
+    def from_raw_command(cls, cmd: RawCommand) -> ChangeFogOpacityCommand:
+        return ChangeFogOpacityCommand(
+            opacity=cast(int, cmd.parameters[0]),
+            frames=cast(int, cmd.parameters[1]),
+            indent=cmd.indent,
+        )
+
+    @override
+    def to_raw_command(self) -> RawCommand:
+        return RawCommand(
+            code=206,
+            parameters=[self.opacity, self.frames],
+            indent=self.indent,
+        )
+
+    @override
+    def unstructure(self, converter: Converter) -> dict[str, Any]:
+        return {
+            "command": "ChangeFogOpacityCommand",
+            "opacity": self.opacity,
+            "frames": self.frames,
         }
