@@ -168,3 +168,5 @@ rtest/
 *.dat
 *.json
 maps/
+
+tiledtest/

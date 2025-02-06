@@ -21,8 +21,7 @@ class RubyTileset(RubyUserObject):
     #: The internal ID of this tileset.
     id: int = attrs.field()
 
-    # TODO: Work out the difference between this and ``name``?
-    #: The display name of this tileset.
+    #: The name of the graphics file for this tileset.
     tileset_name: str = attrs.field()
 
     # unknown/undocced/unused fields
