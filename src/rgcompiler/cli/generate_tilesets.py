@@ -19,8 +19,18 @@ class TilesetArgs(Tap):
     tileset_name: str | None = None
 
 
-def write_tileset(output_dir: Path, decomp: DecompiledTileset):
-    with (output_dir / decomp.name).with_suffix(".tsx").open(mode="wb") as f:
+def write_tileset(
+    output_dir: Path,
+    decomp: DecompiledTileset,
+    is_subtile: bool = False,
+):
+    if is_subtile:
+        of = output_dir / "subtiles" / decomp.name.replace("/", "_")
+        of.mkdir(parents=True, exist_ok=True)
+    else:
+        of = output_dir / decomp.name.replace("/", "_")
+
+    with of.with_suffix(".tsx").open(mode="wb") as f:
         f.write(
             tostring(decomp.tsx_element, pretty_print=True, xml_declaration=True, encoding="UTF-8")
         )
@@ -31,7 +41,7 @@ def write_tileset(output_dir: Path, decomp: DecompiledTileset):
     shutil.copy(decomp.input_image, output)
 
     for subtile in decomp.subtiles:
-        write_tileset(output_dir, subtile)
+        write_tileset(output_dir, subtile, is_subtile=True)
 
 
 def main() -> int:

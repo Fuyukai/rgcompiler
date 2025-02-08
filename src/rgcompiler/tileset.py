@@ -106,7 +106,10 @@ def _make_subtile_tileset(output_graphics_dir: Path, autotile_path: Path) -> Dec
 
     root = _make_root_element(name, columns=image.width // 32)
     image_el = Element(
-        "image", source=str(output_image_path), width=str(image.width), height=str(image.height)
+        "image",
+        source="../" + str(output_image_path),
+        width=str(image.width),
+        height=str(image.height),
     )
     root.append(image_el)
 
@@ -118,17 +121,19 @@ def _make_subtile_tileset(output_graphics_dir: Path, autotile_path: Path) -> Dec
     if frame_count > 1:
         # OH boy
         #
-        for y_tile in range(4):
-            if y_tile == 0:
+        for y_tile in range(type.value):
+            if type == SubtileType.Regular and y_tile == 0:
                 continue
 
-            for x_tile in range(3):
+            x_range = 3 if type == SubtileType.Regular else 1
+
+            for x_tile in range(x_range):
                 actual_tile_coord = x_tile + (y_tile * tiles_across)
                 tile_el = Element("tile", id=str(actual_tile_coord))
                 animation = Element("animation")
 
                 for frame in range(frame_count):
-                    offset_coord = actual_tile_coord + (3 * frame)
+                    offset_coord = actual_tile_coord + (x_range * frame)
                     frame_el = Element(
                         "frame", tileid=str(offset_coord), duration=str(1200 // frame_count)
                     )
@@ -192,7 +197,7 @@ def decompile_tileset(
 
     image_path = input_graphics_dir / "Tilesets" / tileset.tileset_name
     real_path, image = find_image(image_path)
-    output_image_path = (output_graphics / real_path.stem).with_suffix(".png")
+    output_image_path = (output_graphics / real_path.stem.replace("/", "_")).with_suffix(".png")
 
     width, height = image.size
     assert width == 8 * 32, (
