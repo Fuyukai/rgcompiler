@@ -15,6 +15,7 @@ dependencies = [
     "pytest-xdist[psutil]>=3.6.1",
     "pillow>=11.1.0",
     "typed-argument-parser>=1.10.1",
+    "structlog>=25.1.0",
 ]
 requires-python = ">=3.13"
 readme = "README.rst"
@@ -111,6 +112,7 @@ ignore = [
     # wtf is this?
     "RUF036",
     "SIM108",
+    "W391",
 ]
 
 [tool.ruff.lint.per-file-ignores]

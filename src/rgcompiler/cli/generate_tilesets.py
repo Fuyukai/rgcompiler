@@ -1,14 +1,14 @@
+import shutil
 from pathlib import Path
 from typing import cast
 
-import PIL
-import PIL.Image
 import rich
 import rich.progress
-from lxml.etree import Element, tostring
+from lxml.etree import tostring
 from rich import print
 from tap import Tap
 
+from rgcompiler.tileset import DecompiledTileset, decompile_tileset
 from rgss import read_object_rgxp
 from rgss.rpg.tileset import RubyTileset
 
@@ -16,6 +16,22 @@ from rgss.rpg.tileset import RubyTileset
 class TilesetArgs(Tap):
     game_path: Path  # The path to the game directory.
     output_path: Path = Path.cwd() / "output"
+    tileset_name: str | None = None
+
+
+def write_tileset(output_dir: Path, decomp: DecompiledTileset):
+    with (output_dir / decomp.name).with_suffix(".tsx").open(mode="wb") as f:
+        f.write(
+            tostring(decomp.tsx_element, pretty_print=True, xml_declaration=True, encoding="UTF-8")
+        )
+
+    output = output_dir / decomp.output_image
+    output.parent.mkdir(parents=True, exist_ok=True)
+    print(f"copy: {decomp.input_image} -> {output}")
+    shutil.copy(decomp.input_image, output)
+
+    for subtile in decomp.subtiles:
+        write_tileset(output_dir, subtile)
 
 
 def main() -> int:
@@ -38,60 +54,15 @@ def main() -> int:
         if tileset is None:
             continue
 
+        if args.tileset_name and tileset.name != args.tileset_name:
+            continue
+
         if not tileset.tileset_name:
             print(f"skipping tileset {tileset.id} with empty name (?)")
             continue
 
-        print(f"generating tileset [cyan]{tileset.name}[/cyan]...")
-        root_ts_path = graphics_path / "Tilesets" / tileset.tileset_name
-        find_ts_paths = [root_ts_path.with_suffix(".png"), root_ts_path.with_suffix(".PNG")]
+        ts = decompile_tileset(graphics_path, tileset)
 
-        for image_path in find_ts_paths:
-            try:
-                image = PIL.Image.open(image_path)
-                break
-            except FileNotFoundError:
-                continue
-        else:
-            print(f" ! [red]couldn't load tileset image[/red]: {tileset.tileset_name}")
-            continue
-
-        output_image_name = image_path.with_suffix(".png").name
-        output_image_path = out_tilesets / "graphics" / output_image_name
-
-        assert (image.width / 32) == 8.0, "tileset should be exactly 8 tiles across"
-        tile_count = (image.height / 8) * (image.width / 8)
-        assert tile_count.is_integer(), f"tileset has odd dimensions {(image.height, image.width)}"
-
-        tree = Element("tileset")
-        tree.attrib.update({
-            "version": "1.10",
-            "name": tileset.name,
-            "tilewidth": "32",
-            "tileheight": "32",
-            # default values but let's incl them just to be safe
-            "spacing": "0",
-            "margin": "0",
-            # user-editable, but this is fine as it's always 8 for the genned image
-            "columns": "8",
-        })
-        image_el = Element("image")
-        image_el.attrib.update({
-            "source": str(output_image_path.relative_to(out_tilesets)),
-            "width": str(image.width),
-            "height": str(image.height),
-        })
-        tree.append(image_el)
-
-        output_tileset_path = (out_tilesets / tileset.name.replace("/", "_")).with_suffix(".tsx")
-        output_tileset_path.write_bytes(
-            tostring(tree, pretty_print=True, xml_declaration=True, encoding="UTF-8")
-        )
-        print(f" written tsx file {output_tileset_path}")
-
-        with output_image_path.open(mode="wb") as f:
-            image.save(f, format="png")
-
-        print(f" copied image file {output_image_path}")
+        write_tileset(out_tilesets, ts)
 
     return 0
