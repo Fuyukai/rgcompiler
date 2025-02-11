@@ -58,7 +58,7 @@ exclude_lines = [
 ]
 
 [tool.pyright]
-pythonVersion = "3.12"
+pythonVersion = "3.13"
 include = ["src", "tests"]
 typeCheckingMode = "strict"
 

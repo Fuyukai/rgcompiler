@@ -170,3 +170,6 @@ rtest/
 maps/
 
 tiledtest/
+
+logs/
+oldimg/

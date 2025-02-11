@@ -17,7 +17,7 @@ PASSAGE_DOWN_BLOCKED  = 0b0001
 # fmt: on
 
 
-@attrs.define(kw_only=True, frozen=True)
+@attrs.define(kw_only=True, frozen=True, eq=True)
 class TilesetTileInfo:
     """
     Information about a single tile in a tileset.

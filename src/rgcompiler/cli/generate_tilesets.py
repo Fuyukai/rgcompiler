@@ -1,4 +1,3 @@
-import shutil
 from pathlib import Path
 from typing import cast
 
@@ -8,7 +7,7 @@ from lxml.etree import tostring
 from rich import print
 from tap import Tap
 
-from rgcompiler.tileset import DecompiledTileset, decompile_tileset
+from rgcompiler.tileset import DecompiledTileset, SubtileTileset, decompile_tileset
 from rgss import read_object_rgxp
 from rgss.rpg.tileset import RubyTileset
 
@@ -21,27 +20,29 @@ class TilesetArgs(Tap):
 
 def write_tileset(
     output_dir: Path,
-    decomp: DecompiledTileset,
-    is_subtile: bool = False,
+    decomp: DecompiledTileset | SubtileTileset,
 ):
-    if is_subtile:
-        of = output_dir / "subtiles" / decomp.name.replace("/", "_")
-        of.mkdir(parents=True, exist_ok=True)
-    else:
-        of = output_dir / decomp.name.replace("/", "_")
+    tileset_dir = output_dir
+    if isinstance(decomp, SubtileTileset):
+        tileset_dir = output_dir / "subtiles"
 
-    with of.with_suffix(".tsx").open(mode="wb") as f:
+    output_tsx = tileset_dir / decomp.name.replace("/", "_")
+    output_tsx.parent.mkdir(exist_ok=True, parents=True)
+    with output_tsx.with_suffix(".tsx").open(mode="wb") as f:
         f.write(
             tostring(decomp.tsx_element, pretty_print=True, xml_declaration=True, encoding="UTF-8")
         )
 
-    output = output_dir / decomp.output_image
-    output.parent.mkdir(parents=True, exist_ok=True)
-    print(f"copy: {decomp.input_image} -> {output}")
-    shutil.copy(decomp.input_image, output)
+    output_image_dir = output_dir / "graphics"
+    if isinstance(decomp, SubtileTileset):
+        output_image_dir = output_image_dir / "subtiles"
 
-    for subtile in decomp.subtiles:
-        write_tileset(output_dir, subtile, is_subtile=True)
+    output_image_dir.mkdir(parents=True, exist_ok=True)
+    output_image_file = (output_image_dir / output_tsx.stem).with_suffix(".png")
+    print(f"writing tileset image to {output_image_file}")
+
+    with output_image_file.open(mode="wb") as f:
+        decomp.image.save(f)
 
 
 def main() -> int:
@@ -52,12 +53,13 @@ def main() -> int:
     args = TilesetArgs(underscores_to_dashes=True).parse_args()
 
     tilesets = args.game_path / "Data" / "tilesets.rxdata"
-    graphics_path = args.game_path / "Graphics"
     obb = cast(list[RubyTileset | None], read_object_rgxp(tilesets.read_bytes()))
 
     out = args.output_path
     out_tilesets = out / "tilesets"
     (out_tilesets / "graphics").mkdir(exist_ok=True, parents=True)
+
+    seen_subtiles: dict[str, SubtileTileset] = {}
 
     for tileset in rich.progress.track(obb):
         # for whatever reason, ``tilesets.rxdata`` always has an empty tileset as the first one
@@ -71,8 +73,11 @@ def main() -> int:
             print(f"skipping tileset {tileset.id} with empty name (?)")
             continue
 
-        ts = decompile_tileset(graphics_path, tileset)
+        ts = decompile_tileset(args.game_path, tileset, seen_subtiles=seen_subtiles)
 
         write_tileset(out_tilesets, ts)
+
+    for subtileset in rich.progress.track(seen_subtiles.values(), description="Saving subtiles..."):
+        write_tileset(out_tilesets, subtileset)
 
     return 0
