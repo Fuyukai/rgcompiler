@@ -1,8 +1,10 @@
 # pyright: reportImplicitOverride=false
 
+from typing import cast
+
 import attr
 
-from rhodochrosite.ruby import RubySymbol, RubyUserObject, ruby_name, ruby_skip
+from rhodochrosite.ruby import RubySymbol, RubyUserObject, ruby_converter, ruby_name, ruby_skip
 
 
 def test_finding_normal_ivars() -> None:
@@ -42,3 +44,21 @@ def test_finding_renamed_ivars() -> None:
 
     fields = NormalType(field="abc").find_instance_variables()
     assert fields == [(RubySymbol("@other_field"), "abc")]
+
+
+def test_finding_converted_ivars() -> None:
+    @attr.define
+    class WithConverter(RubyUserObject):
+        field: str = attr.field(
+            converter=lambda it: it[::-1],
+            metadata=ruby_converter(lambda it: str(cast(str, it)[::-1])),
+        )
+
+        @property
+        def ruby_class_name(self) -> RubySymbol:
+            raise NotImplementedError
+
+    f = WithConverter("abcdef")
+    assert f.field == "fedcba"
+    fields = f.find_instance_variables()
+    assert fields == [(RubySymbol("@field"), "abcdef")]

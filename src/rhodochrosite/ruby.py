@@ -27,6 +27,7 @@ type RubyMarshalValue = (
 
 
 type ObjectMakerFunc = Callable[[RubySymbol, dict[RubySymbol, RubyMarshalValue]], RubyUserObject]
+type RubyConverter = Callable[[RubyMarshalValue], RubyMarshalValue]
 
 
 class RubyExtra(TypedDict):
@@ -36,6 +37,7 @@ class RubyExtra(TypedDict):
 
     skip: bool
     ivar_name: NotRequired[str]
+    ruby_converter: NotRequired[RubyConverter]
 
 
 def ruby_skip() -> dict[str, RubyExtra]:
@@ -44,6 +46,10 @@ def ruby_skip() -> dict[str, RubyExtra]:
 
 def ruby_name(name: str) -> dict[str, RubyExtra]:
     return {"ruby": {"skip": False, "ivar_name": name}}
+
+
+def ruby_converter(converter: RubyConverter) -> dict[str, RubyExtra]:
+    return {"ruby": {"skip": False, "ruby_converter": converter}}
 
 
 class RubyTypeCode(bytes, enum.Enum):
@@ -209,6 +215,9 @@ class RubyUserObject(AnyRubyObject, abc.ABC):
         for field in fields:
             extra = field.metadata
             name = field.name
+
+            ruby_converter: RubyConverter = lambda it: it  # noqa: E731
+
             if "ruby" in extra:
                 ruby = cast(RubyExtra, extra["ruby"])
 
@@ -216,12 +225,13 @@ class RubyUserObject(AnyRubyObject, abc.ABC):
                     continue
 
                 name = ruby.get("ivar_name", name)
+                ruby_converter = ruby.get("ruby_converter", ruby_converter)
 
             if not name.startswith("@"):
                 name = "@" + name
 
             sym = RubySymbol(name)
-            ivars.append((sym, getattr(self, field.name)))
+            ivars.append((sym, ruby_converter(getattr(self, field.name))))
 
         return ivars
 
