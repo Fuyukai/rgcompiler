@@ -106,7 +106,7 @@ def decompile_map_layout(
                     else:
                         tile_row = tile_offset // 8
                         tile_column = tile_offset % 8
-                        gid = gid_start + (tile_row + (8 * subtile.frame_count)) + tile_column
+                        gid = gid_start + (tile_row * (8 * subtile.frame_count)) + tile_column
 
                 else:
                     gid_start = ids[-1]
