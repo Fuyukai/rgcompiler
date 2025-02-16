@@ -1,6 +1,8 @@
 from pathlib import Path
 from typing import cast
 
+import rich
+import rich.progress
 from lxml.etree import tostring
 from tap import Tap
 
@@ -43,7 +45,9 @@ def main() -> int:
     seen_subtiles: dict[str, SubtileTileset] = {}
     tilesets: dict[str, DecompiledTileset] = {}
 
-    for map in data_dir.glob("Map**.rxdata"):
+    globbed_maps = [i for i in data_dir.glob("Map**.rxdata") if i.name != "MapInfos.rxdata"]
+
+    for map in rich.progress.track(globbed_maps):
         if map.name == "MapInfos.rxdata":
             continue
 

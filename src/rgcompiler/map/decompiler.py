@@ -86,7 +86,7 @@ def decompile_map_layout(
 
                 # always map tiles in 0..48 to the blank tile GID. in theory, rpg maker should only
                 # emit tiles with tile ID 0, but I'm sure there's some corrupt maps out there that
-                # actually use the first block of subtiles to.
+                # actually use the first block of subtiles too.
                 if rpg_tile_id < 48:
                     gid = 0
 
@@ -95,8 +95,18 @@ def decompile_map_layout(
                     # for tiled tilesets, these are *real* tiles in order to get the animations
                     # showing properly in the editor, so it's not a simple 1<->1 mapping.
 
-                    gid_start = ids[rpg_tile_id // 48]
-                    gid = gid_start + (rpg_tile_id % 48)
+                    subtile_group = (rpg_tile_id // 48) - 1
+                    subtile = tileset.subtiles[subtile_group]
+
+                    gid_start = ids[subtile_group]
+                    tile_offset = rpg_tile_id % 48
+
+                    if subtile.is_single_row:
+                        gid = gid_start + tile_offset
+                    else:
+                        tile_row = tile_offset // 8
+                        tile_column = tile_offset % 8
+                        gid = gid_start + (tile_row + (8 * subtile.frame_count)) + tile_column
 
                 else:
                     gid_start = ids[-1]

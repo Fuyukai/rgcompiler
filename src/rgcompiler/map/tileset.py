@@ -69,7 +69,11 @@ class DecompiledTileset:
 
         for subtile in self.subtiles:
             ids.append(counter)
-            counter += 48 * subtile.frame_count
+
+            if subtile.image.height == 32:
+                counter += subtile.frame_count
+            else:
+                counter += 48 * subtile.frame_count
 
         ids.append(counter)
         return ids
@@ -102,6 +106,10 @@ class SubtileTileset:
 
     #: The processed tileset image that will be saved.
     image: Image = attrs.field()
+
+    @property
+    def is_single_row(self) -> bool:
+        return self.image.height == 32
 
 
 class SubtileType(enum.Enum):
@@ -217,7 +225,10 @@ def _make_subtile_tileset_v2(autotile_path: Path) -> SubtileTileset:
     return SubtileTileset(name=name, tsx_element=root, image=image, frame_count=frames)
 
 
-def _make_fake_subtile() -> SubtileTileset:
+BLANK_IMAGE = new_image("RGBA", size=(2 * OUTPUT_WIDTH * TILE_SIZE, 2 * OUTPUT_HEIGHT * TILE_SIZE))
+
+
+def _make_fake_subtile(counter: int) -> SubtileTileset:
     """
     Makes a fake, empty subtile for filling in blank subtile slots.
     """
@@ -225,15 +236,13 @@ def _make_fake_subtile() -> SubtileTileset:
     # aaaaaAAAA
     # fuck you, rpg maker!
 
-    image = new_image("RGBA", size=(2 * OUTPUT_WIDTH * TILE_SIZE, 2 * OUTPUT_HEIGHT * TILE_SIZE))
-    root = _make_root_element("STUB EMPTY SUBTILE", columns=image.width // 16)
-    image_el = Element("image", source="../graphics/subtiles/STUB EMPTY SUBTILE.png")
+    stub_name = f"STUB EMPTY SUBTILE {counter}"
+
+    root = _make_root_element(stub_name, columns=BLANK_IMAGE.width // 16)
+    image_el = Element("image", source=f"../graphics/subtiles/{stub_name}.png")
     root.append(image_el)
 
-    return SubtileTileset(name="STUB EMPTY SUBTILE", tsx_element=root, frame_count=1, image=image)
-
-
-EMPTY_SUBTILE = _make_fake_subtile()
+    return SubtileTileset(name=stub_name, tsx_element=root, frame_count=1, image=BLANK_IMAGE)
 
 
 def decompile_tileset(
@@ -267,6 +276,7 @@ def decompile_tileset(
     input_graphics_dir = input_project_dir / "Graphics"
     output_graphics_dir = Path("./graphics")
     subtiles: list[SubtileTileset] = []
+    fake_counter = 0
 
     for subtile_name in tileset.autotile_names:
         try:
@@ -279,9 +289,11 @@ def decompile_tileset(
         stlogger = tlogger.bind(type="subtile", subtile_name=subtile_name)
 
         if not subtile_name:
-            tlogger.info("insert fake subtile")
-            subtiles.append(EMPTY_SUBTILE)
-            seen_subtiles[subtile_name] = EMPTY_SUBTILE
+            tlogger.info("insert fake subtile", subtile_counter=fake_counter)
+            empty = _make_fake_subtile(fake_counter)
+            fake_counter += 1
+            subtiles.append(empty)
+            seen_subtiles[empty.name] = empty
             continue
 
         stlogger.info("begin decompilation")
