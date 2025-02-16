@@ -16,6 +16,7 @@ dependencies = [
     "pillow>=11.1.0",
     "typed-argument-parser>=1.10.1",
     "structlog>=25.1.0",
+    "click>=8.1.8",
 ]
 requires-python = ">=3.13"
 readme = "README.rst"

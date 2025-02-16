@@ -20,7 +20,7 @@ TILESETS_REL_PATH = Path("../tilesets")
 SUBTILE_REL_PATH = TILESETS_REL_PATH / "subtiles"
 
 
-logger: structlog.stdlib.BoundLogger = structlog.get_logger(name=__name__)
+glogger: structlog.stdlib.BoundLogger = structlog.get_logger(name=__name__)
 
 
 def decompile_map_layout(
@@ -44,7 +44,20 @@ def decompile_map_layout(
         orientation="orthogonal",
     )
 
-    tlogger = logger.bind(type="tilemap", map_name=map_name)
+    map_props_element = Element("properties")
+    root.append(map_props_element)
+
+    if original_map.bgm.name:
+        map_props_element.append(
+            original_map.bgm.as_tiled_properties("rgss_bgm", autoplay=original_map.autoplay_bgm)
+        )
+
+    if original_map.bgs.name:
+        map_props_element.append(
+            original_map.bgs.as_tiled_properties("rgss_bgs", autoplay=original_map.autoplay_bgs)
+        )
+
+    tlogger = glogger.bind(type="tilemap", map_name=map_name)
 
     ids = tileset.calculate_starting_tile_ids()
     for firstgid, subtiles in zip(ids, tileset.subtiles, strict=False):  # zip_shortest
@@ -61,6 +74,7 @@ def decompile_map_layout(
     main_ts_path = (TILESETS_REL_PATH / tileset.name.replace("/", "_")).with_suffix(".tsx")
     main_ts_element = Element("tileset", firstgid=str(ids[-1]), source=str(main_ts_path))
     root.append(main_ts_element)
+    map_props_element.append(Element("property", name="rgss_restrict_tileset", value=tileset.name))
 
     tlogger.info("begin decompilation")
 
