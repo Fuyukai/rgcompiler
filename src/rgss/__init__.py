@@ -1,6 +1,8 @@
 from __future__ import annotations
 
 from io import BytesIO
+from os import PathLike
+from pathlib import Path
 
 from rgss.rpg import (
     RPG_AUDIOFILE,
@@ -36,7 +38,7 @@ from rhodochrosite.ruby import RubyMarshalValue, make_ruby_attrs_object_fn
 from rhodochrosite.writer import MarshalWriter
 
 
-def add_all_ruby_types(reader: MarshalReader) -> None:  # pragma: no cover
+def add_all_ruby_types(reader: MarshalReader) -> None:
     """
     Adds all ruby types to the marshal reader.
     """
@@ -57,18 +59,21 @@ def add_all_ruby_types(reader: MarshalReader) -> None:  # pragma: no cover
     reader.object_factories[RPG_MOVE_COMMAND] = make_command_from_ivars
 
 
-def make_reader(data: bytes) -> MarshalReader:  # pragma: no cover
+def make_reader(data: bytes) -> MarshalReader:
     reader = MarshalReader(stream=Cursor(wrapped=data), decode_all_strings=True)
     add_all_ruby_types(reader)
     return reader
 
 
-def read_object_rgxp(data: bytes) -> RubyMarshalValue:  # pragma: no cover
+def read_object_rgxp(data: bytes | PathLike[str]) -> RubyMarshalValue:
+    if not isinstance(data, bytes):
+        data = Path(data).read_bytes()
+
     reader = make_reader(data)
     return reader.next_object()
 
 
-def write_object_rgxp(data: RubyMarshalValue) -> bytes:  # pragma: no cover
+def write_object_rgxp(data: RubyMarshalValue) -> bytes:
     buf = BytesIO()
     writer = MarshalWriter(buffer=buf)
     writer.write_object(data)

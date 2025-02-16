@@ -15,7 +15,7 @@ from rgss.rpg.tileset import RubyTileset
 if TYPE_CHECKING:
     from lxml.etree import _Element
 
-from lxml.etree import Element
+from lxml.etree import Element, tostring
 
 TILE_SIZE = 16
 OUTPUT_WIDTH = 8
@@ -56,6 +56,24 @@ class DecompiledTileset:
     #: The subtiles for this tileset. Empty for subtiles themselves.
     subtiles: list[SubtileTileset] = attrs.field(factory=list)
 
+    def calculate_starting_tile_ids(self) -> list[int]:
+        """
+        Calculates the list of starting global tile IDs for a tileset.
+
+        This returns a list of ``[*subtile_starting_id, tileset_starting_id]``.
+        """
+
+        # tile zero is the empty tile, so start the counter at 1.
+        counter = 1
+        ids: list[int] = []
+
+        for subtile in self.subtiles:
+            ids.append(counter)
+            counter += 48 * subtile.frame_count
+
+        ids.append(counter)
+        return ids
+
     @property
     def starting_tile_idx(self) -> int:
         """
@@ -71,8 +89,18 @@ class SubtileTileset:
     A decompressed and unpacked subtile tileset.
     """
 
+    #: The image name for this subtile tileset.
     name: str = attrs.field()
+
+    #: The TSX element used when saving this tileset.
     tsx_element: _Element = attrs.field()
+
+    #: The number of animation frames for this tileset.
+    #:
+    #: This is used for calculating global tile IDs.
+    frame_count: int = attrs.field()
+
+    #: The processed tileset image that will be saved.
     image: Image = attrs.field()
 
 
@@ -95,9 +123,8 @@ def _make_root_element(name: str, *, columns: int = 8):
 
 
 def _decompress_autotile_image(tileset: Image) -> Image:
-    # tileset = tileset.convert("RGBA")
+    tileset = tileset.convert("RGBA")
     parts: list[Image] = []
-    tileset.save("/tmp/rgd/input.png")
 
     for y in range(0, 128, TILE_SIZE):
         for x in range(0, 96, TILE_SIZE):
@@ -187,7 +214,26 @@ def _make_subtile_tileset_v2(autotile_path: Path) -> SubtileTileset:
         tile_el.append(animation)
         root.append(tile_el)
 
-    return SubtileTileset(name=name, tsx_element=root, image=image)
+    return SubtileTileset(name=name, tsx_element=root, image=image, frame_count=frames)
+
+
+def _make_fake_subtile() -> SubtileTileset:
+    """
+    Makes a fake, empty subtile for filling in blank subtile slots.
+    """
+
+    # aaaaaAAAA
+    # fuck you, rpg maker!
+
+    image = new_image("RGBA", size=(2 * OUTPUT_WIDTH * TILE_SIZE, 2 * OUTPUT_HEIGHT * TILE_SIZE))
+    root = _make_root_element("STUB EMPTY SUBTILE", columns=image.width // 16)
+    image_el = Element("image", source="../graphics/subtiles/STUB EMPTY SUBTILE.png")
+    root.append(image_el)
+
+    return SubtileTileset(name="STUB EMPTY SUBTILE", tsx_element=root, frame_count=1, image=image)
+
+
+EMPTY_SUBTILE = _make_fake_subtile()
 
 
 def decompile_tileset(
@@ -197,9 +243,9 @@ def decompile_tileset(
     Decompiles an RPG Maker tileset into a set of Tiled tilesets.
     """
 
-    tlogger = logger.bind(tileset_name=tileset.name, type="tileset")
+    tlogger = logger.bind(tileset_name=tileset.name, type="tileset", phase="decompilation")
 
-    tlogger.info("begin decompilation", type="tileset", tileset_name=tileset.name)
+    tlogger.info("begin", type="tileset", tileset_name=tileset.name)
 
     # rpg maker (XP) maps are really fucking stupid!
     # here's a list of misfeatures:
@@ -223,9 +269,6 @@ def decompile_tileset(
     subtiles: list[SubtileTileset] = []
 
     for subtile_name in tileset.autotile_names:
-        if not subtile_name:
-            continue
-
         try:
             subtiles.append(seen_subtiles[subtile_name])
         except KeyError:
@@ -234,6 +277,13 @@ def decompile_tileset(
             continue
 
         stlogger = tlogger.bind(type="subtile", subtile_name=subtile_name)
+
+        if not subtile_name:
+            tlogger.info("insert fake subtile")
+            subtiles.append(EMPTY_SUBTILE)
+            seen_subtiles[subtile_name] = EMPTY_SUBTILE
+            continue
+
         stlogger.info("begin decompilation")
 
         subtile_path = input_graphics_dir / "Autotiles" / subtile_name
@@ -307,5 +357,38 @@ def decompile_tileset(
         tsx_tile_count=tile_count,
         subtiles=subtiles,
     )
-    tlogger.info("completed decompilation")
+    tlogger.info("end")
     return decomp
+
+
+def write_tileset(
+    output_dir: Path,
+    decomp: DecompiledTileset | SubtileTileset,
+):
+    tlogger = logger.bind(phase="saving")
+
+    tileset_dir = output_dir
+    if isinstance(decomp, SubtileTileset):
+        tileset_dir = output_dir / "subtiles"
+        tlogger = tlogger.bind(type="subtile", subtile_name=decomp.name)
+    else:
+        tlogger = tlogger.bind(type="tileset", tileset_name=decomp.name)
+
+    output_tsx = (tileset_dir / decomp.name.replace("/", "_")).with_suffix(".tsx")
+    output_tsx.parent.mkdir(exist_ok=True, parents=True)
+    with output_tsx.open(mode="wb") as f:
+        tlogger.info("tsx", path=str(output_tsx))
+        f.write(
+            tostring(decomp.tsx_element, pretty_print=True, xml_declaration=True, encoding="UTF-8")
+        )
+
+    output_image_dir = output_dir / "graphics"
+    if isinstance(decomp, SubtileTileset):
+        output_image_dir = output_image_dir / "subtiles"
+
+    output_image_dir.mkdir(parents=True, exist_ok=True)
+    output_image_file = (output_image_dir / output_tsx.stem).with_suffix(".png")
+    tlogger.info("png", path=str(output_image_file))
+
+    with output_image_file.open(mode="wb") as f:
+        decomp.image.save(f)

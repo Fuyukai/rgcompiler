@@ -3,11 +3,10 @@ from typing import cast
 
 import rich
 import rich.progress
-from lxml.etree import tostring
 from rich import print
 from tap import Tap
 
-from rgcompiler.tileset import DecompiledTileset, SubtileTileset, decompile_tileset
+from rgcompiler.map.tileset import SubtileTileset, decompile_tileset, write_tileset
 from rgss import read_object_rgxp
 from rgss.rpg.tileset import RubyTileset
 
@@ -16,33 +15,6 @@ class TilesetArgs(Tap):
     game_path: Path  # The path to the game directory.
     output_path: Path = Path.cwd() / "output"
     tileset_name: str | None = None
-
-
-def write_tileset(
-    output_dir: Path,
-    decomp: DecompiledTileset | SubtileTileset,
-):
-    tileset_dir = output_dir
-    if isinstance(decomp, SubtileTileset):
-        tileset_dir = output_dir / "subtiles"
-
-    output_tsx = tileset_dir / decomp.name.replace("/", "_")
-    output_tsx.parent.mkdir(exist_ok=True, parents=True)
-    with output_tsx.with_suffix(".tsx").open(mode="wb") as f:
-        f.write(
-            tostring(decomp.tsx_element, pretty_print=True, xml_declaration=True, encoding="UTF-8")
-        )
-
-    output_image_dir = output_dir / "graphics"
-    if isinstance(decomp, SubtileTileset):
-        output_image_dir = output_image_dir / "subtiles"
-
-    output_image_dir.mkdir(parents=True, exist_ok=True)
-    output_image_file = (output_image_dir / output_tsx.stem).with_suffix(".png")
-    print(f"writing tileset image to {output_image_file}")
-
-    with output_image_file.open(mode="wb") as f:
-        decomp.image.save(f)
 
 
 def main() -> int:

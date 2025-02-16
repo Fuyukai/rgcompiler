@@ -26,6 +26,7 @@ rgd-ruby-unmarshal = "rgcompiler.cli.dump_json:main"
 rgd-ruby-roundtrip = "rgcompiler.cli.roundtrip:main"
 rgd-verify-maps = "rgcompiler.cli.verify_maps:main"
 rgd-generate-tsx = "rgcompiler.cli.generate_tilesets:main"
+rgd-generate-tmx = "rgcompiler.cli.decompile_maps:main"
 
 [dependency-groups]
 dev = [
