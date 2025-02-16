@@ -102,7 +102,10 @@ def decompile_map_layout(
                     tile_offset = rpg_tile_id % 48
 
                     if subtile.is_single_row:
-                        gid = gid_start + tile_offset
+                        # Oh yeah RPG maker will still do autotile expansion on single tile tall
+                        # images!!
+                        # Because fuck you??
+                        gid = gid_start
                     else:
                         tile_row = tile_offset // 8
                         tile_column = tile_offset % 8
