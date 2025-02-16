@@ -17,17 +17,19 @@ dependencies = [
     "typed-argument-parser>=1.10.1",
     "structlog>=25.1.0",
     "click>=8.1.8",
+    "rich-click>=1.8.5",
 ]
 requires-python = ">=3.13"
 readme = "README.rst"
 license = { text = "AGPL-3.0-or-later" }
 
 [project.scripts]
-rgd-ruby-unmarshal = "rgcompiler.cli.dump_json:main"
-rgd-ruby-roundtrip = "rgcompiler.cli.roundtrip:main"
-rgd-verify-maps = "rgcompiler.cli.verify_maps:main"
-rgd-generate-tsx = "rgcompiler.cli.generate_tilesets:main"
-rgd-generate-tmx = "rgcompiler.cli.decompile_maps:main"
+rgd-ruby-unmarshal = "rgcompiler.debug.dump_json:main"
+rgd-ruby-roundtrip = "rgcompiler.debug.roundtrip:main"
+rgd-verify-maps = "rgcompiler.debug.verify_maps:main"
+rgd-generate-tsx = "rgcompiler.debug.generate_tilesets:main"
+rgd-generate-tmx = "rgcompiler.debug.decompile_maps:main"
+rgc = "rgcompiler.__main__:main"
 
 [dependency-groups]
 dev = [
