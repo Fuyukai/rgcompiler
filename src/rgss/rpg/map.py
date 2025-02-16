@@ -13,6 +13,7 @@ from rhodochrosite.ruby import (
 )
 
 RPG_MAP = atom("RPG::Map")
+RPG_MAP_INFO = atom("RPG::MapInfo")
 
 
 @attrs.define(slots=True)
@@ -69,3 +70,28 @@ class RubyRpgMap(RubyUserObject):
     @override
     def ruby_class_name(self) -> RubySymbol:
         return RPG_MAP
+
+
+@attrs.define(kw_only=True)
+@final
+class RubyMapInfo(RubyUserObject):
+    """
+    Additional "map info" that isn't included in the main Ruby object, for some reason.
+    """
+
+    # unknown, presumably editor data
+    scroll_x: int = attrs.field()
+    scroll_y: int = attrs.field()
+    expanded: bool = attrs.field()
+    order: int = attrs.field()
+
+    #: The human name for this map.
+    name: str = attrs.field()
+
+    #: The parent map of this map. Used for nested maps.
+    parent_id: int = attrs.field()
+
+    @property
+    @override
+    def ruby_class_name(self) -> RubySymbol:
+        return RPG_MAP_INFO
