@@ -6,7 +6,7 @@ import rich.progress
 from lxml.etree import tostring
 from tap import Tap
 
-from rgcompiler.map.decompiler import decompile_map_layout
+from rgcompiler.map.layout import decompile_map_layout
 from rgcompiler.map.tileset import (
     DecompiledTileset,
     SubtileTileset,
