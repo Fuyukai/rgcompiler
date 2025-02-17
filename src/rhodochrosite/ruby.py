@@ -231,7 +231,8 @@ class RubyUserObject(AnyRubyObject, abc.ABC):
                 name = "@" + name
 
             sym = RubySymbol(name)
-            ivars.append((sym, ruby_converter(getattr(self, field.name))))
+            converted = ruby_converter(getattr(self, field.name))
+            ivars.append((sym, converted))
 
         return ivars
 

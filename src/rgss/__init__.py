@@ -24,6 +24,14 @@ from rgss.rpg import (
 from rgss.rpg.commands import make_command_from_ivars
 from rgss.rpg.commands.base import RPG_EVENT_COMMAND, RPG_MOVE_COMMAND
 from rgss.rpg.map import RPG_MAP_INFO, RubyMapInfo
+from rgss.rpg.misc import (
+    RPG_SYSTEM,
+    RPG_SYSTEM_TESTBATTLER,
+    RPG_SYSTEM_WORDS,
+    RubyRpgSystem as RubyRpgSystem,
+    RubyRpgTestBattler,
+    RubyRpgWords,
+)
 from rgss.rpg.moves import RPG_MOVE_ROUTE
 from rgss.types import (
     COLOUR_TYPE,
@@ -59,6 +67,9 @@ def add_all_ruby_types(reader: MarshalReader) -> None:
     reader.object_factories[RPG_MOVE_ROUTE] = make_ruby_attrs_object_fn(RubyMoveRoute)
     reader.object_factories[RPG_MOVE_COMMAND] = make_command_from_ivars
     reader.object_factories[RPG_MAP_INFO] = make_ruby_attrs_object_fn(RubyMapInfo)
+    reader.object_factories[RPG_SYSTEM] = make_ruby_attrs_object_fn(RubyRpgSystem)
+    reader.object_factories[RPG_SYSTEM_WORDS] = make_ruby_attrs_object_fn(RubyRpgWords)
+    reader.object_factories[RPG_SYSTEM_TESTBATTLER] = make_ruby_attrs_object_fn(RubyRpgTestBattler)
 
 
 def make_reader(data: bytes) -> MarshalReader:
