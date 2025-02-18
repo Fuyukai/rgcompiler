@@ -67,6 +67,26 @@ class RubyRpgMap(RubyUserObject):
         assert self.data.column_count == self.height
 
     @property
+    def tiles_per_layer(self) -> int:
+        return self.data.row_count * self.data.column_count
+
+    def get_tile_at(self, layer: int, xpos: int, ypos: int) -> int:
+        """
+        Gets the tile number at the specified position on the specified layer.
+        """
+
+        if layer > self.data.layer_count:
+            raise ValueError(f"{layer} > {self.data.layer_count}")
+
+        # serialised in three layers, bottom to top.
+        offset = int(layer) * self.tiles_per_layer
+        # serialised in rows of tiles, then Y down.
+        offset += self.width * ypos
+        offset += xpos
+
+        return self.data.raw_data[offset]
+
+    @property
     @override
     def ruby_class_name(self) -> RubySymbol:
         return RPG_MAP
