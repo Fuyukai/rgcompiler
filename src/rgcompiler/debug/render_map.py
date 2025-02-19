@@ -72,7 +72,7 @@ def render_single_map(
     map_image = Image.new(mode="RGBA", size=(map.width * 32, map.height * 32))
 
     evt_filter: Callable[[str], bool] = (
-        filter_event_images if filter_event_images else lambda it: True
+        filter_event_images if filter_event_images else lambda it: False
     )
 
     logger = glogger.bind(map_name=name, tileset=tileset.name)
@@ -113,7 +113,7 @@ def render_single_map(
             elogger.info("draw", tile_id=page.graphic.tile_id)
             map_image.paste(evt_image, (event.x * 32, event.y * 32), mask=evt_image)
 
-        elif page.graphic.character_name and evt_filter(page.graphic.character_name):
+        elif page.graphic.character_name and not evt_filter(page.graphic.character_name):
             image_path = project_directory / "Graphics" / "Characters" / page.graphic.character_name
             character_image = find_image(image_path)
             # weird as hell fucking rpg maker format
