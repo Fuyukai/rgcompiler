@@ -59,6 +59,9 @@ class MarshalReader:
     #: of encoding them as instance strings.
     decode_all_strings: bool = attrs.field(default=False)
 
+    #: If True, then dict keys will be unwrapped into strings.
+    unwrap_dict_keys: bool = attrs.field(default=False)
+
     #: A mapping of {ruby type name: (name, instance vars) -> RubyObject} to make user objects.
     object_factories: dict[RubySymbol, ObjectMakerFunc] = attrs.field(factory=dict)
 
@@ -77,6 +80,7 @@ class MarshalReader:
         *,
         unwrap_strings: bool = True,
         decode_all_strings: bool = False,
+        unwrap_dict_keys: bool = False,
     ) -> MarshalReader:
         """
         Creates a new :class:`.MarshalReader` from a series of bytes.
@@ -86,6 +90,7 @@ class MarshalReader:
             stream=Cursor(wrapped=bytes(data)),
             unwrap_strings=unwrap_strings,
             decode_all_strings=decode_all_strings,
+            unwrap_dict_keys=unwrap_dict_keys,
         )
 
     def __attrs_post_init__(self) -> None:
@@ -208,7 +213,13 @@ class MarshalReader:
         """
 
         item_count = self._read_fixnum()
-        return {self.next_object(): self.next_object() for _ in range(item_count)}
+        values = {self.next_object(): self.next_object() for _ in range(item_count)}
+        if self.unwrap_dict_keys:
+            for key in list(values.keys()):
+                if isinstance(key, RubySymbol):
+                    values[key.value] = values.pop(key)
+
+        return values
 
     def _read_symbol_pairs(self) -> list[tuple[RubySymbol, RubyMarshalValue]]:
         """
@@ -424,12 +435,19 @@ class MarshalReader:
 
 
 def read_object(
-    data: bytes | bytearray, *, unwrap_strings: bool = True, decode_all_strings: bool = False
+    data: bytes | bytearray,
+    *,
+    unwrap_strings: bool = True,
+    decode_all_strings: bool = False,
+    unwrap_dict_keys: bool = False,
 ) -> RubyMarshalValue:
     """
     Reads a single ``RubyMarshalValue`` from the provided byte data source.
     """
 
     return MarshalReader.from_bytes(
-        data, unwrap_strings=unwrap_strings, decode_all_strings=decode_all_strings
+        data,
+        unwrap_strings=unwrap_strings,
+        decode_all_strings=decode_all_strings,
+        unwrap_dict_keys=unwrap_dict_keys,
     ).next_object()

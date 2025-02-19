@@ -38,3 +38,7 @@ def test_reading_symlink_after_objlink() -> None:
     abc = atom("abc")
     def_ = atom("def")
     assert read_object(b"\x04\b[\t[\x06:\babc@\x06:\bdef;\x06") == [[abc], [abc], def_, def_]
+
+
+def test_unwrapping_dict_keys() -> None:
+    assert read_object(b"\x04\b{\x06:\x06ai\x06", unwrap_dict_keys=True) == {"a": 1}
