@@ -4,6 +4,7 @@ from pathlib import Path
 from typing import cast
 
 import click
+import structlog
 from PIL import Image
 
 from rgcompiler.map.tileset import DecompiledTileset, SubtileTileset, decompile_tileset
@@ -13,6 +14,8 @@ from rgss.rpg.map import RubyRpgMap
 from rgss.rpg.tileset import RubyTileset
 
 type TsCache = dict[int, Image.Image]
+
+glogger: structlog.stdlib.BoundLogger = structlog.get_logger(__name__)
 
 
 def get_tile_image(
@@ -52,6 +55,7 @@ def render_single_map(
     shared_cache: dict[str, TsCache],
     project_directory: Path,
     tilesets: list[DecompiledTileset],
+    name: str,
     map: RubyRpgMap,
     *,
     filter_event_images: Callable[[str], bool] | None = None,
@@ -59,7 +63,8 @@ def render_single_map(
     """
     Renders an RPG Maker XP map to an image.
 
-    If ``
+    If ``filter_event_images`` is provided, this will remove any images that match the provided
+    function; useful for filtering out light events that otherwise spam the image.
     """
 
     tileset = tilesets[map.tileset_id - 1]
@@ -70,7 +75,11 @@ def render_single_map(
         filter_event_images if filter_event_images else lambda it: True
     )
 
+    logger = glogger.bind(map_name=name, tileset=tileset.name)
+    logger.info("begin", phase="render")
+
     for layer in (0, 1, 2):
+        logger.info("draw", type="tile", layer=layer)
         for xpos in range(map.width):
             for ypos in range(map.height):
                 tile_idx = map.get_tile_at(layer, xpos, ypos)
@@ -93,12 +102,15 @@ def render_single_map(
     for event in map.events.values():
         page = event.pages[0]
 
+        elogger = logger.bind(type="event", name=event.name, x=event.x, y=event.y)
+
         if page.graphic.tile_id:
             evt_image = get_tile_image(shared_cache, tileset, page.graphic.tile_id)
 
             if not evt_image:
                 continue
 
+            elogger.info("draw", tile_id=page.graphic.tile_id)
             map_image.paste(evt_image, (event.x * 32, event.y * 32), mask=evt_image)
 
         elif page.graphic.character_name and evt_filter(page.graphic.character_name):
@@ -141,7 +153,16 @@ def render_single_map(
                 height_right,
             )
 
+            elogger.info(
+                "draw",
+                character_name=page.graphic.character_name,
+                direction=str(page.graphic.direction),
+                pattern=page.graphic.pattern,
+            )
+
             map_image.paste(evt_image, box=box, mask=evt_image)
+
+    logger.info("end", phase="render")
 
     return map_image
 
@@ -169,6 +190,7 @@ def main(input_directory: Path, map_idx: int):
         shared_cache,
         input_directory,
         tilesets,
+        map_file.stem,
         rpg_map,
     )
 
