@@ -8,10 +8,10 @@ import structlog
 from PIL import Image
 
 from rgcompiler.map.tileset import DecompiledTileset, SubtileTileset, decompile_tileset
-from rgcompiler.util import find_image
 from rgss import read_object_rgxp
 from rgss.rpg.map import RubyRpgMap
 from rgss.rpg.tileset import RubyTileset
+from rgss.util import find_image_file_harder
 
 type TsCache = dict[int, Image.Image]
 
@@ -115,7 +115,7 @@ def render_single_map(
 
         elif page.graphic.character_name and not evt_filter(page.graphic.character_name):
             image_path = project_directory / "Graphics" / "Characters" / page.graphic.character_name
-            character_image = find_image(image_path)
+            character_image = find_image_file_harder(image_path)
             # weird as hell fucking rpg maker format
             # don't think direction can ever be a diagonal...
             across_size = character_image.width // 4

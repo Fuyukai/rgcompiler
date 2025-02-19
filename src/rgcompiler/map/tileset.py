@@ -9,8 +9,8 @@ import attrs
 import structlog
 from PIL.Image import Image, new as new_image
 
-from rgcompiler.util import find_image
 from rgss.rpg.tileset import RubyTileset
+from rgss.util import find_image_file_harder
 
 if TYPE_CHECKING:
     from lxml.etree import _Element
@@ -159,7 +159,7 @@ def _make_subtile_tileset_v2(autotile_path: Path) -> SubtileTileset:
     """
 
     name = autotile_path.stem.replace("/", "_")
-    original_image = find_image(autotile_path)
+    original_image = find_image_file_harder(autotile_path)
     output_image_path = (Path("graphics/subtiles") / name).with_suffix(".png")
 
     type: SubtileType
@@ -305,7 +305,7 @@ def decompile_tileset(
         seen_subtiles[subtile_name] = subtile
 
     image_path = input_graphics_dir / "Tilesets" / tileset.tileset_name
-    image = find_image(image_path)
+    image = find_image_file_harder(image_path)
     output_image_path = (output_graphics_dir / tileset.name.replace("/", "_")).with_suffix(".png")
 
     width, height = image.size
