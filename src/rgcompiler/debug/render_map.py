@@ -9,6 +9,7 @@ from PIL import Image
 
 from rgcompiler.map.tileset import DecompiledTileset, SubtileTileset, decompile_tileset
 from rgss import read_object_rgxp
+from rgss.rpg.event import RubyRpgEvent
 from rgss.rpg.map import RubyRpgMap
 from rgss.rpg.tileset import RubyTileset
 from rgss.util import find_image_file_harder
@@ -78,37 +79,40 @@ def render_single_map(
     logger = glogger.bind(map_name=name, tileset=tileset.name)
     logger.info("begin", phase="render")
 
-    for layer in (0, 1, 2):
-        logger.info("draw", type="tile", layer=layer)
-        for xpos in range(map.width):
-            for ypos in range(map.height):
-                tile_idx = map.get_tile_at(layer, xpos, ypos)
-                tile_image = get_tile_image(shared_cache, tileset, tile_idx)
+    # order events by y coordinate so that layer 3 tiles from the next layer draw over them.
 
-                if tile_image is None:
-                    continue
-
-                pasted_x = xpos * 32
-                pasted_y = ypos * 32
-
-                # PIL my behated
-                # use the tile image as the mask to correctly blend alpha for higher layers
-
-                mask = tile_image if tile_image.mode == "RGBA" else None  # what the hell, PIL?
-                map_image.paste(
-                    tile_image, (pasted_x, pasted_y, pasted_x + 32, pasted_y + 32), mask
-                )
-
+    events_by_y_coord: dict[int, list[RubyRpgEvent]] = defaultdict(list)
     for event in map.events.values():
-        page = event.pages[0]
+        events_by_y_coord[event.y].append(event)
 
+    for k, v in list(events_by_y_coord.items()):
+        events_by_y_coord[k] = sorted(v, key=lambda it: it.x)
+
+    def draw_tile(layer: int, xpos: int, ypos: int):
+        tile_idx = map.get_tile_at(layer, xpos, ypos)
+        tile_image = get_tile_image(shared_cache, tileset, tile_idx)
+
+        if tile_image is None:
+            return
+
+        pasted_x = xpos * 32
+        pasted_y = ypos * 32
+
+        # PIL my behated
+        # use the tile image as the mask to correctly blend alpha for higher layers
+
+        mask = tile_image if tile_image.mode == "RGBA" else None  # what the hell, PIL?
+        map_image.paste(tile_image, (pasted_x, pasted_y, pasted_x + 32, pasted_y + 32), mask)
+
+    def draw_event(event: RubyRpgEvent):
+        page = event.pages[0]
         elogger = logger.bind(type="event", name=event.name, x=event.x, y=event.y)
 
         if page.graphic.tile_id:
             evt_image = get_tile_image(shared_cache, tileset, page.graphic.tile_id)
 
             if not evt_image:
-                continue
+                return
 
             elogger.info("draw", tile_id=page.graphic.tile_id)
             map_image.paste(evt_image, (event.x * 32, event.y * 32), mask=evt_image)
@@ -161,6 +165,27 @@ def render_single_map(
             )
 
             map_image.paste(evt_image, box=box, mask=evt_image)
+
+    for layer in (0, 1):
+        logger.info("draw", type="tile", layer=layer)
+        for xpos in range(map.width):
+            for ypos in range(map.height):
+                draw_tile(layer, xpos, ypos)
+
+    logger.info("draw", type="tile", layer=3)
+    # draw layer 3 events for a Y range, then the layer 3 tile
+    for ypos in range(map.height):
+        events = events_by_y_coord[ypos]
+        events_counter = 0
+        for xpos in range(map.width):
+            # advance forwards iterator until the X pos matches the current one
+            if events_counter < len(events):
+                next_event = events[events_counter]
+                if next_event.x == xpos:
+                    events_counter += 1
+                    draw_event(next_event)
+
+            draw_tile(2, xpos, ypos)
 
     logger.info("end", phase="render")
 
