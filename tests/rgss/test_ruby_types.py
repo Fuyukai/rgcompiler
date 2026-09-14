@@ -37,5 +37,5 @@ def test_rgss_color_writing() -> None:
     colour = RgssColour(red=0.39, blue=0.25, green=0.416, alpha=0.77)
     assert (
         write_object_rgxp(colour)
-        == b"\x04\bu:\nColor%\xf6(\\\x8f\xc2\xf5\xd8?\x00\x00\x00\x00\x00\x00\xd0?9\xb4\xc8v\xbe\x9f\xda?\xa4p=\n\xd7\xa3\xe8?"  # noqa: E501
+        == b"\x04\bu:\nColor%\xf6(\\\x8f\xc2\xf5\xd8?\x00\x00\x00\x00\x00\x00\xd0?9\xb4\xc8v\xbe\x9f\xda?\xa4p=\n\xd7\xa3\xe8?"  # ruff: ignore[line-too-long]
     )

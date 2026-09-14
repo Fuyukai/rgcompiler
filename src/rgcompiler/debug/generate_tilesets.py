@@ -1,7 +1,6 @@
 from pathlib import Path
 from typing import cast
 
-import rich
 import rich.progress
 from rich import print
 from tap import Tap
