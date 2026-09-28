@@ -216,7 +216,7 @@ class RubyUserObject(AnyRubyObject, abc.ABC):
             extra = field.metadata
             name = field.name
 
-            ruby_converter: RubyConverter = lambda it: it  # noqa: E731
+            ruby_converter: RubyConverter = lambda it: it  # ruff: ignore[lambda-assignment]
 
             if "ruby" in extra:
                 ruby = cast(RubyExtra, extra["ruby"])
