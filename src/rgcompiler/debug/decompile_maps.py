@@ -1,7 +1,6 @@
 from pathlib import Path
 from typing import cast
 
-import rich
 import rich.progress
 from lxml.etree import tostring
 from tap import Tap
