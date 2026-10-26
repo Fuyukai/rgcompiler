@@ -1,4 +1,3 @@
-import importlib
 import importlib.metadata
 from pathlib import Path
 
