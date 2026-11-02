@@ -171,7 +171,7 @@ class MarshalWriter:
             self.buffer.write(RubyTypeCode.StaticTrue)
             return
 
-        elif object is False:  # noqa: RET505
+        elif object is False:  # ruff: ignore[superfluous-else-return]
             self.buffer.write(RubyTypeCode.StaticFalse)
             return
 
