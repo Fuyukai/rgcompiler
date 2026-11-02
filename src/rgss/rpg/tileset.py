@@ -1,4 +1,4 @@
-# ruff: noqa: E221
+# ruff: file-ignore[multiple-spaces-before-operator]
 
 from typing import final, override
 
